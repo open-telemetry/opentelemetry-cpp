@@ -55,7 +55,7 @@ public:
     return exporter_ != nullptr && exporter_->RecordableEnforcesLogRecordLimits();
   }
 
-  bool IsShutdown() const noexcept;
+  bool IsShutdown() const;
 
 private:
   // The configured exporter

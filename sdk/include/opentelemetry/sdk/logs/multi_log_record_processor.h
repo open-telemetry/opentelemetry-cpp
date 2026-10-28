@@ -72,8 +72,7 @@ protected:
    * @param timeout that the forceflush is required to finish within.
    * @return a result code indicating whether it succeeded, failed or timed out
    */
-  bool InternalForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool InternalForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   /**
    * Shuts down the processor and does any cleanup required.
@@ -82,8 +81,7 @@ protected:
    * returning failure.
    * @return true if the shutdown succeeded, false otherwise
    */
-  bool InternalShutdown(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool InternalShutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   bool EnabledImplementation(
       const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,

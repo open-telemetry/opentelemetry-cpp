@@ -27,10 +27,10 @@ public:
   virtual ~IdGenerator() = default;
 
   /** Returns a SpanId represented by opaque 128-bit trace identifier */
-  virtual opentelemetry::trace::SpanId GenerateSpanId() noexcept = 0;
+  virtual opentelemetry::trace::SpanId GenerateSpanId() = 0;
 
   /** Returns a TraceId represented by opaque 64-bit trace identifier */
-  virtual opentelemetry::trace::TraceId GenerateTraceId() noexcept = 0;
+  virtual opentelemetry::trace::TraceId GenerateTraceId() = 0;
 
   bool IsRandom() const { return is_random_; }
 

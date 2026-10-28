@@ -191,20 +191,20 @@ void MeterProvider::RemoveMeter(nostd::string_view name,
 }
 #endif
 
-const resource::Resource &MeterProvider::GetResource() const noexcept
+const resource::Resource &MeterProvider::GetResource() const
 {
   return context_->GetResource();
 }
 
 void MeterProvider::AddMetricReader(std::shared_ptr<MetricReader> reader,
-                                    std::unique_ptr<MetricFilter> metric_filter) noexcept
+                                    std::unique_ptr<MetricFilter> metric_filter)
 {
   context_->AddMetricReader(std::move(reader), std::move(metric_filter));
 }
 
 void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
                             std::unique_ptr<MeterSelector> meter_selector,
-                            std::unique_ptr<View> view) noexcept
+                            std::unique_ptr<View> view)
 {
   context_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 }
@@ -236,7 +236,7 @@ void MeterProvider::UpdateMeterConfigurator(
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type) noexcept
+void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type)
 {
   context_->SetExemplarFilter(exemplar_filter_type);
 }
@@ -246,7 +246,7 @@ void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filte
 /**
  * Shutdown the meter provider.
  */
-bool MeterProvider::Shutdown(std::chrono::microseconds timeout) noexcept
+bool MeterProvider::Shutdown(std::chrono::microseconds timeout)
 {
   // Shutdown only once
   if (shutdown_latch_.test_and_set(std::memory_order_acquire))
@@ -259,7 +259,7 @@ bool MeterProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 /**
  * Force flush the meter provider.
  */
-bool MeterProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool MeterProvider::ForceFlush(std::chrono::microseconds timeout)
 {
   return context_->ForceFlush(timeout);
 }

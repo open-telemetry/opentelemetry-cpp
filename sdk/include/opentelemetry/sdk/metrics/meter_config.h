@@ -19,13 +19,13 @@ namespace metrics
 class OPENTELEMETRY_EXPORT MeterConfig
 {
 public:
-  bool operator==(const MeterConfig &other) const noexcept;
+  bool operator==(const MeterConfig &other) const;
 
   /**
    * Returns if the Meter is enabled or disabled. Meters are enabled by default.
    * @return a boolean indicating if the Meter is enabled. Defaults to true.
    */
-  bool IsEnabled() const noexcept;
+  bool IsEnabled() const;
 
   /**
    * Returns a MeterConfig that represents a disabled Meter. A disabled meter behaves like a

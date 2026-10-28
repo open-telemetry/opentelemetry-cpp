@@ -22,37 +22,36 @@ template <class T>
 class AtomicUniquePtr
 {
 public:
-  AtomicUniquePtr() noexcept {}
+  AtomicUniquePtr() {}
   AtomicUniquePtr(const AtomicUniquePtr &)            = delete;
   AtomicUniquePtr(AtomicUniquePtr &&)                 = delete;
   AtomicUniquePtr &operator=(const AtomicUniquePtr &) = delete;
   AtomicUniquePtr &operator=(AtomicUniquePtr &&)      = delete;
 
-  explicit AtomicUniquePtr(std::unique_ptr<T> &&other) noexcept : ptr_(std::move(other).release())
-  {}
+  explicit AtomicUniquePtr(std::unique_ptr<T> &&other) : ptr_(std::move(other).release()) {}
 
-  ~AtomicUniquePtr() noexcept { Reset(); }
+  ~AtomicUniquePtr() { Reset(); }
 
-  T &operator*() const noexcept { return *Get(); }
+  T &operator*() const { return *Get(); }
 
-  T *operator->() const noexcept { return Get(); }
+  T *operator->() const { return Get(); }
 
   /**
    * @return the underly pointer managed.
    */
-  T *Get() const noexcept { return ptr_; }
+  T *Get() const { return ptr_; }
 
   /**
    * @return true if the pointer is null
    */
-  bool IsNull() const noexcept { return ptr_.load() == nullptr; }
+  bool IsNull() const { return ptr_.load() == nullptr; }
 
   /**
    * Atomically swap the pointer only if it's null.
    * @param owner the pointer to swap with
    * @return true if the swap was successful
    */
-  bool SwapIfNull(std::unique_ptr<T> &owner) noexcept
+  bool SwapIfNull(std::unique_ptr<T> &owner)
   {
     auto ptr            = owner.get();
     T *expected         = nullptr;
@@ -69,13 +68,13 @@ public:
    * Atomically swap the pointer with another.
    * @param other The pointer to swap with
    */
-  void Swap(std::unique_ptr<T> &other) noexcept { other.reset(ptr_.exchange(other.release())); }
+  void Swap(std::unique_ptr<T> &other) { other.reset(ptr_.exchange(other.release())); }
 
   /**
    * Set the pointer to a new value and delete the current value if non-null.
    * @param ptr the new pointer value to set
    */
-  void Reset(T *ptr = nullptr) noexcept
+  void Reset(T *ptr = nullptr)
   {
     ptr = ptr_.exchange(ptr);
     if (ptr != nullptr)

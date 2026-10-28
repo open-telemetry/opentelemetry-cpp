@@ -45,19 +45,16 @@ public:
 
   virtual ~View() = default;
 
-  virtual std::string GetName() const noexcept { return name_; }
+  virtual std::string GetName() const { return name_; }
 
-  virtual std::string GetDescription() const noexcept { return description_; }
+  virtual std::string GetDescription() const { return description_; }
 
-  virtual AggregationType GetAggregationType() const noexcept { return aggregation_type_; }
+  virtual AggregationType GetAggregationType() const { return aggregation_type_; }
 
-  virtual AggregationConfig *GetAggregationConfig() const noexcept
-  {
-    return aggregation_config_.get();
-  }
+  virtual AggregationConfig *GetAggregationConfig() const { return aggregation_config_.get(); }
 
   virtual std::shared_ptr<const opentelemetry::sdk::metrics::AttributesProcessor>
-  GetAttributesProcessor() const noexcept
+  GetAttributesProcessor() const
   {
     return attributes_processor_;
   }

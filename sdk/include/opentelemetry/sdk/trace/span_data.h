@@ -51,26 +51,26 @@ public:
    * Get the name for this event
    * @return the name for this event
    */
-  std::string GetName() const noexcept { return name_; }
+  std::string GetName() const { return name_; }
 
   /**
    * Get the timestamp for this event
    * @return the timestamp for this event
    */
-  opentelemetry::common::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
+  opentelemetry::common::SystemTimestamp GetTimestamp() const { return timestamp_; }
 
   /**
    * Get the attributes for this event
    * @return the attributes for this event
    */
   const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
-  GetAttributes() const noexcept;
+  GetAttributes() const;
 
   /**
    * Get the number of attributes dropped due to the per-event attribute count limit.
    * @return the number of attributes dropped
    */
-  std::uint32_t GetDroppedAttributesCount() const noexcept { return dropped_attributes_count_; }
+  std::uint32_t GetDroppedAttributesCount() const { return dropped_attributes_count_; }
 
 private:
   std::string name_;
@@ -96,20 +96,20 @@ public:
    * @return the attributes for this link
    */
   const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
-  GetAttributes() const noexcept;
+  GetAttributes() const;
 
   /**
    * Get the span context for this link
    * @return the span context for this link
    */
-  const opentelemetry::trace::SpanContext &GetSpanContext() const noexcept { return span_context_; }
+  const opentelemetry::trace::SpanContext &GetSpanContext() const { return span_context_; }
 
   /**
    * Get the number of attributes dropped due to the per-link
    * attribute count limit.
    * @return the number of attributes dropped
    */
-  std::uint32_t GetDroppedAttributesCount() const noexcept { return dropped_attributes_count_; }
+  std::uint32_t GetDroppedAttributesCount() const { return dropped_attributes_count_; }
 
 private:
   opentelemetry::trace::SpanContext span_context_;
@@ -128,70 +128,70 @@ public:
    * Get the trace id for this span
    * @return the trace id for this span
    */
-  opentelemetry::trace::TraceId GetTraceId() const noexcept { return span_context_.trace_id(); }
+  opentelemetry::trace::TraceId GetTraceId() const { return span_context_.trace_id(); }
 
   /**
    * Get the span id for this span
    * @return the span id for this span
    */
-  opentelemetry::trace::SpanId GetSpanId() const noexcept { return span_context_.span_id(); }
+  opentelemetry::trace::SpanId GetSpanId() const { return span_context_.span_id(); }
 
   /**
    * Get the span context for this span
    * @return the span context for this span
    */
-  const opentelemetry::trace::SpanContext &GetSpanContext() const noexcept { return span_context_; }
+  const opentelemetry::trace::SpanContext &GetSpanContext() const { return span_context_; }
 
   /**
    * Get the parent span id for this span
    * @return the span id for this span's parent
    */
-  opentelemetry::trace::SpanId GetParentSpanId() const noexcept { return parent_span_id_; }
+  opentelemetry::trace::SpanId GetParentSpanId() const { return parent_span_id_; }
 
   /**
    * Get the name for this span
    * @return the name for this span
    */
-  opentelemetry::nostd::string_view GetName() const noexcept { return name_; }
+  opentelemetry::nostd::string_view GetName() const { return name_; }
 
   /**
    * Get the trace flags for this span
    * @return the trace flags for this span
    */
-  opentelemetry::trace::TraceFlags GetFlags() const noexcept { return flags_; }
+  opentelemetry::trace::TraceFlags GetFlags() const { return flags_; }
 
   /**
    * Get the kind of this span
    * @return the kind of this span
    */
-  opentelemetry::trace::SpanKind GetSpanKind() const noexcept { return span_kind_; }
+  opentelemetry::trace::SpanKind GetSpanKind() const { return span_kind_; }
 
   /**
    * Get the status for this span
    * @return the status for this span
    */
-  opentelemetry::trace::StatusCode GetStatus() const noexcept { return status_code_; }
+  opentelemetry::trace::StatusCode GetStatus() const { return status_code_; }
 
   /**
    * Get the status description for this span
    * @return the description of the status of this span
    */
-  opentelemetry::nostd::string_view GetDescription() const noexcept { return status_desc_; }
+  opentelemetry::nostd::string_view GetDescription() const { return status_desc_; }
 
   /**
    * Get the attributes associated with the resource
    * @returns the attributes associated with the resource configured for TracerProvider
    */
-  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
+  const opentelemetry::sdk::resource::Resource &GetResource() const;
 
   /**
    * Get the attributes associated with the resource
    * @returns the attributes associated with the resource configured for TracerProvider
    */
-  const opentelemetry::sdk::trace::InstrumentationScope &GetInstrumentationScope() const noexcept;
+  const opentelemetry::sdk::trace::InstrumentationScope &GetInstrumentationScope() const;
 
   OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
-  const opentelemetry::sdk::trace::InstrumentationScope &GetInstrumentationLibrary() const noexcept
+  const opentelemetry::sdk::trace::InstrumentationScope &GetInstrumentationLibrary() const
   {
     return GetInstrumentationScope();
   }
@@ -200,32 +200,32 @@ public:
    * Get the start time for this span
    * @return the start time for this span
    */
-  opentelemetry::common::SystemTimestamp GetStartTime() const noexcept { return start_time_; }
+  opentelemetry::common::SystemTimestamp GetStartTime() const { return start_time_; }
 
   /**
    * Get the duration for this span
    * @return the duration for this span
    */
-  std::chrono::nanoseconds GetDuration() const noexcept { return duration_; }
+  std::chrono::nanoseconds GetDuration() const { return duration_; }
 
   /**
    * Get the attributes for this span
    * @return the attributes for this span
    */
   const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
-  GetAttributes() const noexcept;
+  GetAttributes() const;
 
   /**
    * Get the events associated with this span
    * @return the events associated with this span
    */
-  const std::vector<SpanDataEvent> &GetEvents() const noexcept { return events_; }
+  const std::vector<SpanDataEvent> &GetEvents() const { return events_; }
 
   /**
    * Get the links associated with this span
    * @return the links associated with this span
    */
-  const std::vector<SpanDataLink> &GetLinks() const noexcept { return links_; }
+  const std::vector<SpanDataLink> &GetLinks() const { return links_; }
 
   void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                    opentelemetry::trace::SpanId parent_span_id) noexcept override;
@@ -262,11 +262,11 @@ public:
 
   void SetInstrumentationScope(const InstrumentationScope &instrumentation_scope) noexcept override;
 
-  std::uint32_t GetDroppedAttributesCount() const noexcept { return dropped_attributes_count_; }
+  std::uint32_t GetDroppedAttributesCount() const { return dropped_attributes_count_; }
 
-  std::uint32_t GetDroppedEventsCount() const noexcept { return dropped_events_count_; }
+  std::uint32_t GetDroppedEventsCount() const { return dropped_events_count_; }
 
-  std::uint32_t GetDroppedLinksCount() const noexcept { return dropped_links_count_; }
+  std::uint32_t GetDroppedLinksCount() const { return dropped_links_count_; }
 
 private:
   opentelemetry::trace::SpanContext span_context_{false, false};

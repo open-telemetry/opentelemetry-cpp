@@ -23,7 +23,7 @@ namespace logs
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 EventLogger::EventLogger(
     opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
-    opentelemetry::nostd::string_view event_domain) noexcept
+    opentelemetry::nostd::string_view event_domain)
     : delegate_logger_(std::move(delegate_logger)), event_domain_(event_domain)
 {}
 

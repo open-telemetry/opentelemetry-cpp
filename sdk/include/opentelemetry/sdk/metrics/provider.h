@@ -24,8 +24,7 @@ public:
   /**
    * Changes the singleton MeterProvider.
    */
-  static void SetMeterProvider(
-      const nostd::shared_ptr<opentelemetry::metrics::MeterProvider> &mp) noexcept;
+  static void SetMeterProvider(const nostd::shared_ptr<opentelemetry::metrics::MeterProvider> &mp);
 };
 
 }  // namespace metrics

@@ -456,8 +456,7 @@ Meter::CreateDoubleObservableUpDownCounter(opentelemetry::nostd::string_view nam
       new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
-const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentationScope()
-    const noexcept
+const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentationScope() const
 {
   return scope_.get();
 }
@@ -642,7 +641,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
 
 /** collect metrics across all the meters **/
 std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
-                                       opentelemetry::common::SystemTimestamp collect_ts) noexcept
+                                       opentelemetry::common::SystemTimestamp collect_ts)
 {
   // A disabled meter still exports what its sync instruments recorded before it was disabled.
   // Async callbacks are skipped, and so are async storages, which would otherwise re-export

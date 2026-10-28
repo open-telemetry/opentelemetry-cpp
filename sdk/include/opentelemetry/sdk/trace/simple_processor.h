@@ -38,7 +38,7 @@ public:
    * Initialize a simple span processor.
    * @param exporter the exporter used by the span processor
    */
-  explicit SimpleSpanProcessor(std::unique_ptr<SpanExporter> &&exporter) noexcept
+  explicit SimpleSpanProcessor(std::unique_ptr<SpanExporter> &&exporter)
       : exporter_(std::move(exporter))
   {}
 
@@ -88,8 +88,7 @@ public:
   ~SimpleSpanProcessor() override { InternalShutdown(); }
 
 protected:
-  bool InternalShutdown(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept
+  bool InternalShutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)())
   {
     // We only call shutdown ONCE.
     if (exporter_ != nullptr && !shutdown_latch_.test_and_set(std::memory_order_acquire))

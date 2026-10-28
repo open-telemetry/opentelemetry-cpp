@@ -69,13 +69,13 @@ public:
    *
    * Note: This method is not thread safe.
    */
-  void AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
+  void AddProcessor(std::unique_ptr<SpanProcessor> processor);
 
   /**
    * Obtain the sampler associated with this tracer.
    * @return The sampler for this tracer.
    */
-  Sampler &GetSampler() const noexcept;
+  Sampler &GetSampler() const;
 
   /**
    * Obtain the configured (composite) processor.
@@ -83,32 +83,31 @@ public:
    * Note: When more than one processor is active, this will
    * return an "aggregate" processor
    */
-  SpanProcessor &GetProcessor() const noexcept;
+  SpanProcessor &GetProcessor() const;
 
   /**
    * Obtain the resource associated with this tracer context.
    * @return The resource for this tracer context.
    */
-  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
+  const opentelemetry::sdk::resource::Resource &GetResource() const;
 
   /**
    * Obtain the ScopeConfigurator with this tracer context.
    * @return The ScopeConfigurator for this tracer context.
    */
-  const instrumentationscope::ScopeConfigurator<TracerConfig> &GetTracerConfigurator()
-      const noexcept;
+  const instrumentationscope::ScopeConfigurator<TracerConfig> &GetTracerConfigurator() const;
 
   /**
    * Obtain the Id Generator associated with this tracer context.
    * @return The ID Generator for this tracer context.
    */
-  opentelemetry::sdk::trace::IdGenerator &GetIdGenerator() const noexcept;
+  opentelemetry::sdk::trace::IdGenerator &GetIdGenerator() const;
 
   /**
    * Obtain the SpanLimits associated with this tracer context.
    * @return The SpanLimits for this tracer context.
    */
-  const SpanLimits &GetSpanLimits() const noexcept;
+  const SpanLimits &GetSpanLimits() const;
 
   /**
    * Replace the TracerConfigurator for this context.
@@ -116,19 +115,19 @@ public:
    * Note: This method is not thread safe.
    * @param tracer_configurator The new configurator.
    */
-  void SetTracerConfigurator(std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
-                                 tracer_configurator) noexcept;
+  void SetTracerConfigurator(
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator);
 
   /**
    * Force all active SpanProcessors to flush any buffered spans
    * within the given timeout.
    */
-  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   /**
    * Shutdown the span processor associated with this tracer provider.
    */
-  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
 private:
   //  order of declaration is important here - resource object should be destroyed after processor.

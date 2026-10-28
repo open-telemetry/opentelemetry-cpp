@@ -64,11 +64,11 @@ public:
 
   /** Returns the associated instrumentation scope */
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationScope()
-      const noexcept;
+      const;
 
   OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationLibrary()
-      const noexcept
+      const
   {
     return GetInstrumentationScope();
   }
@@ -101,7 +101,7 @@ private:
    * LoggerProvider::UpdateLoggerConfigurator when the provider-level
    * LoggerConfigurator is replaced at runtime.
    */
-  void UpdateLoggerConfig(LoggerConfig config) noexcept;
+  void UpdateLoggerConfig(LoggerConfig config);
 
   // The name of this logger
   std::string logger_name_;

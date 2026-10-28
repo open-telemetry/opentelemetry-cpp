@@ -48,12 +48,12 @@ public:
   /** Offers a long measurement to be sampled. */
   virtual void OfferMeasurement(int64_t value,
                                 const MetricAttributes &attributes,
-                                const opentelemetry::context::Context &context) noexcept = 0;
+                                const opentelemetry::context::Context &context) = 0;
 
   /** Offers a double measurement to be sampled. */
   virtual void OfferMeasurement(double value,
                                 const MetricAttributes &attributes,
-                                const opentelemetry::context::Context &context) noexcept = 0;
+                                const opentelemetry::context::Context &context) = 0;
 
   /**
    * Builds vector of Exemplars for exporting from the current reservoir.
@@ -66,7 +66,7 @@ public:
    *     filter out pointAttributes from the original recorded attributes.
    */
   virtual std::vector<std::shared_ptr<ExemplarData>> CollectAndReset(
-      const MetricAttributes &pointAttributes) noexcept = 0;
+      const MetricAttributes &pointAttributes) = 0;
 
   static nostd::shared_ptr<ExemplarReservoir> GetSimpleFixedSizeExemplarReservoir(
       size_t size,

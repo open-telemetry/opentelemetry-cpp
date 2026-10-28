@@ -48,9 +48,9 @@ public:
   // @returns integer with individual bits set if they are to be filtered.
 
   virtual MetricAttributes process(
-      const opentelemetry::common::KeyValueIterable &attributes) const noexcept = 0;
+      const opentelemetry::common::KeyValueIterable &attributes) const = 0;
 
-  virtual bool isPresent(nostd::string_view key) const noexcept = 0;
+  virtual bool isPresent(nostd::string_view key) const = 0;
 
   virtual ~AttributesProcessor() = default;
 };
@@ -63,14 +63,13 @@ public:
 class DefaultAttributesProcessor : public AttributesProcessor
 {
 public:
-  MetricAttributes process(
-      const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
+  MetricAttributes process(const opentelemetry::common::KeyValueIterable &attributes) const override
   {
     MetricAttributes result(attributes);
     return result;
   }
 
-  bool isPresent(nostd::string_view /*key*/) const noexcept override { return true; }
+  bool isPresent(nostd::string_view /*key*/) const override { return true; }
 };
 
 /**
@@ -89,12 +88,11 @@ public:
       : allowed_attribute_keys_(allowed_attribute_keys)
   {}
 
-  MetricAttributes process(
-      const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
+  MetricAttributes process(const opentelemetry::common::KeyValueIterable &attributes) const override
   {
     MetricAttributes result;
     attributes.ForEachKeyValue(
-        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) {
           if (opentelemetry::sdk::common::find_heterogeneous(allowed_attribute_keys_, key) !=
               allowed_attribute_keys_.end())
           {
@@ -108,7 +106,7 @@ public:
     return result;
   }
 
-  bool isPresent(nostd::string_view key) const noexcept override
+  bool isPresent(nostd::string_view key) const override
   {
     return (opentelemetry::sdk::common::find_heterogeneous(allowed_attribute_keys_, key) !=
             allowed_attribute_keys_.end());
@@ -134,12 +132,11 @@ public:
       : exclude_list_(exclude_list)
   {}
 
-  MetricAttributes process(
-      const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
+  MetricAttributes process(const opentelemetry::common::KeyValueIterable &attributes) const override
   {
     MetricAttributes result;
     attributes.ForEachKeyValue([&](nostd::string_view key,
-                                   opentelemetry::common::AttributeValue value) noexcept {
+                                   opentelemetry::common::AttributeValue value) {
       if (opentelemetry::sdk::common::find_heterogeneous(exclude_list_, key) == exclude_list_.end())
       {
         result.SetAttribute(key, value);
@@ -152,7 +149,7 @@ public:
     return result;
   }
 
-  bool isPresent(nostd::string_view key) const noexcept override
+  bool isPresent(nostd::string_view key) const override
   {
     return (opentelemetry::sdk::common::find_heterogeneous(exclude_list_, key) ==
             exclude_list_.end());
@@ -174,12 +171,12 @@ public:
                                     std::vector<std::string> excluded_patterns);
 
   MetricAttributes process(
-      const opentelemetry::common::KeyValueIterable &attributes) const noexcept override;
+      const opentelemetry::common::KeyValueIterable &attributes) const override;
 
-  bool isPresent(nostd::string_view key) const noexcept override;
+  bool isPresent(nostd::string_view key) const override;
 
 private:
-  static bool MatchesAny(const std::vector<std::string> &patterns, nostd::string_view key) noexcept;
+  static bool MatchesAny(const std::vector<std::string> &patterns, nostd::string_view key);
 
   bool include_all_{true};
   std::vector<std::string> included_patterns_;

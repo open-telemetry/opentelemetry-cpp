@@ -38,7 +38,7 @@ public:
    * Collect the metrics from SDK.
    * @return return the status of the operation.
    */
-  bool Collect(nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept;
+  bool Collect(nostd::function_ref<bool(ResourceMetrics &metric_data)> callback);
 
   /**
    * Get the AggregationTemporality for given Instrument Type for this reader.
@@ -47,7 +47,7 @@ public:
    */
 
   virtual AggregationTemporality GetAggregationTemporality(
-      InstrumentType instrument_type) const noexcept = 0;
+      InstrumentType instrument_type) const = 0;
 
   /**
    * Get the cardinality limit for a given instrument type.
@@ -57,7 +57,7 @@ public:
    * @param instrument_type The instrument type to get the limit for
    * @return The cardinality limit for the requested instrument type
    */
-  std::size_t GetCardinalityLimit(InstrumentType instrument_type) const noexcept;
+  std::size_t GetCardinalityLimit(InstrumentType instrument_type) const;
 
   /**
    * Set per-instrument-type cardinality limits for this reader.
@@ -68,7 +68,7 @@ public:
    *
    * @param limits The cardinality limits to apply
    */
-  void SetCardinalityLimits(const CardinalityLimits &limits) noexcept;
+  void SetCardinalityLimits(const CardinalityLimits &limits);
 
   /**
    * Shutdown the metric reader.
@@ -78,7 +78,7 @@ public:
    *
    * @return the result of OnShutDown() for the first call, true for any subsequent call.
    */
-  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   /**
    * Force flush the metric read by the reader.
@@ -86,21 +86,21 @@ public:
    * @return false without invoking OnForceFlush() if the reader is already shut down, otherwise
    * the result of OnForceFlush().
    */
-  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   /**
    * Return the status of Metric reader.
    */
-  bool IsShutdown() const noexcept;
+  bool IsShutdown() const;
 
   virtual ~MetricReader() = default;
 
 private:
-  virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept = 0;
+  virtual bool OnForceFlush(std::chrono::microseconds timeout) = 0;
 
-  virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept = 0;
+  virtual bool OnShutDown(std::chrono::microseconds timeout) = 0;
 
-  virtual void OnInitialized() noexcept {}
+  virtual void OnInitialized() {}
 
 protected:
 private:

@@ -28,7 +28,7 @@ IncludeExcludeAttributesProcessor::IncludeExcludeAttributesProcessor(
 {}
 
 MetricAttributes IncludeExcludeAttributesProcessor::process(
-    const opentelemetry::common::KeyValueIterable &attributes) const noexcept
+    const opentelemetry::common::KeyValueIterable &attributes) const
 {
   MetricAttributes result;
   attributes.ForEachKeyValue(
@@ -44,14 +44,14 @@ MetricAttributes IncludeExcludeAttributesProcessor::process(
   return result;
 }
 
-bool IncludeExcludeAttributesProcessor::isPresent(nostd::string_view key) const noexcept
+bool IncludeExcludeAttributesProcessor::isPresent(nostd::string_view key) const
 {
   return (include_all_ || MatchesAny(included_patterns_, key)) &&
          !MatchesAny(excluded_patterns_, key);
 }
 
 bool IncludeExcludeAttributesProcessor::MatchesAny(const std::vector<std::string> &patterns,
-                                                   nostd::string_view key) noexcept
+                                                   nostd::string_view key)
 {
   for (const auto &pattern : patterns)
   {

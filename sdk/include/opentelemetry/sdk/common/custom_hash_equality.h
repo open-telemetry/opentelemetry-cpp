@@ -55,7 +55,7 @@ struct FnvOffset<Ty, 4>
   // 32-bit offset basis
   static constexpr Ty value = static_cast<Ty>(0x811C9DC5U);
 
-  static constexpr Ty Fix(Ty hval) noexcept { return hval; }
+  static constexpr Ty Fix(Ty hval) { return hval; }
 };
 
 // Specialization for 64-bit
@@ -66,7 +66,7 @@ struct FnvOffset<Ty, 8>
   static constexpr Ty value = static_cast<Ty>(0xCBF29CE484222325ULL);
 
   // Fix function: mix upper and lower bits for better distribution
-  static constexpr Ty Fix(Ty hval) noexcept { return hval ^ (hval >> 32); }
+  static constexpr Ty Fix(Ty hval) { return hval ^ (hval >> 32); }
 };
 
 /**
@@ -79,7 +79,7 @@ struct FnvOffset<Ty, 8>
  * @return     Computed hash
  */
 template <typename Ty>
-inline Ty Fnv1a(const void *buf, size_t len, Ty hval = FnvOffset<Ty, sizeof(Ty)>::value) noexcept
+inline Ty Fnv1a(const void *buf, size_t len, Ty hval = FnvOffset<Ty, sizeof(Ty)>::value)
 {
   const unsigned char *bp = reinterpret_cast<const unsigned char *>(buf);
   const unsigned char *be = bp + len;
@@ -106,12 +106,12 @@ struct StringViewHash
 #  endif
 #endif
 
-  std::size_t operator()(const std::string &s) const noexcept
+  std::size_t operator()(const std::string &s) const
   {
     return Fnv1a<std::size_t>(s.data(), s.size());
   }
 
-  std::size_t operator()(opentelemetry::nostd::string_view sv) const noexcept
+  std::size_t operator()(opentelemetry::nostd::string_view sv) const
   {
     return Fnv1a<std::size_t>(sv.data(), sv.size());
   }
@@ -126,7 +126,7 @@ struct StringViewEqual
 #endif
 
   template <typename Lhs, typename Rhs>
-  bool operator()(const Lhs &lhs, const Rhs &rhs) const noexcept
+  bool operator()(const Lhs &lhs, const Rhs &rhs) const
   {
     opentelemetry::nostd::string_view lsv(lhs);
     opentelemetry::nostd::string_view rsv(rhs);

@@ -104,12 +104,12 @@ public:
       nostd::string_view name,
       opentelemetry::trace::SpanKind span_kind,
       const opentelemetry::common::KeyValueIterable &attributes,
-      const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept = 0;
+      const opentelemetry::trace::SpanContextKeyValueIterable &links) = 0;
 
   /**
    * Short description with configuration, for debug pages and logs.
    */
-  virtual nostd::string_view GetDescription() const noexcept = 0;
+  virtual nostd::string_view GetDescription() const = 0;
 };
 
 }  // namespace trace

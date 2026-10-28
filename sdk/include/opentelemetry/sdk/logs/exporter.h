@@ -40,7 +40,7 @@ public:
    *
    * Note: This method must be callable from multiple threads.
    */
-  virtual std::unique_ptr<Recordable> MakeRecordable() noexcept = 0;
+  virtual std::unique_ptr<Recordable> MakeRecordable() = 0;
 
   /**
    * Exports the batch of log records to their export destination.
@@ -51,13 +51,13 @@ public:
    * @returns an ExportResult code (whether export was success or failure)
    */
   virtual sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
+      const nostd::span<std::unique_ptr<Recordable>> &records) = 0;
 
   /**
    * Force flush the log records pushed into this log exporter.
    */
   virtual bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) = 0;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.
@@ -66,8 +66,7 @@ public:
    * returning failure.
    * @return true if the exporter shutdown succeeded, false otherwise
    */
-  virtual bool Shutdown(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+  virtual bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) = 0;
 
   /**
    * Returns true when the recordable produced by MakeRecordable() enforces
@@ -76,7 +75,7 @@ public:
    * recordables that ignore limits. Exporters whose recordable applies the
    * limits (OTLP, ostream) override this to return true.
    */
-  virtual bool RecordableEnforcesLogRecordLimits() const noexcept { return false; }
+  virtual bool RecordableEnforcesLogRecordLimits() const { return false; }
 };
 }  // namespace logs
 }  // namespace sdk

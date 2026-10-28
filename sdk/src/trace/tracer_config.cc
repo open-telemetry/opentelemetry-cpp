@@ -26,12 +26,12 @@ OPENTELEMETRY_EXPORT TracerConfig TracerConfig::Default()
   return kDefaultConfig;
 }
 
-OPENTELEMETRY_EXPORT bool TracerConfig::IsEnabled() const noexcept
+OPENTELEMETRY_EXPORT bool TracerConfig::IsEnabled() const
 {
   return enabled_;
 }
 
-OPENTELEMETRY_EXPORT bool TracerConfig::operator==(const TracerConfig &other) const noexcept
+OPENTELEMETRY_EXPORT bool TracerConfig::operator==(const TracerConfig &other) const
 {
   return enabled_ == other.enabled_;
 }

@@ -41,7 +41,7 @@ public:
                     opentelemetry::common::SystemTimestamp sdk_start_ts,
                     opentelemetry::common::SystemTimestamp collection_ts,
                     const std::shared_ptr<AttributesHashMap> &delta_metrics,
-                    nostd::function_ref<bool(MetricData)> callback) noexcept;
+                    nostd::function_ref<bool(MetricData)> callback);
 
 private:
   InstrumentDescriptor instrument_descriptor_;

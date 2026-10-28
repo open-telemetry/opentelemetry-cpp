@@ -108,7 +108,7 @@ Logger::Logger(opentelemetry::nostd::string_view name,
   UpdateLoggerConfig(config);
 }
 
-void Logger::UpdateLoggerConfig(LoggerConfig config) noexcept
+void Logger::UpdateLoggerConfig(LoggerConfig config)
 {
   logger_enabled_.store(config.IsEnabled(), std::memory_order_relaxed);
   trace_based_.store(config.IsTraceBased(), std::memory_order_relaxed);
@@ -265,7 +265,7 @@ bool Logger::EnabledImplementation(
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
-Logger::GetInstrumentationScope() const noexcept
+Logger::GetInstrumentationScope() const
 {
   return *instrumentation_scope_;
 }

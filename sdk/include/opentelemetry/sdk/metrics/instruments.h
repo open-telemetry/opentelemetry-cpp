@@ -71,7 +71,7 @@ struct InstrumentDescriptor
 struct InstrumentDescriptorUtil
 {
   // Case-insensitive comparison of two ASCII strings used to evaluate equality of instrument names
-  static bool CaseInsensitiveAsciiEquals(const std::string &lhs, const std::string &rhs) noexcept
+  static bool CaseInsensitiveAsciiEquals(const std::string &lhs, const std::string &rhs)
   {
     return lhs.size() == rhs.size() &&
            std::equal(lhs.begin(), lhs.end(), rhs.begin(), [](char a, char b) {
@@ -84,7 +84,7 @@ struct InstrumentDescriptorUtil
   // An instrument is a duplicate if it has the same name (case-insensitive) as another instrument,
   // but different instrument kind, unit, or description.
   // https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L869
-  static bool IsDuplicate(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs) noexcept
+  static bool IsDuplicate(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs)
   {
     // Not a duplicate if case-insensitive names are not equal
     if (!InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals(lhs.name_, rhs.name_))
@@ -115,7 +115,7 @@ struct InstrumentDescriptorUtil
     return false;
   }
 
-  static opentelemetry::nostd::string_view GetInstrumentTypeString(InstrumentType type) noexcept
+  static opentelemetry::nostd::string_view GetInstrumentTypeString(InstrumentType type)
   {
     switch (type)
     {
@@ -139,7 +139,7 @@ struct InstrumentDescriptorUtil
   }
 
   static opentelemetry::nostd::string_view GetInstrumentValueTypeString(
-      InstrumentValueType value_type) noexcept
+      InstrumentValueType value_type)
   {
     switch (value_type)
     {
@@ -160,7 +160,7 @@ struct InstrumentDescriptorUtil
 struct AggregationUtil
 {
   static opentelemetry::nostd::string_view GetAggregationTypeString(
-      AggregationType aggregation_type) noexcept
+      AggregationType aggregation_type)
   {
     switch (aggregation_type)
     {
@@ -184,7 +184,7 @@ struct AggregationUtil
 
 struct InstrumentEqualNameCaseInsensitive
 {
-  bool operator()(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs) const noexcept
+  bool operator()(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs) const
   {
     // Names (case-insensitive)
     if (!InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals(lhs.name_, rhs.name_))
@@ -221,7 +221,7 @@ struct InstrumentEqualNameCaseInsensitive
 // description, unit) are equal.
 struct InstrumentDescriptorHash
 {
-  std::size_t operator()(const InstrumentDescriptor &instrument_descriptor) const noexcept
+  std::size_t operator()(const InstrumentDescriptor &instrument_descriptor) const
   {
     std::size_t hashcode{};
 

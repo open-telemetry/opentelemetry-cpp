@@ -22,15 +22,14 @@ template <class T>
 class CircularBufferRange
 {
 public:
-  CircularBufferRange() noexcept = default;
+  CircularBufferRange() = default;
 
-  explicit CircularBufferRange(nostd::span<T> first) noexcept : first_{first} {}
+  explicit CircularBufferRange(nostd::span<T> first) : first_{first} {}
 
-  CircularBufferRange(nostd::span<T> first, nostd::span<T> second) noexcept
-      : first_{first}, second_{second}
+  CircularBufferRange(nostd::span<T> first, nostd::span<T> second) : first_{first}, second_{second}
   {}
 
-  operator CircularBufferRange<const T>() const noexcept { return {first_, second_}; }
+  operator CircularBufferRange<const T>() const { return {first_, second_}; }
 
   /**
    * Iterate over the elements in the range.
@@ -61,19 +60,19 @@ public:
   /**
    * @return the number of elements in the range
    */
-  size_t size() const noexcept { return first_.size() + second_.size(); }
+  size_t size() const { return first_.size() + second_.size(); }
 
   /**
    * @return true if the range is empty
    */
-  bool empty() const noexcept { return first_.empty(); }
+  bool empty() const { return first_.empty(); }
 
   /**
    * Return a subrange taken from the start of this range.
    * @param n the number of element to take in the subrange
    * @return a subrange of the first n elements in this range
    */
-  CircularBufferRange Take(size_t n) const noexcept
+  CircularBufferRange Take(size_t n) const
   {
     assert(n <= size());
     if (first_.size() >= n)

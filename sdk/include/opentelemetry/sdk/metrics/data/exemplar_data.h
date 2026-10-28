@@ -45,7 +45,7 @@ public:
    * Returns the SpanContext associated with this exemplar. If the exemplar was not recorded
    * inside a sampled trace, the Context will be invalid.
    */
-  const opentelemetry::trace::SpanContext &GetSpanContext() const noexcept { return context_; }
+  const opentelemetry::trace::SpanContext &GetSpanContext() const { return context_; }
 
   static PointType CreateSumPointData(ValueType value)
   {

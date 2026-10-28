@@ -73,7 +73,7 @@ bool SimpleLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexc
   return true;
 }
 
-bool SimpleLogRecordProcessor::IsShutdown() const noexcept
+bool SimpleLogRecordProcessor::IsShutdown() const
 {
   return is_shutdown_.load(std::memory_order_acquire);
 }

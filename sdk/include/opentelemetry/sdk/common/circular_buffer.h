@@ -38,7 +38,7 @@ public:
    *
    * Note: This method must only be called from the consumer thread.
    */
-  CircularBufferRange<const AtomicUniquePtr<T>> Peek() const noexcept { return PeekImpl(); }
+  CircularBufferRange<const AtomicUniquePtr<T>> Peek() const { return PeekImpl(); }
 
   /**
    * Consume elements from the circular buffer's tail.
@@ -51,7 +51,7 @@ public:
    * Note: This method must only be called from the consumer thread.
    */
   template <class Callback>
-  void Consume(size_t n, Callback callback) noexcept
+  void Consume(size_t n, Callback callback)
   {
     assert(n <= static_cast<size_t>(head_ - tail_));
     auto range = PeekImpl().Take(n);
@@ -66,7 +66,7 @@ public:
    *
    * Note: This method must only be called from the consumer thread.
    */
-  void Consume(size_t n) noexcept
+  void Consume(size_t n)
   {
     Consume(n, [](CircularBufferRange<AtomicUniquePtr<T>> &range) noexcept {
       range.ForEach([](AtomicUniquePtr<T> &ptr) noexcept {
@@ -81,7 +81,7 @@ public:
    * @param ptr a pointer to the element to add
    * @return true if the element was successfully added; false, otherwise.
    */
-  bool Add(std::unique_ptr<T> &ptr) noexcept
+  bool Add(std::unique_ptr<T> &ptr)
   {
     while (true)
     {
@@ -116,7 +116,7 @@ public:
     }
   }
 
-  bool Add(std::unique_ptr<T> &&ptr) noexcept
+  bool Add(std::unique_ptr<T> &&ptr)
   {
     std::unique_ptr<T> owner = std::move(ptr);
     return Add(owner);
@@ -127,17 +127,17 @@ public:
    *
    * Note: This method must only be called from the consumer thread.
    */
-  void Clear() noexcept { Consume(size()); }
+  void Clear() { Consume(size()); }
 
   /**
    * @return the maximum number of bytes that can be stored in the buffer.
    */
-  size_t max_size() const noexcept { return capacity_ - 1; }
+  size_t max_size() const { return capacity_ - 1; }
 
   /**
    * @return true if the buffer is empty.
    */
-  bool empty() const noexcept { return head_ == tail_; }
+  bool empty() const { return head_ == tail_; }
 
   /**
    * @return the number of bytes stored in the circular buffer.
@@ -145,7 +145,7 @@ public:
    * Note: this method will only return a correct snapshot of the size if called
    * from the consumer thread.
    */
-  size_t size() const noexcept
+  size_t size() const
   {
     uint64_t tail = tail_;
     uint64_t head = head_;
@@ -156,12 +156,12 @@ public:
   /**
    * @return the number of elements consumed from the circular buffer.
    */
-  uint64_t consumption_count() const noexcept { return tail_; }
+  uint64_t consumption_count() const { return tail_; }
 
   /**
    * @return the number of elements added to the circular buffer.
    */
-  uint64_t production_count() const noexcept { return head_; }
+  uint64_t production_count() const { return head_; }
 
 private:
   std::unique_ptr<AtomicUniquePtr<T>[]> data_;
@@ -169,7 +169,7 @@ private:
   std::atomic<uint64_t> head_{0};
   std::atomic<uint64_t> tail_{0};
 
-  CircularBufferRange<AtomicUniquePtr<T>> PeekImpl() const noexcept
+  CircularBufferRange<AtomicUniquePtr<T>> PeekImpl() const
   {
     uint64_t tail_index = tail_ % capacity_;
     uint64_t head_index = head_ % capacity_;

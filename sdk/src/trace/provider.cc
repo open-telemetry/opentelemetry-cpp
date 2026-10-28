@@ -14,8 +14,7 @@ namespace sdk
 namespace trace
 {
 
-void Provider::SetTracerProvider(
-    const nostd::shared_ptr<opentelemetry::trace::TracerProvider> &tp) noexcept
+void Provider::SetTracerProvider(const nostd::shared_ptr<opentelemetry::trace::TracerProvider> &tp)
 {
   bool disabled = opentelemetry::sdk::common::GetSdkDisabled();
 

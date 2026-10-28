@@ -63,7 +63,7 @@ public:
     }
   }
 
-  std::unique_ptr<Recordable> MakeRecordable() noexcept override
+  std::unique_ptr<Recordable> MakeRecordable() override
   {
     auto recordable       = std::unique_ptr<Recordable>(new MultiRecordable);
     auto multi_recordable = static_cast<MultiRecordable *>(recordable.get());
@@ -77,8 +77,7 @@ public:
     return recordable;
   }
 
-  void OnStart(Recordable &span,
-               const opentelemetry::trace::SpanContext &parent_context) noexcept override
+  void OnStart(Recordable &span, const opentelemetry::trace::SpanContext &parent_context) override
   {
     auto multi_recordable = static_cast<MultiRecordable *>(&span);
     ProcessorNode *node   = head_;
@@ -94,7 +93,7 @@ public:
     }
   }
 
-  void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
+  void OnEnd(std::unique_ptr<Recordable> &&span) override
   {
     auto multi_recordable = static_cast<MultiRecordable *>(std::move(span).release());
     ProcessorNode *node   = head_;
@@ -111,8 +110,7 @@ public:
     delete multi_recordable;
   }
 
-  bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) override
   {
     bool result         = true;
     ProcessorNode *node = head_;
@@ -128,8 +126,7 @@ public:
     return result;
   }
 
-  bool Shutdown(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) override
   {
     return InternalShutdown(timeout);
   }
@@ -141,8 +138,7 @@ public:
   }
 
 protected:
-  bool InternalShutdown(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept
+  bool InternalShutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)())
   {
     bool result         = true;
     ProcessorNode *node = head_;

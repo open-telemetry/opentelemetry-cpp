@@ -22,8 +22,7 @@ public:
   /**
    * Changes the singleton TracerProvider.
    */
-  static void SetTracerProvider(
-      const nostd::shared_ptr<opentelemetry::trace::TracerProvider> &tp) noexcept;
+  static void SetTracerProvider(const nostd::shared_ptr<opentelemetry::trace::TracerProvider> &tp);
 };
 
 }  // namespace trace

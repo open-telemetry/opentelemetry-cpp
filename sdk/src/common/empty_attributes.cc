@@ -16,7 +16,7 @@ namespace sdk
 {
 
 const opentelemetry::common::KeyValueIterableView<std::array<std::pair<std::string, int32_t>, 0>> &
-GetEmptyAttributes() noexcept
+GetEmptyAttributes()
 {
   static const std::array<std::pair<std::string, int32_t>, 0> array{};
   static const opentelemetry::common::KeyValueIterableView<

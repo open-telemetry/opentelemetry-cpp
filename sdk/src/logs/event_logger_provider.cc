@@ -18,7 +18,7 @@ namespace sdk
 namespace logs
 {
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
-EventLoggerProvider::EventLoggerProvider() noexcept
+EventLoggerProvider::EventLoggerProvider()
 {
   OTEL_INTERNAL_LOG_DEBUG("[EventLoggerProvider] EventLoggerProvider created.");
 }

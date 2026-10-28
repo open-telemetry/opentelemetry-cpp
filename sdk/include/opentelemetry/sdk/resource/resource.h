@@ -19,11 +19,11 @@ using ResourceAttributes = opentelemetry::sdk::common::AttributeMap;
 class Resource
 {
 public:
-  Resource() noexcept;
+  Resource();
 
-  Resource(const ResourceAttributes &attributes) noexcept;
+  Resource(const ResourceAttributes &attributes);
 
-  Resource(const ResourceAttributes &attributes, const std::string &schema_url) noexcept;
+  Resource(const ResourceAttributes &attributes, const std::string &schema_url);
 
   Resource(const Resource &)            = default;
   Resource(Resource &&)                 = default;
@@ -32,8 +32,8 @@ public:
 
   ~Resource() = default;
 
-  const ResourceAttributes &GetAttributes() const noexcept;
-  const std::string &GetSchemaURL() const noexcept;
+  const ResourceAttributes &GetAttributes() const;
+  const std::string &GetSchemaURL() const;
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource
@@ -48,7 +48,7 @@ public:
    * @returns the newly merged Resource.
    */
 
-  Resource Merge(const Resource &other) const noexcept;
+  Resource Merge(const Resource &other) const;
 
   /**
    * Returns a newly created Resource with the specified attributes.

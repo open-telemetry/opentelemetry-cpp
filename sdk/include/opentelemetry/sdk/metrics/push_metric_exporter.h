@@ -38,7 +38,7 @@ public:
    * concurrently for the same exporter instance.
    * @param data metrics data
    */
-  virtual opentelemetry::sdk::common::ExportResult Export(const ResourceMetrics &data) noexcept = 0;
+  virtual opentelemetry::sdk::common::ExportResult Export(const ResourceMetrics &data) = 0;
 
   /**
    * Get the AggregationTemporality for given Instrument Type for this exporter.
@@ -46,21 +46,20 @@ public:
    * @return AggregationTemporality
    */
   virtual AggregationTemporality GetAggregationTemporality(
-      InstrumentType instrument_type) const noexcept = 0;
+      InstrumentType instrument_type) const = 0;
 
   /**
    * Force flush the exporter.
    */
   virtual bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) = 0;
 
   /**
    * Shut down the metric exporter.
    * @param timeout an optional timeout.
    * @return return the status of the operation.
    */
-  virtual bool Shutdown(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+  virtual bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) = 0;
 };
 }  // namespace metrics
 }  // namespace sdk

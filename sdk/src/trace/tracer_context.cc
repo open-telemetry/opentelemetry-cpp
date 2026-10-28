@@ -40,41 +40,40 @@ TracerContext::TracerContext(
       span_limits_(span_limits)
 {}
 
-Sampler &TracerContext::GetSampler() const noexcept
+Sampler &TracerContext::GetSampler() const
 {
   return *sampler_;
 }
 
-const resource::Resource &TracerContext::GetResource() const noexcept
+const resource::Resource &TracerContext::GetResource() const
 {
   return resource_;
 }
 
 const instrumentationscope::ScopeConfigurator<TracerConfig> &TracerContext::GetTracerConfigurator()
-    const noexcept
+    const
 {
   return *tracer_configurator_;
 }
 
-opentelemetry::sdk::trace::IdGenerator &TracerContext::GetIdGenerator() const noexcept
+opentelemetry::sdk::trace::IdGenerator &TracerContext::GetIdGenerator() const
 {
   return *id_generator_;
 }
 
-const SpanLimits &TracerContext::GetSpanLimits() const noexcept
+const SpanLimits &TracerContext::GetSpanLimits() const
 {
   return span_limits_;
 }
 
-void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
+void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor)
 {
   auto multi_processor = static_cast<MultiSpanProcessor *>(processor_.get());
   multi_processor->AddProcessor(std::move(processor));
 }
 
 void TracerContext::SetTracerConfigurator(
-    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
-        tracer_configurator) noexcept
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator)
 {
   if (!tracer_configurator)
   {
@@ -85,17 +84,17 @@ void TracerContext::SetTracerConfigurator(
   tracer_configurator_ = std::move(tracer_configurator);
 }
 
-SpanProcessor &TracerContext::GetProcessor() const noexcept
+SpanProcessor &TracerContext::GetProcessor() const
 {
   return *processor_;
 }
 
-bool TracerContext::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool TracerContext::ForceFlush(std::chrono::microseconds timeout)
 {
   return processor_->ForceFlush(timeout);
 }
 
-bool TracerContext::Shutdown(std::chrono::microseconds timeout) noexcept
+bool TracerContext::Shutdown(std::chrono::microseconds timeout)
 {
   return processor_->Shutdown(timeout);
 }

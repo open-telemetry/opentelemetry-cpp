@@ -90,14 +90,14 @@ public:
     return result;
   }
 
-  std::size_t HashCode() const noexcept;
+  std::size_t HashCode() const;
 
   /**
    * Compare 2 instrumentation libraries.
    * @param other the instrumentation scope to compare to.
    * @returns true if the 2 instrumentation libraries are equal, false otherwise.
    */
-  bool operator==(const InstrumentationScope &other) const noexcept;
+  bool operator==(const InstrumentationScope &other) const;
 
   /**
    * Check whether the instrumentation scope has given name and version.
@@ -112,15 +112,14 @@ public:
   bool equal(const nostd::string_view name,
              const nostd::string_view version,
              const nostd::string_view schema_url                       = "",
-             const opentelemetry::common::KeyValueIterable *attributes = nullptr) const noexcept;
+             const opentelemetry::common::KeyValueIterable *attributes = nullptr) const;
 
-  const std::string &GetName() const noexcept;
-  const std::string &GetVersion() const noexcept;
-  const std::string &GetSchemaURL() const noexcept;
-  const InstrumentationScopeAttributes &GetAttributes() const noexcept;
+  const std::string &GetName() const;
+  const std::string &GetVersion() const;
+  const std::string &GetSchemaURL() const;
+  const InstrumentationScopeAttributes &GetAttributes() const;
 
-  void SetAttribute(nostd::string_view key,
-                    const opentelemetry::common::AttributeValue &value) noexcept;
+  void SetAttribute(nostd::string_view key, const opentelemetry::common::AttributeValue &value);
 
 private:
   InstrumentationScope(nostd::string_view name,

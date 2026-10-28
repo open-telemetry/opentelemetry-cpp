@@ -34,22 +34,21 @@ nostd::unique_ptr<InstrumentationScope> InstrumentationScope::Create(
       name, version, schema_url, InstrumentationScopeAttributes(attributes)});
 }
 
-std::size_t InstrumentationScope::HashCode() const noexcept
+std::size_t InstrumentationScope::HashCode() const
 {
   return hash_code_;
 }
 
-bool InstrumentationScope::operator==(const InstrumentationScope &other) const noexcept
+bool InstrumentationScope::operator==(const InstrumentationScope &other) const
 {
   return this->name_ == other.name_ && this->version_ == other.version_ &&
          this->schema_url_ == other.schema_url_ && this->attributes_ == other.attributes_;
 }
 
-bool InstrumentationScope::equal(
-    const nostd::string_view name,
-    const nostd::string_view version,
-    const nostd::string_view schema_url,
-    const opentelemetry::common::KeyValueIterable *attributes) const noexcept
+bool InstrumentationScope::equal(const nostd::string_view name,
+                                 const nostd::string_view version,
+                                 const nostd::string_view schema_url,
+                                 const opentelemetry::common::KeyValueIterable *attributes) const
 {
 
   if (this->name_ != name || this->version_ != version || this->schema_url_ != schema_url)
@@ -69,25 +68,25 @@ bool InstrumentationScope::equal(
   return attributes_.EqualTo(*attributes);
 }
 
-const std::string &InstrumentationScope::GetName() const noexcept
+const std::string &InstrumentationScope::GetName() const
 {
   return name_;
 }
-const std::string &InstrumentationScope::GetVersion() const noexcept
+const std::string &InstrumentationScope::GetVersion() const
 {
   return version_;
 }
-const std::string &InstrumentationScope::GetSchemaURL() const noexcept
+const std::string &InstrumentationScope::GetSchemaURL() const
 {
   return schema_url_;
 }
-const InstrumentationScopeAttributes &InstrumentationScope::GetAttributes() const noexcept
+const InstrumentationScopeAttributes &InstrumentationScope::GetAttributes() const
 {
   return attributes_;
 }
 
 void InstrumentationScope::SetAttribute(nostd::string_view key,
-                                        const opentelemetry::common::AttributeValue &value) noexcept
+                                        const opentelemetry::common::AttributeValue &value)
 {
   attributes_[std::string(key)] =
       nostd::visit(opentelemetry::sdk::common::AttributeConverter(), value);

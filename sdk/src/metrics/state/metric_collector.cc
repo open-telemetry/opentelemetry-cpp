@@ -39,19 +39,18 @@ MetricCollector::MetricCollector(opentelemetry::sdk::metrics::MeterContext *cont
   metric_reader_->SetMetricProducer(this);
 }
 
-AggregationTemporality MetricCollector::GetAggregationTemporality(
-    InstrumentType instrument_type) noexcept
+AggregationTemporality MetricCollector::GetAggregationTemporality(InstrumentType instrument_type)
 {
   auto aggregation_temporality = metric_reader_->GetAggregationTemporality(instrument_type);
   return aggregation_temporality;
 }
 
-std::size_t MetricCollector::GetCardinalityLimit(InstrumentType instrument_type) const noexcept
+std::size_t MetricCollector::GetCardinalityLimit(InstrumentType instrument_type) const
 {
   return metric_reader_->GetCardinalityLimit(instrument_type);
 }
 
-MetricProducer::Result MetricCollector::Produce() noexcept
+MetricProducer::Result MetricCollector::Produce()
 {
   if (!meter_context_)
   {
@@ -60,7 +59,7 @@ MetricProducer::Result MetricCollector::Produce() noexcept
     return {{}, MetricProducer::Status::kFailure};
   }
   ResourceMetrics resource_metrics;
-  meter_context_->ForEachMeter([&](const std::shared_ptr<Meter> &meter) noexcept {
+  meter_context_->ForEachMeter([&](const std::shared_ptr<Meter> &meter) {
     auto collection_ts = std::chrono::system_clock::now();
     auto metric_data   = meter->Collect(this, collection_ts);
     if (metric_data.empty())
@@ -125,12 +124,12 @@ MetricProducer::Result MetricCollector::Produce() noexcept
   return {resource_metrics, MetricProducer::Status::kSuccess};
 }
 
-bool MetricCollector::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool MetricCollector::ForceFlush(std::chrono::microseconds timeout)
 {
   return metric_reader_->ForceFlush(timeout);
 }
 
-bool MetricCollector::Shutdown(std::chrono::microseconds timeout) noexcept
+bool MetricCollector::Shutdown(std::chrono::microseconds timeout)
 {
   return metric_reader_->Shutdown(timeout);
 }

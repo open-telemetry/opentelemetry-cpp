@@ -37,7 +37,7 @@ public:
    * Set Resource of this log
    * @param resource the resource to set
    */
-  virtual void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept = 0;
+  virtual void SetResource(const opentelemetry::sdk::resource::Resource &resource) = 0;
 
   /**
    * Set instrumentation_scope for this log.
@@ -45,7 +45,7 @@ public:
    */
   virtual void SetInstrumentationScope(
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope
-          &instrumentation_scope) noexcept = 0;
+          &instrumentation_scope) = 0;
 
   /**
    * Apply attribute count and value length limits to this log. The default
@@ -54,7 +54,7 @@ public:
    * SetAttribute call is observed, so the caller does not need to keep the
    * supplied object alive.
    */
-  virtual void SetLogRecordLimits(const LogRecordLimits & /* limits */) noexcept {}
+  virtual void SetLogRecordLimits(const LogRecordLimits & /* limits */) {}
 };
 
 }  // namespace logs

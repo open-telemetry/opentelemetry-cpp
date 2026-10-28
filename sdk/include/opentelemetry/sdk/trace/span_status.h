@@ -39,7 +39,7 @@ struct StatusTransition
  */
 inline StatusTransition ApplyStatusTransition(opentelemetry::trace::StatusCode current,
                                               opentelemetry::trace::StatusCode code,
-                                              nostd::string_view description) noexcept
+                                              nostd::string_view description)
 {
   const auto is_already_ok{current == opentelemetry::trace::StatusCode::kOk};
   const auto is_unset{code == opentelemetry::trace::StatusCode::kUnset};
