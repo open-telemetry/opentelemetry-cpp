@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Remove a curl easy handle from the multi handle before freeing that
+  handle and the header list it points at, and keep both when libcurl will not
+  take the handle back
+  [#4391](https://github.com/open-telemetry/opentelemetry-cpp/issues/4391)
+
 * [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
   so a larger value no longer stops spans from being exported until the
   schedule delay expires.
