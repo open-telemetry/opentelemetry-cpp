@@ -689,7 +689,7 @@ prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
 
 void PrometheusExporterUtils::SetTarget(
     const sdk::metrics::ResourceMetrics &data,
-    const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope * /* scope */,
     std::vector<::prometheus::MetricFamily> *output)
 {
   if (output == nullptr || data.resource_ == nullptr)
@@ -707,7 +707,7 @@ void PrometheusExporterUtils::SetTarget(
   metric.info.value                       = 1.0;
 
   metric_sdk::PointAttributes empty_attributes;
-  SetMetricBasic(metric, empty_attributes, scope, data.resource_);
+  SetMetricBasic(metric, empty_attributes, nullptr, data.resource_);
 
   for (auto &label : data.resource_->GetAttributes())
   {
