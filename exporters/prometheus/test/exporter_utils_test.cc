@@ -777,4 +777,45 @@ TEST(PrometheusExporterUtils, InstrumentationScopePointAttributeCollisions)
   }
 }
 
+TEST(PrometheusExporterUtils, TargetInfoExcludesInstrumentationScopeLabels)
+{
+  auto scope = InstrumentationScope::Create(
+      "library_name", "1.2.0", "https://opentelemetry.io/schemas/1.21.0", {{"foo", "scope_foo"}});
+
+  metric_sdk::SumPointData sum_point_data{};
+  sum_point_data.value_ = 5.0;
+  metric_sdk::MetricData metric_data{
+      metric_sdk::InstrumentDescriptor{"requests", "description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{}, sum_point_data}}};
+
+  Resource resource = Resource::Create(
+      ResourceAttributes{{"service.name", "test_service"}, {"otel_scope_foo", "resource_foo"}});
+  metric_sdk::ResourceMetrics data{
+      &resource, std::vector<metric_sdk::ScopeMetrics>{
+                     {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, true, false);
+  ASSERT_EQ(translated.size(), 2U);
+  ASSERT_EQ(translated[0].name, "target");
+  ASSERT_EQ(translated[0].metric.size(), 1U);
+
+  std::size_t otel_scope_foo_count = 0;
+  for (const auto &label : translated[0].metric[0].label)
+  {
+    EXPECT_NE(label.name, "otel_scope_name");
+    EXPECT_NE(label.name, "otel_scope_version");
+    EXPECT_NE(label.name, "otel_scope_schema_url");
+    if (label.name == "otel_scope_foo")
+    {
+      EXPECT_EQ(label.value, "resource_foo");
+      ++otel_scope_foo_count;
+    }
+  }
+  EXPECT_EQ(otel_scope_foo_count, 1U);
+}
+
 OPENTELEMETRY_END_NAMESPACE
