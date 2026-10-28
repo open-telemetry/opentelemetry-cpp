@@ -10,6 +10,7 @@
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/always_record_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_builder.h"
@@ -233,6 +234,11 @@ void Registry::SetConsoleLogRecordBuilder(
 void Registry::SetAlwaysOnSamplerBuilder(std::unique_ptr<AlwaysOnSamplerBuilder> &&builder)
 {
   always_on_sampler_builder_ = std::move(builder);
+}
+
+void Registry::SetAlwaysRecordSamplerBuilder(std::unique_ptr<AlwaysRecordSamplerBuilder> &&builder)
+{
+  always_record_sampler_builder_ = std::move(builder);
 }
 
 void Registry::SetAlwaysOffSamplerBuilder(std::unique_ptr<AlwaysOffSamplerBuilder> &&builder)
