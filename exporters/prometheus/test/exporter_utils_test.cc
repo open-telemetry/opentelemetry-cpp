@@ -707,4 +707,56 @@ TEST(PrometheusExporterUtils, MultipleScopesMetricFamilyCollisions)
   EXPECT_DOUBLE_EQ(translated[0].metric[1].counter.value, 20.0);
 }
 
+TEST(PrometheusExporterUtils, TargetInfoMetricFamilyCollision)
+{
+  Resource resource = Resource::Create(ResourceAttributes{{"service.name", "test_service"}});
+  auto scope        = InstrumentationScope::Create("scope_1", "1.0.0");
+
+  metric_sdk::LastValuePointData gauge_point{};
+  gauge_point.value_              = 42.0;
+  gauge_point.is_lastvalue_valid_ = true;
+
+  metric_sdk::SumPointData counter_point{};
+  counter_point.value_        = 7.0;
+  counter_point.is_monotonic_ = true;
+
+  // A unitless gauge named "target" maps to family name "target", which collides with the
+  // MetricFamily{"target", MetricType::Info} emitted by SetTarget when populate_target_info=true.
+  metric_sdk::MetricData colliding_target_gauge{
+      metric_sdk::InstrumentDescriptor{"target", "conflicting gauge description", "",
+                                       metric_sdk::InstrumentType::kObservableGauge,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{{"env", "prod"}}, gauge_point}}};
+
+  metric_sdk::MetricData counter_metric{
+      metric_sdk::InstrumentDescriptor{"http.requests", "requests description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{{"env", "prod"}}, counter_point}}};
+
+  metric_sdk::ResourceMetrics data{
+      &resource, std::vector<metric_sdk::ScopeMetrics>{
+                     {scope.get(), std::vector<metric_sdk::MetricData>{colliding_target_gauge,
+                                                                       counter_metric}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(
+      data, /*populate_target_info=*/true, /*without_otel_scope=*/false,
+      /*without_units=*/false, /*without_type_suffix=*/false);
+
+  ASSERT_EQ(translated.size(), 2U);
+  EXPECT_EQ(translated[0].name, "target");
+  EXPECT_EQ(translated[0].help, "Target metadata");
+  EXPECT_EQ(translated[0].type, prometheus_client::MetricType::Info);
+  ASSERT_EQ(translated[0].metric.size(), 1U);
+
+  EXPECT_EQ(translated[1].name, "http_requests_total");
+  EXPECT_EQ(translated[1].type, prometheus_client::MetricType::Counter);
+  ASSERT_EQ(translated[1].metric.size(), 1U);
+  EXPECT_DOUBLE_EQ(translated[1].metric[0].counter.value, 7.0);
+}
+
 OPENTELEMETRY_END_NAMESPACE
