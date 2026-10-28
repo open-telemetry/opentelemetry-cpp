@@ -15,6 +15,25 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Check what curl_multi_init returns instead of treating a failed
+  allocation as success, and report a curl operation that could not be
+  constructed once, with the reason, rather than from the constructor as well
+  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
+
+* [BUG] Stop the curl IO thread spinning, flooding the log, and refusing to be
+  destroyed, when the multi handle cannot be created
+  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
+
+* [BUG] Keep the curl IO thread from retiring while a request it accepted is
+  still waiting to be scheduled, and release the easy handles and header lists
+  left queued when the client is destroyed
+  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
+
+* [BUG] Take an operation that was cancelled or torn down out of the curl retry
+  queue, and check what curl_multi_remove_handle and curl_multi_add_handle
+  return when a retry is scheduled
+  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
+
 * [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
   so a larger value no longer stops spans from being exported until the
   schedule delay expires.
