@@ -759,4 +759,57 @@ TEST(PrometheusExporterUtils, TargetInfoMetricFamilyCollision)
   EXPECT_DOUBLE_EQ(translated[1].metric[0].counter.value, 7.0);
 }
 
+TEST(PrometheusExporterUtils, UnsupportedAggregationDoesNotReserveMetricFamilyName)
+{
+  Resource resource = Resource::Create(ResourceAttributes{});
+  auto scope1       = InstrumentationScope::Create("scope_1", "1.0.0");
+  auto scope2       = InstrumentationScope::Create("scope_2", "2.0.0");
+
+  metric_sdk::Base2ExponentialHistogramPointData exp_histogram_point{};
+  exp_histogram_point.count_ = 5;
+  exp_histogram_point.sum_   = 15.0;
+
+  metric_sdk::HistogramPointData histogram_point{};
+  histogram_point.boundaries_ = {10.0, 20.0};
+  histogram_point.counts_     = {1, 2, 1};
+  histogram_point.count_      = 4;
+  histogram_point.sum_        = 45.0;
+
+  // An unsupported Base2ExponentialHistogram aggregation should be skipped without reserving
+  // the metric family name as Untyped, allowing a subsequent supported Histogram with the same
+  // name to be exported.
+  metric_sdk::MetricData unsupported_exp_histogram{
+      metric_sdk::InstrumentDescriptor{"http.server.duration", "exp histogram description", "s",
+                                       metric_sdk::InstrumentType::kHistogram,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{{"env", "prod"}}, exp_histogram_point}}};
+
+  metric_sdk::MetricData supported_histogram{
+      metric_sdk::InstrumentDescriptor{"http.server.duration", "histogram description", "s",
+                                       metric_sdk::InstrumentType::kHistogram,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{{"env", "prod"}}, histogram_point}}};
+
+  metric_sdk::ResourceMetrics data{
+      &resource, std::vector<metric_sdk::ScopeMetrics>{
+                     {scope1.get(), std::vector<metric_sdk::MetricData>{unsupported_exp_histogram}},
+                     {scope2.get(), std::vector<metric_sdk::MetricData>{supported_histogram}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(
+      data, /*populate_target_info=*/false, /*without_otel_scope=*/false,
+      /*without_units=*/false, /*without_type_suffix=*/false);
+
+  ASSERT_EQ(translated.size(), 1U);
+  EXPECT_EQ(translated[0].name, "http_server_duration_seconds");
+  EXPECT_EQ(translated[0].help, "histogram description");
+  EXPECT_EQ(translated[0].type, prometheus_client::MetricType::Histogram);
+  ASSERT_EQ(translated[0].metric.size(), 1U);
+  EXPECT_EQ(translated[0].metric[0].histogram.sample_count, 4U);
+  EXPECT_DOUBLE_EQ(translated[0].metric[0].histogram.sample_sum, 45.0);
+}
+
 OPENTELEMETRY_END_NAMESPACE
