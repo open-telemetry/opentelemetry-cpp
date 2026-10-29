@@ -88,7 +88,7 @@ file_format: "2.0"
 TEST(Yaml, unsupported_new_minor_format)
 {
   std::string yaml = R"(
-file_format: "1.2"
+file_format: "1.3"
 )";
 
   auto config = DoParse(yaml);
@@ -116,6 +116,18 @@ file_format: "1.1"
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_EQ(config->file_format, "1.1");
+}
+
+TEST(Yaml, just_format_1_2)
+{
+  // 1.2.0 released 2026-09-11
+  std::string yaml = R"(
+file_format: "1.2"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "1.2");
 }
 
 TEST(Yaml, disabled)

@@ -16,6 +16,7 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/always_record_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
@@ -131,6 +132,7 @@
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/translation_strategy.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
+#include "opentelemetry/sdk/configuration/view_matching_mode.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
@@ -364,7 +366,13 @@ ConfigurationParser::ParseAttributeLimitsConfiguration(
   auto model = std::make_unique<AttributeLimitsConfiguration>();
 
   model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
-  model->attribute_count_limit        = node->GetOptionalInteger("attribute_count_limit");
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->attribute_value_depth_limit = node->GetOptionalInteger("attribute_value_depth_limit");
+  }
+
+  model->attribute_count_limit = node->GetOptionalInteger("attribute_count_limit");
 
   return model;
 }
@@ -419,7 +427,19 @@ ConfigurationParser::ParseOtlpHttpLogRecordExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string encoding = node->GetString("encoding", "protobuf");
   model->encoding            = ParseOtlpHttpEncoding(node, encoding);
@@ -451,7 +471,19 @@ ConfigurationParser::ParseOtlpGrpcLogRecordExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   return model;
 }
@@ -652,7 +684,13 @@ ConfigurationParser::ParseLogRecordLimitsConfiguration(
   auto model = std::make_unique<LogRecordLimitsConfiguration>();
 
   model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
-  model->attribute_count_limit        = node->GetOptionalInteger("attribute_count_limit");
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->attribute_value_depth_limit = node->GetOptionalInteger("attribute_value_depth_limit");
+  }
+
+  model->attribute_count_limit = node->GetOptionalInteger("attribute_count_limit");
 
   return model;
 }
@@ -808,7 +846,19 @@ ConfigurationParser::ParseOtlpHttpPushMetricExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string temporality_preference =
       node->GetString("temporality_preference", "cumulative");
@@ -849,7 +899,19 @@ ConfigurationParser::ParseOtlpGrpcPushMetricExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string temporality_preference =
       node->GetString("temporality_preference", "cumulative");
@@ -1345,6 +1407,30 @@ ExemplarFilter ConfigurationParser::ParseExemplarFilter(const std::unique_ptr<Do
   throw InvalidSchemaException(node->Location(), message);
 }
 
+ViewMatchingMode ConfigurationParser::ParseViewMatchingMode(
+    const std::unique_ptr<DocumentNode> &node,
+    const std::string &name) const
+{
+  if (name == "")
+  {
+    return ViewMatchingMode::independent;
+  }
+
+  if (name == "independent")
+  {
+    return ViewMatchingMode::independent;
+  }
+
+  if (name == "composable")
+  {
+    return ViewMatchingMode::composable;
+  }
+
+  std::string message("Illegal view matching mode: ");
+  message.append(name);
+  throw InvalidSchemaException(node->Location(), message);
+}
+
 std::unique_ptr<ViewSelectorConfiguration> ConfigurationParser::ParseViewSelectorConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
@@ -1629,6 +1715,17 @@ std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProvi
     model->meter_configurator = ParseMeterConfiguratorConfiguration(child);
   }
 
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    std::string view_matching_mode =
+        node->GetString("view_matching_mode/development", "independent");
+    model->view_matching_mode = ParseViewMatchingMode(node, view_matching_mode);
+  }
+  else
+  {
+    model->view_matching_mode = ViewMatchingMode::independent;
+  }
+
   return model;
 }
 
@@ -1696,11 +1793,17 @@ std::unique_ptr<SpanLimitsConfiguration> ConfigurationParser::ParseSpanLimitsCon
   };
 
   model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
-  model->attribute_count_limit        = get_optional_uint32("attribute_count_limit");
-  model->event_count_limit            = get_optional_uint32("event_count_limit");
-  model->link_count_limit             = get_optional_uint32("link_count_limit");
-  model->event_attribute_count_limit  = get_optional_uint32("event_attribute_count_limit");
-  model->link_attribute_count_limit   = get_optional_uint32("link_attribute_count_limit");
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->attribute_value_depth_limit = node->GetOptionalInteger("attribute_value_depth_limit");
+  }
+
+  model->attribute_count_limit       = get_optional_uint32("attribute_count_limit");
+  model->event_count_limit           = get_optional_uint32("event_count_limit");
+  model->link_count_limit            = get_optional_uint32("link_count_limit");
+  model->event_attribute_count_limit = get_optional_uint32("event_attribute_count_limit");
+  model->link_attribute_count_limit  = get_optional_uint32("link_attribute_count_limit");
 
   return model;
 }
@@ -1721,6 +1824,16 @@ ConfigurationParser::ParseAlwaysOnSamplerConfiguration(
     size_t /* depth */) const
 {
   auto model = std::make_unique<AlwaysOnSamplerConfiguration>();
+
+  return model;
+}
+
+std::unique_ptr<AlwaysRecordSamplerConfiguration>
+ConfigurationParser::ParseAlwaysRecordSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */,
+    size_t /* depth */) const
+{
+  auto model = std::make_unique<AlwaysRecordSamplerConfiguration>();
 
   return model;
 }
@@ -2121,6 +2234,11 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
   {
     model = ParseAlwaysOnSamplerConfiguration(child, depth);
   }
+  else if ((version_major_ == 1) && (version_minor_ >= 2) && (name == "always_record"))
+  {
+    // Added in version 1.2.0
+    model = ParseAlwaysRecordSamplerConfiguration(child, depth);
+  }
   else if (name == "jaeger_remote")
   {
     model = ParseJaegerRemoteSamplerConfiguration(child, depth);
@@ -2176,7 +2294,19 @@ ConfigurationParser::ParseOtlpHttpSpanExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string encoding = node->GetString("encoding", "protobuf");
   model->encoding            = ParseOtlpHttpEncoding(node, encoding);
@@ -2208,7 +2338,19 @@ ConfigurationParser::ParseOtlpGrpcSpanExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   return model;
 }
@@ -2904,7 +3046,7 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
       throw InvalidSchemaException(node->Location(), message);
     }
 
-    if (minor > 1)
+    if (minor > 2)
     {
       std::string message("Unsupported file_format, major = ");
       message.append(std::to_string(major));
