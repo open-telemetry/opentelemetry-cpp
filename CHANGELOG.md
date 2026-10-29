@@ -15,6 +15,18 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Elasticsearch: report an asynchronous export's outcome exactly once
+  [#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502)
+
+* [BUG] Elasticsearch: retire an asynchronous session before the completion
+  callback writes its diagnostic, so a log handler that flushes does not wait
+  for the export reporting to it
+  [#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502)
+
+* [CODE HEALTH] Elasticsearch: say log record(s) rather than trace span(s) in
+  the asynchronous export result
+  [#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502)
+
 * [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
   so a larger value no longer stops spans from being exported until the
   schedule delay expires.
