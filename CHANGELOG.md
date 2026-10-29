@@ -21,7 +21,9 @@ Increment the:
   flush actually completed in time. Also closes a race where a session could
   register for export after `Shutdown()` had already taken its snapshot of
   in-flight sessions, so `ForceFlush()` could return without ever waiting for
-  it.
+  it. Also fixes that wait turning into a CPU spin when `response_timeout_` is
+  not positive, which (like `SetTimeoutMs()`/`CURLOPT_TIMEOUT_MS`) means no
+  timeout rather than zero.
   [#4359](https://github.com/open-telemetry/opentelemetry-cpp/issues/4359)
 
 ## [1.30.0] 2026-10-22

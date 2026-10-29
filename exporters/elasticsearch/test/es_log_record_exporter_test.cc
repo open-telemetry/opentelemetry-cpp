@@ -377,6 +377,42 @@ TEST(ElasticsearchLogsExporterTests, ShutdownClampsWaitToCallerTimeoutWhenExport
   // Let the export finish now that the assertions are done.
   parked.reset();
 }
+
+// Regression test: a non-positive response_timeout_ made wait_interval collapse to zero
+// (duration_cast<steady_clock::duration>(seconds{0})), turning the wait loop into a spin that
+// re-armed on every near-instant wait_for() instead of blocking. response_timeout_ = 0 means
+// "no timeout" (see SetTimeoutMs()/CURLOPT_TIMEOUT_MS), matching the convention used by
+// ElasticsearchLogRecordExporter::Export()'s own deadline, not an instruction to poll
+// continuously. The result is still correct either way (bounded by timeout_steady), so this
+// mainly documents the fix; the absence of the spin itself was confirmed manually by reverting
+// configured's `response_timeout_ > 0 ? ... : timeout_steady` to the unconditional
+// response_timeout_ cast and observing the wait loop busy-spin instead of blocking.
+TEST(ElasticsearchLogsExporterTests, ShutdownDoesNotSpinWhenResponseTimeoutIsZero)
+{
+  // Declared first so it outlives the client and the session that point at it.
+  std::shared_ptr<http_client::EventHandler> parked;
+  logs_exporter::ElasticsearchExporterOptions options;
+  options.response_timeout_ = 0;
+  auto http_client           = std::make_shared<HoldingHttpClient>(&parked);
+  auto exporter              = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  auto record = exporter->MakeRecordable();
+  record->SetBody("this export never completes");
+  auto export_result =
+      exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+  ASSERT_EQ(export_result, opentelemetry::sdk::common::ExportResult::kSuccess);
+
+  auto start   = std::chrono::steady_clock::now();
+  bool result  = exporter->Shutdown(std::chrono::milliseconds(50));
+  auto elapsed = std::chrono::steady_clock::now() - start;
+
+  EXPECT_FALSE(result);
+  EXPECT_LT(elapsed, std::chrono::seconds(1));
+
+  // Let the export finish now that the assertions are done.
+  parked.reset();
+}
 #endif  // ENABLE_ASYNC_EXPORT
 
 // Regression test: once Shutdown() has been called, any later Export() must fail rather than

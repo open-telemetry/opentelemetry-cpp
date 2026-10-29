@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <algorithm>  // IWYU pragma: keep
-#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
@@ -562,11 +561,16 @@ bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeou
     // Clamp the wait to whatever is left of the caller's deadline: waiting the full
     // response_timeout_ regardless of timeout_steady would let Shutdown(timeout) block far
     // longer than the timeout it was given whenever nothing ever notifies this condition
-    // variable (e.g. an export that never completes).
+    // variable (e.g. an export that never completes). A non-positive response_timeout_ means
+    // "no timeout" (see SetTimeoutMs()/CURLOPT_TIMEOUT_MS), not zero, so it must not be allowed
+    // to collapse the wait into a spin; fall back to whatever is left of the caller's deadline.
+    const std::chrono::steady_clock::duration configured =
+        options_.response_timeout_ > 0
+            ? std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+                  std::chrono::seconds{options_.response_timeout_})
+            : timeout_steady;
     const std::chrono::steady_clock::duration wait_interval =
-        (std::min)(std::chrono::duration_cast<std::chrono::steady_clock::duration>(
-                       std::chrono::seconds{options_.response_timeout_}),
-                   timeout_steady);
+        (std::min)(configured, timeout_steady);
 
     std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
     synchronization_data_->force_flush_cv.wait_for(lk_cv, wait_interval);
