@@ -48,9 +48,11 @@ SpanLimits GetSpanLimitsFromEnv(const SpanLimits &defaults)
 
   // General attribute limits first; the span-specific variables below take precedence.
   UpdateFromEnv(kAttributeValueLengthLimitEnv, limits.attribute_value_length_limit);
+  // No OTEL_ATTRIBUTE_VALUE_DEPTH_LIMIT in the specification
   UpdateFromEnv(kAttributeCountLimitEnv, limits.attribute_count_limit);
 
   UpdateFromEnv(kSpanAttributeValueLengthLimitEnv, limits.attribute_value_length_limit);
+  // No OTEL_SPAN_ATTRIBUTE_VALUE_DEPTH_LIMIT in the specification
   UpdateFromEnv(kSpanAttributeCountLimitEnv, limits.attribute_count_limit);
   UpdateFromEnv(kSpanEventCountLimitEnv, limits.event_count_limit);
   UpdateFromEnv(kSpanLinkCountLimitEnv, limits.link_count_limit);
