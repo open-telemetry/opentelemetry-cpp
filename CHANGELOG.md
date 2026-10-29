@@ -15,6 +15,18 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Fix the Elasticsearch log exporter's synchronous export path
+  waiting with no deadline of its own, trusting an injected `HttpClient` to
+  always eventually deliver a terminal event. A client that accepts a
+  request and never calls back (a dead thread, a reused socket, a swallowed
+  error) left `Export()` blocked for the life of the process. The wait now
+  has its own deadline derived from the configured response timeout, so a
+  non-responding client fails the export instead of hanging it. A
+  `response_timeout` of 0 means no timeout, matching the curl client's own
+  `CURLOPT_TIMEOUT_MS` 0 semantics, so it no longer maps to a deadline
+  already in the past.
+  [#4530](https://github.com/open-telemetry/opentelemetry-cpp/pull/4530)
+
 * [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
   so a larger value no longer stops spans from being exported until the
   schedule delay expires.
