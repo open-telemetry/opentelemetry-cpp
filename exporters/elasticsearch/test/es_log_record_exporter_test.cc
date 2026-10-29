@@ -393,8 +393,8 @@ TEST(ElasticsearchLogsExporterTests, ShutdownDoesNotSpinWhenResponseTimeoutIsZer
   std::shared_ptr<http_client::EventHandler> parked;
   logs_exporter::ElasticsearchExporterOptions options;
   options.response_timeout_ = 0;
-  auto http_client           = std::make_shared<HoldingHttpClient>(&parked);
-  auto exporter              = std::unique_ptr<sdklogs::LogRecordExporter>(
+  auto http_client          = std::make_shared<HoldingHttpClient>(&parked);
+  auto exporter             = std::unique_ptr<sdklogs::LogRecordExporter>(
       new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
 
   auto record = exporter->MakeRecordable();
