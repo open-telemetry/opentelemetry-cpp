@@ -22,6 +22,19 @@ Increment the:
   supplied context on its way to the processor.
   [#4421](https://github.com/open-telemetry/opentelemetry-cpp/pull/4421)
 
+* [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
+  so a larger value no longer stops spans from being exported until the
+  schedule delay expires.
+  [#4727](https://github.com/open-telemetry/opentelemetry-cpp/pull/4727)
+
+* [BUG] Store `SocketAddr` in a `sockaddr_storage` and pass `addr()` and
+  `addr_len()` to the socket API, fixing a misaligned `sockaddr_in` access
+  [#4307](https://github.com/open-telemetry/opentelemetry-cpp/issues/4307)
+
+* [EXPORTER] Prometheus exporter: fix attribute serialization, label collision,
+  and empty point guards
+  [#4738](https://github.com/open-telemetry/opentelemetry-cpp/pull/4738)
+
 Breaking changes:
 
 * [LOGS] `logs::Logger` and `sdk::logs::LogRecordProcessor` each gained a new
