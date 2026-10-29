@@ -15,6 +15,19 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Fix a doc comment on the Elasticsearch log exporter's
+  `ResponseHandler::waitForResponse()` claiming a request timeout (set via
+  `SetTimeoutMs()`) arrives as a `SessionState::TimedOut` event. No
+  `HttpClient` implementation in this repo dispatches `TimedOut`; the curl
+  client maps a timeout to `SendFailed` like any other transport error, which
+  is what the comment now says.
+  [#4604](https://github.com/open-telemetry/opentelemetry-cpp/issues/4604)
+
+* [SDK] Release provider mutexes before construction-failure diagnostics so
+  custom log handlers can retrieve cached or noop tracers, loggers, and meters
+  from the same provider without deadlocking.
+  [#4693](https://github.com/open-telemetry/opentelemetry-cpp/issues/4693)
+
 * [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
   so a larger value no longer stops spans from being exported until the
   schedule delay expires.
