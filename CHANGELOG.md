@@ -24,9 +24,8 @@ Increment the:
   non-responding client fails the export instead of hanging it. A
   `response_timeout` of 0 means no timeout, matching the curl client's own
   `CURLOPT_TIMEOUT_MS` 0 semantics, so it no longer maps to a deadline
-  already in the past: that previously failed every synchronous export
-  immediately, even one the client was about to answer successfully.
-  [#4362](https://github.com/open-telemetry/opentelemetry-cpp/issues/4362)
+  already in the past.
+  [#4530](https://github.com/open-telemetry/opentelemetry-cpp/pull/4530)
 
 ## [1.30.0] 2026-10-22
 

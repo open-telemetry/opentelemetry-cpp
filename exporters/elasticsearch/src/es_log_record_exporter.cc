@@ -133,7 +133,22 @@ public:
     // before this thread got here, in which case there is no notification left to receive.
     // A deadline that passes without a terminal event leaves completion_ at Pending, which
     // reads as failure below, the same outcome a terminal error event would have produced.
-    cv_.wait_until(lk, deadline, [this] { return completion_ != CompletionState::Pending; });
+    //
+    // time_point::max() (no response_timeout_, see the caller) is handed to wait_until() as-is
+    // on some platforms (observed on Alpine and pre-GCC-10 libstdc++), where adding the
+    // steady_clock epoch to it internally overflows and the call returns immediately instead of
+    // waiting, turning "no timeout" into "no wait" and leaving completion_ Pending forever
+    // because every retry races into the same immediate return. Waiting without a deadline
+    // avoids computing that sum at all.
+    auto done = [this] { return completion_ != CompletionState::Pending; };
+    if (deadline == std::chrono::steady_clock::time_point::max())
+    {
+      cv_.wait(lk, done);
+    }
+    else
+    {
+      cv_.wait_until(lk, deadline, done);
+    }
     if (timed_out != nullptr)
     {
       *timed_out = (completion_ == CompletionState::Pending);
