@@ -15,6 +15,15 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] `BatchLogRecordProcessor` now exports at most one batch on normal
+  wakeups instead of continuously draining the buffer, matching
+  `BatchSpanProcessor`
+  ([#4466](https://github.com/open-telemetry/opentelemetry-cpp/pull/4466)).
+  Scheduled exports and queue-pressure wakeups can still export partial batches.
+  `ForceFlush` and `Shutdown` drain buffered log records in batches respecting
+  `max_export_batch_size`.
+  [#4498](https://github.com/open-telemetry/opentelemetry-cpp/issues/4498)
+
 * [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
   so a larger value no longer stops spans from being exported until the
   schedule delay expires.
