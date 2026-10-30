@@ -15,6 +15,28 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Finish a curl operation that never gets scheduled, instead of leaving
+  FinishSession blocked forever
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+
+* [BUG] Report a curl request the multi handle refused as a failed create,
+  rather than as a cancel nobody asked for
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+
+* [BUG] Store the curl session state before the event that reports it, so a
+  cancel dispatched by the IO thread is not overwritten or raced
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+
+* [BUG] Let a handler finish the request it is being told about from any event,
+  including the ones the IO thread delivers, instead of waiting on a completion
+  only that thread goes on to publish
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+
+* [BUG] Decide whether a curl thread is inside a callback without an
+  unsynchronized member, which was read and written from two threads behind a
+  sanitizer suppression
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+
 * [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
   so a larger value no longer stops spans from being exported until the
   schedule delay expires.
