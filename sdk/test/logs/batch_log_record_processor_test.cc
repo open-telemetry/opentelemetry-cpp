@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <memory>
 #include <mutex>
+#include <new>
 #include <string>
 #include <thread>
 #include <utility>
@@ -184,7 +185,7 @@ public:
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<Recordable>(new MockLogRecordable());
+    return std::unique_ptr<Recordable>(new (std::nothrow) MockLogRecordable());
   }
 
   ExportResult Export(
