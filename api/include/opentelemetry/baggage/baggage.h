@@ -149,8 +149,9 @@ public:
       bool err       = false;
       auto key_str   = UrlDecode(common::StringUtil::Trim(key), err);
       auto value_str = UrlDecode(common::StringUtil::Trim(value), err);
+      value_str      = ReplaceInvalidUtf8(value_str);
 
-      if (err == false && IsValidKey(key_str) && IsValidValue(value_str) &&
+      if (err == false && IsValidKey(key_str) && !ContainsAsciiControl(value_str) &&
           IsValidMetadata(metadata))
       {
         if (!metadata.empty())
@@ -307,6 +308,84 @@ private:
   static bool IsValidKey(nostd::string_view key) { return key.size() && IsPrintableString(key); }
 
   static bool IsValidValue(nostd::string_view value) { return IsPrintableString(value); }
+
+  static bool ContainsAsciiControl(nostd::string_view str) noexcept
+  {
+    for (unsigned char ch : str)
+    {
+      if (ch < 0x20 || ch == 0x7f)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Returns the length of a valid UTF-8 sequence at the start of str, or zero if none exists.
+  static size_t Utf8SequenceLength(nostd::string_view str) noexcept
+  {
+    const auto lead          = static_cast<unsigned char>(str[0]);
+    size_t length            = 0;
+    unsigned char min_second = 0x80;
+    unsigned char max_second = 0xbf;
+    if (lead >= 0xc2 && lead <= 0xdf)
+    {
+      length = 2;
+    }
+    else if (lead >= 0xe0 && lead <= 0xef)
+    {
+      length     = 3;
+      min_second = lead == 0xe0 ? 0xa0 : 0x80;
+      max_second = lead == 0xed ? 0x9f : 0xbf;
+    }
+    else if (lead >= 0xf0 && lead <= 0xf4)
+    {
+      length     = 4;
+      min_second = lead == 0xf0 ? 0x90 : 0x80;
+      max_second = lead == 0xf4 ? 0x8f : 0xbf;
+    }
+    if (length == 0 || str.size() < length)
+    {
+      return 0;
+    }
+    const auto second = static_cast<unsigned char>(str[1]);
+    if (second < min_second || second > max_second)
+    {
+      return 0;
+    }
+    for (size_t i = 2; i < length; ++i)
+    {
+      if ((static_cast<unsigned char>(str[i]) & 0xc0) != 0x80)
+      {
+        return 0;
+      }
+    }
+    return length;
+  }
+
+  // W3C Baggage requires invalid percent-decoded UTF-8 octets to become U+FFFD.
+  static std::string ReplaceInvalidUtf8(nostd::string_view str)
+  {
+    std::string ret;
+    ret.reserve(str.size());
+    for (size_t i = 0; i < str.size();)
+    {
+      auto remaining       = str.substr(i);
+      const auto ch        = static_cast<unsigned char>(remaining[0]);
+      const size_t length  = ch < 0x80 ? 1 : Utf8SequenceLength(remaining);
+      if (length == 0)
+      {
+        ret.append("\xef\xbf\xbd");
+        ++i;
+      }
+      else
+      {
+        ret.append(str.data() + i, length);
+        i += length;
+      }
+    }
+    return ret;
+  }
 
   // Uri encode key value pairs before injecting into header
   // Implementation inspired from : https://golang.org/src/net/url/url.go?s=7851:7884#L264

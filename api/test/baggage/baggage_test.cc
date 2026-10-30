@@ -97,6 +97,23 @@ TEST(BaggageTest, RejectMemberInjectionFromDecodedDelimiters)
   EXPECT_EQ(baggage->ToHeader(), "good=ok");
 }
 
+TEST(BaggageTest, ReplaceInvalidUtf8InPercentDecodedValue)
+{
+  auto baggage = Baggage::FromHeader("k=aa%ffcc%fedd%fa,valid=Am%C3%A9lie");
+  std::string value;
+  ASSERT_TRUE(baggage->GetValue("k", value));
+  EXPECT_EQ(value, std::string("aa\xef\xbf\xbd" "cc\xef\xbf\xbd\xef\xbf\xbd"));
+  ASSERT_TRUE(baggage->GetValue("valid", value));
+  EXPECT_EQ(value, "Am\xc3\xa9lie");
+  EXPECT_EQ(baggage->ToHeader(), "k=aa%EF%BF%BDcc%EF%BF%BD%EF%BF%BD,valid=Am%C3%A9lie");
+}
+
+TEST(BaggageTest, RejectDecodedAsciiControlInValue)
+{
+  auto baggage = Baggage::FromHeader("bad=before%0Aafter,good=ok");
+  EXPECT_EQ(baggage->ToHeader(), "good=ok");
+}
+
 TEST(BaggageTest, PreserveValidMetadataWireRepresentation)
 {
   for (const std::string metadata :
