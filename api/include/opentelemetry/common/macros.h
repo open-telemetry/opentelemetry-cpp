@@ -375,6 +375,7 @@ point.
 
 #  define OPENTELEMETRY_ATOMIC_READ_8(ptr) __atomic_load_n(ptr, __ATOMIC_SEQ_CST)
 #  define OPENTELEMETRY_ATOMIC_WRITE_8(ptr, value) __atomic_store_n(ptr, value, __ATOMIC_SEQ_CST)
+#  define OPENTELEMETRY_ATOMIC_READ_RELAXED_8(ptr) __atomic_load_n(ptr, __ATOMIC_RELAXED)
 
 #elif defined(_MSC_VER)
 
@@ -384,6 +385,9 @@ point.
     static_cast<uint8_t>(_InterlockedCompareExchange8(reinterpret_cast<char *>(ptr), 0, 0))
 #  define OPENTELEMETRY_ATOMIC_WRITE_8(ptr, value) \
     _InterlockedExchange8(reinterpret_cast<char *>(ptr), static_cast<char>(value))
+// A plain load, unlike OPENTELEMETRY_ATOMIC_READ_8 which locks the cache line on every read.
+#  define OPENTELEMETRY_ATOMIC_READ_RELAXED_8(ptr) \
+    static_cast<uint8_t>(__iso_volatile_load8(reinterpret_cast<const volatile char *>(ptr)))
 
 #else
 #  error port atomics read/write for the current platform

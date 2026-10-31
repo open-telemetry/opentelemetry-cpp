@@ -863,6 +863,97 @@ TEST(MeterProvider, UpdateMeterConfiguratorAppliesToAllViewsOfAnInstrument)
             CollectCounterSums(reader, "scope.views"));
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(MeterProvider, SyncInstrumentEnabledFollowsMeterConfig)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader);
+  ASSERT_NE(nullptr, reader);
+
+  auto meter = provider->GetMeter("scope.enabled");
+  std::vector<std::unique_ptr<opentelemetry::metrics::SynchronousInstrument>> instruments;
+  instruments.emplace_back(meter->CreateUInt64Counter("uint64_counter").release());
+  instruments.emplace_back(meter->CreateDoubleCounter("double_counter").release());
+  instruments.emplace_back(meter->CreateUInt64Histogram("uint64_histogram").release());
+  instruments.emplace_back(meter->CreateDoubleHistogram("double_histogram").release());
+  instruments.emplace_back(meter->CreateInt64UpDownCounter("int64_up_down_counter").release());
+  instruments.emplace_back(meter->CreateDoubleUpDownCounter("double_up_down_counter").release());
+  instruments.emplace_back(meter->CreateInt64Gauge("int64_gauge").release());
+  instruments.emplace_back(meter->CreateDoubleGauge("double_gauge").release());
+
+  for (const auto &instrument : instruments)
+  {
+    EXPECT_TRUE(instrument->Enabled());
+  }
+
+  provider->UpdateMeterConfigurator(DisableAll());
+  for (const auto &instrument : instruments)
+  {
+    EXPECT_FALSE(instrument->Enabled());
+  }
+
+  provider->UpdateMeterConfigurator(EnableAll());
+  for (const auto &instrument : instruments)
+  {
+    EXPECT_TRUE(instrument->Enabled());
+  }
+}
+
+TEST(MeterProvider, SyncInstrumentEnabledCreatedWhileMeterDisabled)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader, DisableAll());
+  ASSERT_NE(nullptr, reader);
+
+  auto counter = provider->GetMeter("scope.revived")->CreateUInt64Counter("counter");
+  EXPECT_FALSE(counter->Enabled());
+
+  provider->UpdateMeterConfigurator(EnableAll());
+  EXPECT_TRUE(counter->Enabled());
+}
+
+TEST(MeterProvider, SyncInstrumentEnabledFalseWhenAllViewsDrop)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader);
+  ASSERT_NE(nullptr, reader);
+  provider->AddView(std::unique_ptr<InstrumentSelector>(
+                        new InstrumentSelector(InstrumentType::kCounter, "dropped", "")),
+                    std::unique_ptr<MeterSelector>(new MeterSelector("scope.drop", "", "")),
+                    std::unique_ptr<View>(new View("", "", AggregationType::kDrop)));
+
+  auto meter   = provider->GetMeter("scope.drop");
+  auto dropped = meter->CreateUInt64Counter("dropped");
+  auto kept    = meter->CreateUInt64Counter("kept");
+
+  EXPECT_FALSE(dropped->Enabled());
+  EXPECT_TRUE(kept->Enabled());
+
+  // A dropped instrument stays disabled when its meter is enabled again.
+  provider->UpdateMeterConfigurator(DisableAll());
+  provider->UpdateMeterConfigurator(EnableAll());
+  EXPECT_FALSE(dropped->Enabled());
+  EXPECT_TRUE(kept->Enabled());
+}
+
+TEST(MeterProvider, SyncInstrumentEnabledWhenAnyViewKeepsData)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader);
+  ASSERT_NE(nullptr, reader);
+  for (auto aggregation : {AggregationType::kDrop, AggregationType::kSum})
+  {
+    provider->AddView(std::unique_ptr<InstrumentSelector>(
+                          new InstrumentSelector(InstrumentType::kCounter, "counter", "")),
+                      std::unique_ptr<MeterSelector>(new MeterSelector("scope.mixed", "", "")),
+                      std::unique_ptr<View>(new View("", "", aggregation)));
+  }
+
+  auto counter = provider->GetMeter("scope.mixed")->CreateUInt64Counter("counter");
+  EXPECT_TRUE(counter->Enabled());
+}
+#endif
+
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2 && \
     defined(OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW)
 // A handle bound while the meter is disabled records once it is enabled, and its pending data is
@@ -1093,6 +1184,25 @@ TEST(MeterProvider, MeterWithExpiredContextIsDisabled)
   ASSERT_NE(nullptr, counter);
   counter->Add(1);  // Dropped: the meter is disabled.
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+// An instrument created after its meter's context is gone has no storage, so it is disabled.
+TEST(MeterProvider, SyncInstrumentEnabledFalseWithoutContext)
+{
+  ScopedTestLogHandler log_handler{LogLevel::Error};
+
+  auto context = std::make_shared<MeterContext>(std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+                                                opentelemetry::sdk::resource::Resource::Create({}),
+                                                EnableAll());
+  Meter meter{context,
+              opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("scope")};
+  context.reset();
+
+  auto counter = meter.CreateUInt64Counter("counter");
+  ASSERT_NE(nullptr, counter);
+  EXPECT_FALSE(counter->Enabled());
+}
+#endif
 
 TEST(MeterProvider, ConstructorsAreNotNoexcept)
 {
