@@ -154,6 +154,8 @@ public:
     auto sdk_exemplar_filter = ConvertExemplarFilter(model->exemplar_filter);
 #endif
 
+    // FIXME-SDK: support ViewMatchingMode
+
     std::unique_ptr<opentelemetry::sdk::metrics::MeterContext> meter_context;
     if (model->meter_configurator)
     {
