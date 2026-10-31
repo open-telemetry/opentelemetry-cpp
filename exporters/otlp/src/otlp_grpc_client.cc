@@ -335,7 +335,7 @@ std::string OtlpGrpcClient::GetGrpcTarget(const std::string &endpoint)
   }
   else if (url.scheme_ == "vsock")
   {
-    grpc_target = "vsock:" + url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
+    grpc_target = "vsock:" + url.host_ + ":" + std::to_string(url.port_);
   }
   else
   {

@@ -72,6 +72,7 @@ TEST(OtlpGrpcClientEndpointTest, VsockEndpoints)
 {
   EXPECT_EQ(OtlpGrpcClient::GetGrpcTarget("vsock:3:1234"), "vsock:3:1234");
   EXPECT_EQ(OtlpGrpcClient::GetGrpcTarget("vsock://3:1234"), "vsock:3:1234");
+  EXPECT_EQ(OtlpGrpcClient::GetGrpcTarget("vsock://3:100000"), "vsock:3:100000");
 }
 
 TEST_F(OtlpGrpcClientTestPeer, ChannelArgumentsOptionTest)

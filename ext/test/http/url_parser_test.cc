@@ -23,7 +23,7 @@ struct ParsedUrl
 {
   std::string scheme;
   std::string host;
-  std::uint16_t port{};
+  std::uint32_t port{};
   std::string path;
   std::string query;
   bool success{};
@@ -104,7 +104,11 @@ INSTANTIATE_TEST_SUITE_P(
         std::make_tuple("https://example.com:80a/some/path",
                         ParsedUrl{"https", "example.com", 0, "/some/path", "", false}),
         std::make_tuple("https://example.com:18446744073709551616/some/path",
-                        ParsedUrl{"https", "example.com", 0, "/some/path", "", false})));
+                        ParsedUrl{"https", "example.com", 0, "/some/path", "", false}),
+        std::make_tuple("vsock://3:100000",
+                        ParsedUrl{"vsock", "3", 100000, "/", "", true}),
+        std::make_tuple("vsock://3:4294967296",
+                        ParsedUrl{"vsock", "3", 0, "/", "", false})));
 
 TEST_P(UrlParserTests, BasicTests)
 {
