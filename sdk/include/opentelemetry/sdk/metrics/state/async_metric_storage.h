@@ -8,6 +8,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
@@ -51,8 +52,6 @@ public:
         aggregation_config_{AggregationConfig::GetOrDefault(aggregation_config)},
         attributes_processor_{std::move(attributes_processor)},
         is_monotonic_sum_{IsMonotonicSum(aggregation_type, instrument_descriptor)},
-        last_observed_hash_map_(
-            std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
         delta_hash_map_(
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
         round_hash_map_(
@@ -135,9 +134,13 @@ public:
     std::shared_ptr<AttributesHashMap> delta_metrics = nullptr;
     {
       std::lock_guard<std::mutex> guard(hashmap_lock_);
-      if (!is_monotonic_sum_)
+      if (is_monotonic_sum_)
       {
-        BuildDeltaFromRound();
+        BuildMonotonicDeltaFromRound(collector);
+      }
+      else
+      {
+        BuildDeltaFromRound(collector);
       }
       delta_metrics = std::move(delta_hash_map_);
       delta_hash_map_ =
@@ -159,23 +162,14 @@ private:
   template <class T>
   void RecordMonotonicSum(const MetricAttributes &attributes, T value)
   {
-    auto observed = create_default_aggregation_();
-    observed->Aggregate(value);
-
-    std::unique_ptr<Aggregation> delta;
-    auto previous = last_observed_hash_map_->Get(attributes);
-    if (previous)
+    auto observed = monotonic_round_observations_.find(attributes);
+    if (observed == monotonic_round_observations_.end())
     {
-      delta = previous->Diff(*observed);
+      observed =
+          monotonic_round_observations_.emplace(attributes, create_default_aggregation_()).first;
+      monotonic_round_attribute_order_.push_back(attributes);
     }
-    else
-    {
-      delta = DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_,
-                                                   *observed);
-    }
-    last_observed_hash_map_->Set(attributes, std::move(observed));
-
-    AccumulateDelta(FilterAttributes(attributes), *delta);
+    observed->second->Aggregate(value);
   }
 
   /**
@@ -196,13 +190,49 @@ private:
    * monotonic sums. An attribute set missing from this round keeps its baseline and contributes
    * no delta; suppressing the stale output is the temporal storage's job.
    */
-  void BuildDeltaFromRound() noexcept
+  void BuildMonotonicDeltaFromRound(CollectorHandle *collector) noexcept
   {
-    round_hash_map_->GetAllEntries([this](const MetricAttributes &attributes,
-                                          Aggregation &aggregation) {
+    auto &last_observed = last_observed_monotonic_hash_maps_[collector];
+    for (const auto &attributes : monotonic_round_attribute_order_)
+    {
+      auto observed = monotonic_round_observations_.find(attributes);
+      if (observed == monotonic_round_observations_.end())
+      {
+        continue;
+      }
+
+      std::unique_ptr<Aggregation> delta;
+      auto previous = last_observed.find(attributes);
+      if (previous != last_observed.end())
+      {
+        delta = previous->second->Diff(*observed->second);
+      }
+      else
+      {
+        delta = DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_,
+                                                     *observed->second);
+      }
+      last_observed[attributes] = DefaultAggregation::CloneAggregation(
+          aggregation_type_, instrument_descriptor_, *observed->second);
+      AccumulateDelta(FilterAttributes(attributes), *delta);
+    }
+
+    monotonic_round_observations_.clear();
+    monotonic_round_attribute_order_.clear();
+  }
+
+  void BuildDeltaFromRound(CollectorHandle *collector) noexcept
+  {
+    auto &last_observed = last_observed_hash_maps_[collector];
+    if (!last_observed)
+    {
+      last_observed = std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
+    }
+    round_hash_map_->GetAllEntries([this, &last_observed](const MetricAttributes &attributes,
+                                                          Aggregation &aggregation) {
       auto observed = DefaultAggregation::CloneAggregation(aggregation_type_,
                                                            instrument_descriptor_, aggregation);
-      auto previous = last_observed_hash_map_->Get(attributes);
+      auto previous = last_observed->Get(attributes);
       if (previous)
       {
         delta_hash_map_->Set(attributes, previous->Diff(*observed));
@@ -212,7 +242,7 @@ private:
         delta_hash_map_->Set(attributes, DefaultAggregation::CloneAggregation(
                                              aggregation_type_, instrument_descriptor_, *observed));
       }
-      last_observed_hash_map_->Set(attributes, std::move(observed));
+      last_observed->Set(attributes, std::move(observed));
       return true;
     });
 
@@ -281,7 +311,17 @@ private:
   bool is_monotonic_sum_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
 
-  std::unique_ptr<AttributesHashMap> last_observed_hash_map_;
+  std::unordered_map<CollectorHandle *, std::unique_ptr<AttributesHashMap>>
+      last_observed_hash_maps_;
+  // Source baselines are reader-specific and must remain distinct beyond the output cardinality
+  // limit to calculate future per-attribute deltas.
+  std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, AttributeHashGenerator>
+      monotonic_round_observations_;
+  std::vector<MetricAttributes> monotonic_round_attribute_order_;
+  std::unordered_map<
+      CollectorHandle *,
+      std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, AttributeHashGenerator>>
+      last_observed_monotonic_hash_maps_;
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
   std::unique_ptr<AttributesHashMap> round_hash_map_;
 
