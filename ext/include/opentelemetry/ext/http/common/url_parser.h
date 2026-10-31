@@ -6,6 +6,7 @@
 #include <cerrno>
 #include <cstdint>
 #include <cstdlib>
+#include <limits>
 #include <string>
 #include <utility>
 
@@ -32,7 +33,7 @@ public:
   std::string host_;
   std::string scheme_;
   std::string path_;
-  uint16_t port_{};
+  std::uint32_t port_{};
   std::string query_;
   bool success_{true};
 
@@ -171,18 +172,21 @@ private:
     return std::string::npos;
   }
 
-  std::uint16_t GetPort(const std::string &s)
+  std::uint32_t GetPort(const std::string &s)
   {
-    char *e   = nullptr;
-    errno     = 0;
-    auto port = std::strtol(s.c_str(), &e, 10);
-    if (e == s.c_str() || e != s.c_str() + s.size() || errno == ERANGE || port < 0 || port > 65535)
+    char *e = nullptr;
+    errno   = 0;
+    auto port = std::strtoull(s.c_str(), &e, 10);
+    auto max_port = scheme_ == "vsock" ? std::numeric_limits<std::uint32_t>::max()
+                                        : std::numeric_limits<std::uint16_t>::max();
+    if (e == s.c_str() || e != s.c_str() + s.size() || errno == ERANGE || s[0] == '-' ||
+        port > max_port)
     {
       success_ = false;
       return 0;
     }
 
-    return static_cast<uint16_t>(port);
+    return static_cast<std::uint32_t>(port);
   }
 };
 

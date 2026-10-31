@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [OTLP/gRPC] Support VSOCK endpoints on Linux
+  [#4706](https://github.com/open-telemetry/opentelemetry-cpp/issues/4706)
+
 * [SDK] `BatchLogRecordProcessor` now exports at most one batch on normal
   wakeups instead of continuously draining the buffer, matching
   `BatchSpanProcessor`
