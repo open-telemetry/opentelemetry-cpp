@@ -39,3 +39,9 @@ gtest_add_tests(
   TARGET ${URL_PARSER_FILENAME}
   TEST_PREFIX ext.http.urlparser.
   TEST_LIST ${URL_PARSER_FILENAME})
+
+# curl_http_test.cc: every case drives a server on port 19000.
+if(OTELCPP_WITH_HTTP_CLIENT_CURL)
+  set_tests_properties(${curl_http_test} PROPERTIES RESOURCE_LOCK
+                                                    otelcpp_port_19000)
+endif()
