@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/metrics/sync_instruments.h"
@@ -66,5 +67,41 @@ TEST(SynchronousInstrument, NoopInstrumentsAreDisabled)
   EXPECT_FALSE(histogram.Enabled());
   EXPECT_FALSE(up_down_counter.Enabled());
   EXPECT_FALSE(gauge.Enabled());
+}
+
+namespace
+{
+// An instrument reading an external flag, the way an SDK instrument does.
+class FlagCounter : public opentelemetry::metrics::NoopCounter<uint64_t>
+{
+public:
+  explicit FlagCounter(const bool *flag) : NoopCounter("test", "none", "unitless")
+  {
+    SetEnabledFlag(flag);
+  }
+};
+}  // namespace
+
+// A copy must not read the default flag stored in the instrument it was copied from.
+TEST(SynchronousInstrument, CopyOfDefaultInstrumentIsDisabled)
+{
+  std::unique_ptr<opentelemetry::metrics::NoopCounter<uint64_t>> original{
+      new opentelemetry::metrics::NoopCounter<uint64_t>("test", "none", "unitless")};
+  opentelemetry::metrics::NoopCounter<uint64_t> copy(*original);
+  original.reset();
+  EXPECT_FALSE(copy.Enabled());
+}
+
+// A copy keeps reading the external flag after the instrument it was copied from is destroyed.
+TEST(SynchronousInstrument, CopySharesExternalFlag)
+{
+  bool flag = true;
+  std::unique_ptr<FlagCounter> original{new FlagCounter(&flag)};
+  FlagCounter copy(*original);
+  original.reset();
+  EXPECT_TRUE(copy.Enabled());
+
+  OPENTELEMETRY_ATOMIC_WRITE_8(&flag, false);
+  EXPECT_FALSE(copy.Enabled());
 }
 #endif

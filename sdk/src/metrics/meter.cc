@@ -158,8 +158,9 @@ void Meter::UpdateMeterConfig(MeterConfig config) noexcept
 std::shared_ptr<MeterEnabledState> Meter::GetInstrumentEnabledState(
     const SyncMultiMetricStorage *storage) const noexcept
 {
-  // Every matching view uses the Drop aggregation, so the instrument never records.
-  if (storage != nullptr && storage->Empty())
+  // Without storage the instrument never records: either the meter context is gone, or every
+  // matching view uses the Drop aggregation.
+  if (storage == nullptr || storage->Empty())
   {
     return always_disabled_state_;
   }

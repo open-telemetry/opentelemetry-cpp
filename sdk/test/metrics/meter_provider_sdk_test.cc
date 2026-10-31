@@ -1185,6 +1185,25 @@ TEST(MeterProvider, MeterWithExpiredContextIsDisabled)
   counter->Add(1);  // Dropped: the meter is disabled.
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+// An instrument created after its meter's context is gone has no storage, so it is disabled.
+TEST(MeterProvider, SyncInstrumentEnabledFalseWithoutContext)
+{
+  ScopedTestLogHandler log_handler{LogLevel::Error};
+
+  auto context = std::make_shared<MeterContext>(std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+                                                opentelemetry::sdk::resource::Resource::Create({}),
+                                                EnableAll());
+  Meter meter{context,
+              opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("scope")};
+  context.reset();
+
+  auto counter = meter.CreateUInt64Counter("counter");
+  ASSERT_NE(nullptr, counter);
+  EXPECT_FALSE(counter->Enabled());
+}
+#endif
+
 TEST(MeterProvider, ConstructorsAreNotNoexcept)
 {
   static_assert(!noexcept(MeterProvider()), "MeterProvider construction must be allowed to throw");

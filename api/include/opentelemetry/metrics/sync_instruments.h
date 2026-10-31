@@ -22,12 +22,36 @@ namespace metrics
 class SynchronousInstrument
 {
 public:
-  SynchronousInstrument()                                             = default;
+  SynchronousInstrument() = default;
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  // Copies share the SDK flag, but never point at the source's own flag, which is destroyed with
+  // the source.
+  SynchronousInstrument(const SynchronousInstrument &other) noexcept
+      : enabled_(other.EnabledFlagForCopy(*this))
+  {}
+  SynchronousInstrument(SynchronousInstrument &&other) noexcept
+      : enabled_(other.EnabledFlagForCopy(*this))
+  {}
+  SynchronousInstrument &operator=(const SynchronousInstrument &other) noexcept
+  {
+    if (this != &other)
+    {
+      enabled_ = other.EnabledFlagForCopy(*this);
+    }
+    return *this;
+  }
+  SynchronousInstrument &operator=(SynchronousInstrument &&other) noexcept
+  {
+    enabled_ = other.EnabledFlagForCopy(*this);
+    return *this;
+  }
+#else
   SynchronousInstrument(const SynchronousInstrument &)                = default;
   SynchronousInstrument(SynchronousInstrument &&) noexcept            = default;
   SynchronousInstrument &operator=(const SynchronousInstrument &)     = default;
   SynchronousInstrument &operator=(SynchronousInstrument &&) noexcept = default;
-  virtual ~SynchronousInstrument()                                    = default;
+#endif
+  virtual ~SynchronousInstrument() = default;
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   /**
@@ -43,30 +67,24 @@ public:
 
 protected:
   /**
-   * Sets the flag read by Enabled(). SDKs point it at a flag they update; it must outlive this
-   * instrument.
+   * Points Enabled() at a flag owned by the SDK. The flag must outlive this instrument, and must
+   * only be changed with atomic writes such as OPENTELEMETRY_ATOMIC_WRITE_8, since Enabled() can
+   * read it concurrently.
    *
    * @since ABI_VERSION 2
    */
   void SetEnabledFlag(const bool *enabled) noexcept { enabled_ = enabled; }
 
-  /** A flag that is always false, for instruments that are never enabled. */
-  static const bool *DisabledFlag() noexcept
-  {
-    static const bool kDisabled = false;
-    return &kDisabled;
-  }
-
 private:
-  static const bool *EnabledFlag() noexcept
+  const bool *EnabledFlagForCopy(const SynchronousInstrument &copy) const noexcept
   {
-    static const bool kEnabled = true;
-    return &kEnabled;
+    return enabled_ == &enabled_in_api_ ? &copy.enabled_in_api_ : enabled_;
   }
 
-  // Variable to support implementation of Enabled method introduced in ABI V2.
-  // A pointer, so an SDK can flip many instruments with a single write.
-  const bool *enabled_ = EnabledFlag();
+  // By default enabled_ points at enabled_in_api_, which is always false. An SDK points it at
+  // its own flag with SetEnabledFlag().
+  bool enabled_in_api_ = false;
+  const bool *enabled_ = &enabled_in_api_;
 #endif
 };
 

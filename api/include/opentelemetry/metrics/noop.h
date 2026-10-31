@@ -39,11 +39,7 @@ public:
   NoopCounter(nostd::string_view /* name */,
               nostd::string_view /* description */,
               nostd::string_view /* unit */) noexcept
-  {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-    this->SetEnabledFlag(this->DisabledFlag());
-#endif
-  }
+  {}
   void Add(T /* value */) noexcept override {}
   void Add(T /* value */, const context::Context & /* context */) noexcept override {}
   void Add(T /* value */, const common::KeyValueIterable & /* attributes */) noexcept override {}
@@ -67,11 +63,7 @@ public:
   NoopHistogram(nostd::string_view /* name */,
                 nostd::string_view /* description */,
                 nostd::string_view /* unit */) noexcept
-  {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-    this->SetEnabledFlag(this->DisabledFlag());
-#endif
-  }
+  {}
   void Record(T /* value */, const context::Context & /* context */) noexcept override {}
   void Record(T /* value */,
               const common::KeyValueIterable & /* attributes */,
@@ -101,11 +93,7 @@ public:
   NoopUpDownCounter(nostd::string_view /* name */,
                     nostd::string_view /* description */,
                     nostd::string_view /* unit */) noexcept
-  {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-    this->SetEnabledFlag(this->DisabledFlag());
-#endif
-  }
+  {}
   void Add(T /* value */) noexcept override {}
   void Add(T /* value */, const context::Context & /* context */) noexcept override {}
   void Add(T /* value */, const common::KeyValueIterable & /* attributes */) noexcept override {}
@@ -123,9 +111,7 @@ public:
   NoopGauge(nostd::string_view /* name */,
             nostd::string_view /* description */,
             nostd::string_view /* unit */) noexcept
-  {
-    this->SetEnabledFlag(this->DisabledFlag());
-  }
+  {}
   void Record(T /* value */) noexcept override {}
   void Record(T /* value */, const context::Context & /* context */) noexcept override {}
   void Record(T /* value */, const common::KeyValueIterable & /* attributes */) noexcept override {}
