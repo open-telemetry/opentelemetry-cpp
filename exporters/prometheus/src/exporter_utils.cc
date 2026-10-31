@@ -44,8 +44,11 @@ namespace metrics
 namespace
 {
 
-static constexpr const char *kScopeNameKey    = "otel_scope_name";
-static constexpr const char *kScopeVersionKey = "otel_scope_version";
+static constexpr const char *kScopeNameKey        = "otel_scope_name";
+static constexpr const char *kScopeVersionKey     = "otel_scope_version";
+static constexpr const char *kScopeSchemaUrlKey   = "otel_scope_schema_url";
+static constexpr const char *kScopeLabelPrefix    = "otel_scope_";
+static constexpr std::size_t kScopeLabelPrefixLen = sizeof("otel_scope_") - 1;
 
 /**
  * Sanitize the given metric name by replacing invalid characters with _,
@@ -686,7 +689,7 @@ prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
 
 void PrometheusExporterUtils::SetTarget(
     const sdk::metrics::ResourceMetrics &data,
-    const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope * /* scope */,
     std::vector<::prometheus::MetricFamily> *output)
 {
   if (output == nullptr || data.resource_ == nullptr)
@@ -704,7 +707,7 @@ void PrometheusExporterUtils::SetTarget(
   metric.info.value                       = 1.0;
 
   metric_sdk::PointAttributes empty_attributes;
-  SetMetricBasic(metric, empty_attributes, scope, data.resource_);
+  SetMetricBasic(metric, empty_attributes, nullptr, data.resource_);
 
   for (auto &label : data.resource_->GetAttributes())
   {
@@ -772,7 +775,12 @@ void PrometheusExporterUtils::SetMetricBasic(
   // Note that attribute keys are sorted, but sanitized keys can be out-of-order.
   // We could sort the sanitized keys again, but this seems too expensive to do
   // in this hot code path. Instead, we ignore out-of-order keys and emit a warning.
-  metric.label.reserve(labels.size() + 2);
+  std::size_t reserve_labels = labels.size();
+  if (scope != nullptr)
+  {
+    reserve_labels += 3 + scope->GetAttributes().size();
+  }
+  metric.label.reserve(reserve_labels);
 
   struct LabelCollisionEntry
   {
@@ -791,7 +799,7 @@ void PrometheusExporterUtils::SetMetricBasic(
     {
       previous_key    = sanitized;
       std::string val = AttributeValueToString(label.second);
-      if (scope != nullptr && (sanitized == kScopeNameKey || sanitized == kScopeVersionKey))
+      if (scope != nullptr && sanitized.compare(0, kScopeLabelPrefixLen, kScopeLabelPrefix) == 0)
       {
         colliding_scope_entries.push_back({metric.label.size(), label.first, val});
       }
@@ -800,7 +808,7 @@ void PrometheusExporterUtils::SetMetricBasic(
     else if (comparison == 0)  // key collision after sanitation
     {
       std::string val = AttributeValueToString(label.second);
-      if (scope != nullptr && (sanitized == kScopeNameKey || sanitized == kScopeVersionKey))
+      if (scope != nullptr && sanitized.compare(0, kScopeLabelPrefixLen, kScopeLabelPrefix) == 0)
       {
         colliding_scope_entries.push_back({metric.label.size() - 1, label.first, val});
       }
@@ -820,7 +828,8 @@ void PrometheusExporterUtils::SetMetricBasic(
     return;
   }
 
-  auto add_or_merge_scope_label = [&metric, &colliding_scope_entries](
+  const std::size_t point_label_count = metric.label.size();
+  auto add_or_merge_scope_label       = [&metric, &colliding_scope_entries, point_label_count](
                                       const std::string &sanitized_key,
                                       const std::string &original_key, const std::string &value) {
     for (const auto &entry : colliding_scope_entries)
@@ -854,7 +863,14 @@ void PrometheusExporterUtils::SetMetricBasic(
         return;
       }
     }
-    metric.label.push_back({sanitized_key, value});
+    if (metric.label.size() > point_label_count && metric.label.back().name == sanitized_key)
+    {
+      metric.label.back().value += ";" + value;
+    }
+    else
+    {
+      metric.label.push_back({sanitized_key, value});
+    }
   };
 
   const auto &scope_name = scope->GetName();
@@ -866,6 +882,46 @@ void PrometheusExporterUtils::SetMetricBasic(
   if (!scope_version.empty())
   {
     add_or_merge_scope_label(kScopeVersionKey, kScopeVersionKey, scope_version);
+  }
+  const auto &scope_schema_url = scope->GetSchemaURL();
+  if (!scope_schema_url.empty())
+  {
+    add_or_merge_scope_label(kScopeSchemaUrlKey, kScopeSchemaUrlKey, scope_schema_url);
+  }
+  const auto &scope_attributes = scope->GetAttributes();
+  if (!scope_attributes.empty())
+  {
+    struct ScopeAttrEntry
+    {
+      std::string sanitized_key;
+      const std::string *original_key;
+      const opentelemetry::sdk::common::OwnedAttributeValue *value;
+    };
+    std::vector<ScopeAttrEntry> sorted_scope_attrs;
+    sorted_scope_attrs.reserve(scope_attributes.size());
+    for (const auto &attr : scope_attributes)
+    {
+      std::string sanitized = SanitizeLabel(std::string(kScopeLabelPrefix) + attr.first);
+      if (sanitized == kScopeNameKey || sanitized == kScopeVersionKey ||
+          sanitized == kScopeSchemaUrlKey)
+      {
+        continue;
+      }
+      sorted_scope_attrs.push_back({std::move(sanitized), &attr.first, &attr.second});
+    }
+    std::sort(sorted_scope_attrs.begin(), sorted_scope_attrs.end(),
+              [](const ScopeAttrEntry &a, const ScopeAttrEntry &b) {
+                if (a.sanitized_key != b.sanitized_key)
+                {
+                  return a.sanitized_key < b.sanitized_key;
+                }
+                return *a.original_key < *b.original_key;
+              });
+    for (const auto &scope_attr : sorted_scope_attrs)
+    {
+      add_or_merge_scope_label(scope_attr.sanitized_key, *scope_attr.original_key,
+                               AttributeValueToString(*scope_attr.value));
+    }
   }
 }
 
