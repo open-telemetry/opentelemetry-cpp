@@ -76,6 +76,29 @@ Changes:
 * [SDK] Add missing cstdint include to predicate_factory.h
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+* [SDK] Add Entity support to Resource
+  [#3652](https://github.com/open-telemetry/opentelemetry-cpp/issues/3652)
+
+Breaking changes:
+
+* [SDK] Remove `noexcept` from the public SDK `TracerProvider`,
+  `LoggerProvider`, `MeterProvider`, `Tracer`, `Logger`, and `Meter`
+  constructors so initialization failures can propagate to callers.
+  `GetTracer`, `GetLogger`, and `GetMeter` remain `noexcept` and return a
+  pre-allocated noop object if constructing a new instrumentation object
+  fails. After the first failure, later uncached `Get*` calls return the same
+  noop immediately without retrying construction. Existing cached objects
+  continue to be returned.
+  [#4361](https://github.com/open-telemetry/opentelemetry-cpp/issues/4361)
+
+* [BUG] Send one request per curl session, rather than replacing the operation
+  a running request still belongs to
+  [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
+
+* [BUG] Compare the curl seek offset in `curl_off_t` before narrowing it to
+  `size_t`, so an offset past the `size_t` range cannot wrap back inside the
+  request body on a 32-bit build
+=======
 * [BUG] Fix random attribute selection in metrics foo example
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
 
