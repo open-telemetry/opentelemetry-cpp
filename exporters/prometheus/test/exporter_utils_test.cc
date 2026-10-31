@@ -171,7 +171,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
        {"service.instance.id", "localhost:8000"},
        {"custom_resource_attr", "custom_resource_value"}});
   TestDataPoints dp;
-  metric_sdk::ResourceMetrics metrics_data = dp.CreateSumPointData();
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateDoubleSumPointData();
   metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);

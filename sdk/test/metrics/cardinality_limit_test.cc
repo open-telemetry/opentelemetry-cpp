@@ -80,8 +80,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   auto agg1 = hash_map.GetOrSetDefault(GetOverflowAttributes(), aggregation_callback);
   EXPECT_NE(agg1, nullptr);
   auto sum_agg1 = static_cast<LongSumAggregation *>(agg1);
-  EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg1->ToPoint()).value_),
-            record_value * 5);
+  EXPECT_EQ(nostd::get<LongSumPointData>(sum_agg1->ToPoint()).value_, record_value * 5);
   // get remaining metric points
   for (auto i = 0; i < 10; i++)
   {
@@ -91,12 +90,12 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
     auto sum_agg2 = static_cast<LongSumAggregation *>(agg2);
     if (i < 5)
     {
-      EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg2->ToPoint()).value_),
+      EXPECT_EQ(nostd::get<LongSumPointData>(sum_agg2->ToPoint()).value_,
                 record_value * 2);  // 1 from first recording, 1 from third recording
     }
     else
     {
-      EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg2->ToPoint()).value_),
+      EXPECT_EQ(nostd::get<LongSumPointData>(sum_agg2->ToPoint()).value_,
                 record_value);  // 1 from first recording
     }
   }
@@ -146,7 +145,7 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<LongSumPointData>(data_attr.point_data);
           count_attributes++;
           if (data_attr.attributes.begin()->first == kAttributesLimitOverflowKey)
           {
@@ -155,7 +154,7 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
             // value `true`.
             EXPECT_EQ(data_attr.attributes.size(), 1u);
             EXPECT_EQ(nostd::get<bool>(data_attr.attributes.begin()->second), true);
-            EXPECT_EQ(nostd::get<int64_t>(data.value_), record_value * 5);
+            EXPECT_EQ(data.value_, record_value * 5);
             overflow_present = true;
           }
         }

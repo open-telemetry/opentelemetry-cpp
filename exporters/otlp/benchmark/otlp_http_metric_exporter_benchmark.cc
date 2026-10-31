@@ -48,7 +48,7 @@ static ResourceMetrics MakeMetrics(std::size_t n_points)
 
   for (std::size_t i = 0; i < n_points; ++i)
   {
-    SumPointData sum;
+    DoubleSumPointData sum;
     sum.value_        = static_cast<double>(i);
     sum.is_monotonic_ = true;
 

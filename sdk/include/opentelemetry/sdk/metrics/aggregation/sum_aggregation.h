@@ -22,7 +22,7 @@ class LongSumAggregation : public Aggregation
 {
 public:
   LongSumAggregation(bool is_monotonic);
-  LongSumAggregation(const SumPointData &);
+  LongSumAggregation(const LongSumPointData &);
 
   void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept override;
 
@@ -33,17 +33,18 @@ public:
   std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
 
   PointType ToPoint() const noexcept override;
+  LongSumPointData ToPointData() const noexcept;
 
 private:
   mutable opentelemetry::common::SpinLockMutex lock_;
-  SumPointData point_data_;
+  LongSumPointData point_data_;
 };
 
 class DoubleSumAggregation : public Aggregation
 {
 public:
   DoubleSumAggregation(bool is_monotonic);
-  DoubleSumAggregation(const SumPointData &);
+  DoubleSumAggregation(const DoubleSumPointData &);
 
   void Aggregate(int64_t /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
@@ -54,10 +55,11 @@ public:
   std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
 
   PointType ToPoint() const noexcept override;
+  DoubleSumPointData ToPointData() const noexcept;
 
 private:
   mutable opentelemetry::common::SpinLockMutex lock_;
-  SumPointData point_data_;
+  DoubleSumPointData point_data_;
 };
 
 }  // namespace metrics

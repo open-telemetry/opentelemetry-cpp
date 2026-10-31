@@ -40,9 +40,9 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
   auto exporter =
       std::unique_ptr<metric_sdk::PushMetricExporter>(new exportermetrics::OStreamMetricExporter);
 
-  metric_sdk::SumPointData sum_point_data{};
+  metric_sdk::DoubleSumPointData sum_point_data{};
   sum_point_data.value_ = 10.0;
-  metric_sdk::SumPointData sum_point_data2{};
+  metric_sdk::DoubleSumPointData sum_point_data2{};
   sum_point_data2.value_ = 20.0;
   metric_sdk::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -80,11 +80,11 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
       "\n  instrument name\t: library_name"
       "\n  description\t: description"
       "\n  unit\t\t: unit"
-      "\n  type\t\t: SumPointData"
+      "\n  type\t\t: DoubleSumPointData"
       "\n  value\t\t: 10"
       "\n  attributes\t\t: "
       "\n\ta1: b1"
-      "\n  type\t\t: SumPointData"
+      "\n  type\t\t: DoubleSumPointData"
       "\n  value\t\t: 20"
       "\n  attributes\t\t: "
       "\n\ta1: b1"

@@ -315,8 +315,8 @@ TEST_F(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest1)
         EXPECT_EQ(metric.point_data_attr_.size(), 10);
         for (const PointDataAttributes &pda : metric.point_data_attr_)
         {
-          auto sum_point_data = nostd::get<SumPointData>(pda.point_data);
-          auto value          = nostd::get<int64_t>(sum_point_data.value_);
+          auto sum_point_data = nostd::get<LongSumPointData>(pda.point_data);
+          auto value          = sum_point_data.value_;
           auto stream =
               std::stoi(nostd::get<std::string>(pda.attributes.GetAttributes().at("stream")));
           auto river =
@@ -396,8 +396,8 @@ TEST_F(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest2)
       EXPECT_EQ(metric.point_data_attr_.size(), 3);
       for (const PointDataAttributes &pda : metric.point_data_attr_)
       {
-        auto sum_point_data = nostd::get<SumPointData>(pda.point_data);
-        auto value          = nostd::get<int64_t>(sum_point_data.value_);
+        auto sum_point_data = nostd::get<LongSumPointData>(pda.point_data);
+        auto value          = sum_point_data.value_;
         auto stream =
             std::stoi(nostd::get<std::string>(pda.attributes.GetAttributes().at("stream")));
         auto river = std::stoi(nostd::get<std::string>(pda.attributes.GetAttributes().at("river")));

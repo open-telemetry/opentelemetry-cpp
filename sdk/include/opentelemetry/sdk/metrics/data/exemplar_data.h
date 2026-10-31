@@ -47,9 +47,16 @@ public:
    */
   const opentelemetry::trace::SpanContext &GetSpanContext() const noexcept { return context_; }
 
-  static PointType CreateSumPointData(ValueType value)
+  static PointType CreateLongSumPointData(int64_t value)
   {
-    SumPointData sum_point_data{};
+    LongSumPointData sum_point_data{};
+    sum_point_data.value_ = value;
+    return sum_point_data;
+  }
+
+  static PointType CreateDoubleSumPointData(double value)
+  {
+    DoubleSumPointData sum_point_data{};
     sum_point_data.value_ = value;
     return sum_point_data;
   }
