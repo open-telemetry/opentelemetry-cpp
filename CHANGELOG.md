@@ -42,6 +42,11 @@ Increment the:
   and empty point guards
   [#4738](https://github.com/open-telemetry/opentelemetry-cpp/pull/4738)
 
+* [SDK] Fix lost wakeup in BatchSpanProcessor `OnEnd` notify when a span
+  fills the queue, which could stall the export and drop spans until the
+  schedule delay.
+  [#4741](https://github.com/open-telemetry/opentelemetry-cpp/pull/4741)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
