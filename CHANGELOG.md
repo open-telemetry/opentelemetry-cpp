@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] `PeriodicExportingMetricReader::Shutdown(timeout)` stops an in-flight
+  collection once its budget is spent: the SDK's `MetricCollector` stops
+  between meters and observable callbacks, and the partial result is not
+  exported.
+  [#4746](https://github.com/open-telemetry/opentelemetry-cpp/issues/4746)
+
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
   Drop aggregation
