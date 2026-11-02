@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -38,6 +39,7 @@
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/metrics/view/view_registry_factory.h"
+#include "src/metrics/collection_cancellation.h"
 
 #if defined(__GNUC__) || defined(__clang__) || defined(__apple_build_version__)
 #  pragma GCC diagnostic push
@@ -592,6 +594,29 @@ TEST_F(MetricCollectorTest, ViewCardinalityLimitEnforcedOnCollection)
   EXPECT_LE(total_points, kLimit + 1);
   // The overflow sentinel point must be present
   EXPECT_TRUE(overflow_present);
+}
+
+TEST_F(MetricCollectorTest, ProduceStopsBeforeNextMeterWhenCancelled)
+{
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+  auto scope   = InstrumentationScope::Create("ProduceStopsBeforeNextMeterWhenCancelled");
+  auto meter   = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
+  context->AddMeter(meter);
+
+  auto reader    = std::shared_ptr<MetricReader>(new MockMetricReader());
+  auto collector = AddMetricReaderToMeterContext(context, reader).lock();
+
+  auto counter = meter->CreateUInt64Counter("counter");
+  M attributes = {{"stream", "1"}};
+  counter->Add(1, opentelemetry::common::KeyValueIterableView<M>(attributes),
+               opentelemetry::context::Context{});
+
+  const std::atomic<bool> stop_requested{true};
+  const CollectionCancellation::Scope cancellation_scope(stop_requested);
+
+  const auto result = collector->Produce();
+  EXPECT_EQ(result.status_, MetricProducer::Status::kTimeout);
+  EXPECT_TRUE(result.points_.scope_metric_data_.empty());
 }
 
 #if defined(__GNUC__) || defined(__clang__) || defined(__apple_build_version__)

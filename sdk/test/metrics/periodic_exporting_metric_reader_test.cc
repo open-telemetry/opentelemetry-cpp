@@ -7,8 +7,9 @@
 #include <condition_variable>
 #include <cstddef>
 #include <cstdlib>
-#include <memory>
+#include <initializer_list>
 #include <mutex>
+#include <ratio>
 #include <string>
 #include <thread>
 #include <utility>
@@ -173,11 +174,12 @@ private:
 
 struct SlowCallbackState
 {
-  std::chrono::milliseconds duration;
+  std::chrono::milliseconds duration{0};
   std::atomic<int> calls{0};
   StartedSignal started;
 };
 
+// NOLINTNEXTLINE(performance-unnecessary-value-param)
 void SlowObservableCallback(opentelemetry::metrics::ObserverResult /* result */, void *state)
 {
   auto *slow_state = static_cast<SlowCallbackState *>(state);
