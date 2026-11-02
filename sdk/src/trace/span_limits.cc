@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <cstddef>
 #include <cstdint>
 
 #include "opentelemetry/sdk/common/env_variables.h"
@@ -31,21 +30,13 @@ static constexpr const char *kLinkAttributeCountLimitEnv  = "OTEL_LINK_ATTRIBUTE
 namespace
 {
 
-void UpdateFromEnv(const char *env_var_name, std::uint32_t &limit)
+template <typename LimitType>
+void UpdateFromEnv(const char *env_var_name, LimitType &limit)
 {
   std::uint32_t value{};
   if (opentelemetry::sdk::common::GetUintEnvironmentVariable(env_var_name, value))
   {
-    limit = value;
-  }
-}
-
-void UpdateFromEnv(const char *env_var_name, std::size_t &limit)
-{
-  std::uint32_t value{};
-  if (opentelemetry::sdk::common::GetUintEnvironmentVariable(env_var_name, value))
-  {
-    limit = static_cast<std::size_t>(value);
+    limit = static_cast<LimitType>(value);
   }
 }
 
@@ -57,9 +48,11 @@ SpanLimits GetSpanLimitsFromEnv(const SpanLimits &defaults)
 
   // General attribute limits first; the span-specific variables below take precedence.
   UpdateFromEnv(kAttributeValueLengthLimitEnv, limits.attribute_value_length_limit);
+  // No OTEL_ATTRIBUTE_VALUE_DEPTH_LIMIT in the specification
   UpdateFromEnv(kAttributeCountLimitEnv, limits.attribute_count_limit);
 
   UpdateFromEnv(kSpanAttributeValueLengthLimitEnv, limits.attribute_value_length_limit);
+  // No OTEL_SPAN_ATTRIBUTE_VALUE_DEPTH_LIMIT in the specification
   UpdateFromEnv(kSpanAttributeCountLimitEnv, limits.attribute_count_limit);
   UpdateFromEnv(kSpanEventCountLimitEnv, limits.event_count_limit);
   UpdateFromEnv(kSpanLinkCountLimitEnv, limits.link_count_limit);

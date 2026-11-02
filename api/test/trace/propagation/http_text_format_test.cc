@@ -100,6 +100,23 @@ TEST(TextMapPropagatorTest, NoSendEmptyTraceState)
   EXPECT_FALSE(carrier2.headers_.count("tracestate") > 0);
 }
 
+TEST(TextMapPropagatorTest, NoSendNullTraceState)
+{
+  TextMapCarrierTest carrier;
+  trace::SpanContext span_context{
+      MapHttpTraceContext::TraceIdFromHex("4bf92f3577b34da6a3ce929d0e0e4736"),
+      MapHttpTraceContext::SpanIdFromHex("0102030405060708"), trace::TraceFlags{true}, false,
+      nostd::shared_ptr<trace::TraceState>{}};
+  context::Context ctx{trace::kSpanKey,
+                       nostd::shared_ptr<trace::Span>{new trace::DefaultSpan(span_context)}};
+
+  format.Inject(carrier, ctx);
+
+  EXPECT_EQ(carrier.headers_["traceparent"],
+            "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01");
+  EXPECT_EQ(carrier.headers_.count("tracestate"), 0);
+}
+
 TEST(TextMapPropagatorTest, PropogateTraceState)
 {
   TextMapCarrierTest carrier;
@@ -116,6 +133,23 @@ TEST(TextMapPropagatorTest, PropogateTraceState)
   EXPECT_TRUE(carrier2.headers_.count("traceparent") > 0);
   EXPECT_TRUE(carrier2.headers_.count("tracestate") > 0);
   EXPECT_EQ(carrier2.headers_["tracestate"], "congo=t61rcWkgMzE");
+}
+
+TEST(TextMapPropagatorTest, PropagateEmptyContext)
+{
+  TextMapCarrierTest carrier;
+  context::Context ctx;
+  format.Inject(carrier, ctx);
+  EXPECT_TRUE(carrier.headers_.empty());
+}
+
+TEST(TextMapPropagatorTest, ExtractMissingHeaders)
+{
+  TextMapCarrierTest carrier;
+  context::Context ctx;
+  auto extracted = format.Extract(carrier, ctx);
+  EXPECT_FALSE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(
+      extracted.GetValue(trace::kSpanKey)));
 }
 
 TEST(TextMapPropagatorTest, PropagateInvalidContext)
@@ -199,6 +233,8 @@ TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
       "00-0af7651916cd43dd8448eb211c8031-b9c7c989f97918e1-01",
       "00-0af7651916cd43dd8448eb211c80319c-b9c7c989f97-01",
       "00-1-1-00",
+      "00-00000000000000000000000000000000-b9c7c989f97918e1-01",
+      "00-0af7651916cd43dd8448eb211c80319c-0000000000000000-01",
       "00--b9c7c989f97918e1-01",
       "00-0af7651916cd43dd8448eb211c80319c1--01",
       "",
@@ -262,7 +298,7 @@ TEST(GlobalPropagator, SetAndGet)
 
   std::vector<std::string> fields;
   propagator->Fields([&fields](nostd::string_view field) {
-    fields.push_back(field.data());
+    fields.emplace_back(field.data());
     return true;
   });
   EXPECT_EQ(fields.size(), 2);

@@ -8,6 +8,9 @@
 #include <opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h>
 
+#include <opentelemetry/exporters/otlp/otlp_grpc_builder_utils.h>
+#include <opentelemetry/sdk/configuration/grpc_tls_configuration.h>
+
 #include <opentelemetry/exporters/otlp/otlp_grpc_client_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h>
@@ -96,4 +99,15 @@ TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcLogRecordBuilder)
 
   auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);
+}
+
+TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcBuilderUtilsGrpcUseSsl)
+{
+  opentelemetry::sdk::configuration::GrpcTlsConfiguration tls;
+  tls.insecure = true;
+
+  EXPECT_FALSE(opentelemetry::exporter::otlp::OtlpGrpcBuilderUtils::GrpcUseSsl(
+      "http://localhost:4317", &tls));
+  EXPECT_TRUE(opentelemetry::exporter::otlp::OtlpGrpcBuilderUtils::GrpcUseSsl(
+      "https://localhost:4317", &tls));
 }

@@ -18,6 +18,7 @@ namespace configuration
 // Forward declarations
 class AlwaysOffSamplerBuilder;
 class AlwaysOnSamplerBuilder;
+class AlwaysRecordSamplerBuilder;
 class BatchLogRecordProcessorBuilder;
 class BatchSpanProcessorBuilder;
 class ComposableAlwaysOffSamplerBuilder;
@@ -43,7 +44,9 @@ class ExtensionSpanProcessorBuilder;
 class HostResourceDetectorBuilder;
 class JaegerRemoteSamplerBuilder;
 class LoggerConfiguratorBuilder;
+class LoggerProviderBuilder;
 class MeterConfiguratorBuilder;
+class MeterProviderBuilder;
 class OpenCensusMetricProducerBuilder;
 class OtlpFileLogRecordExporterBuilder;
 class OtlpFilePushMetricExporterBuilder;
@@ -66,6 +69,7 @@ class SimpleSpanProcessorBuilder;
 class TextMapPropagatorBuilder;
 class TraceIdRatioBasedSamplerBuilder;
 class TracerConfiguratorBuilder;
+class TracerProviderBuilder;
 
 class OPENTELEMETRY_EXPORT Registry
 {
@@ -207,6 +211,13 @@ public:
 
   void SetAlwaysOnSamplerBuilder(std::unique_ptr<AlwaysOnSamplerBuilder> &&builder);
 
+  const AlwaysRecordSamplerBuilder *GetAlwaysRecordSamplerBuilder() const
+  {
+    return always_record_sampler_builder_.get();
+  }
+
+  void SetAlwaysRecordSamplerBuilder(std::unique_ptr<AlwaysRecordSamplerBuilder> &&builder);
+
   const AlwaysOffSamplerBuilder *GetAlwaysOffSamplerBuilder() const
   {
     return always_off_sampler_builder_.get();
@@ -346,6 +357,29 @@ public:
 
   void SetLoggerConfiguratorBuilder(std::unique_ptr<LoggerConfiguratorBuilder> &&builder);
 
+  /* Provider builders. */
+
+  const TracerProviderBuilder *GetTracerProviderBuilder() const
+  {
+    return tracer_provider_builder_.get();
+  }
+
+  void SetTracerProviderBuilder(std::unique_ptr<TracerProviderBuilder> &&builder);
+
+  const MeterProviderBuilder *GetMeterProviderBuilder() const
+  {
+    return meter_provider_builder_.get();
+  }
+
+  void SetMeterProviderBuilder(std::unique_ptr<MeterProviderBuilder> &&builder);
+
+  const LoggerProviderBuilder *GetLoggerProviderBuilder() const
+  {
+    return logger_provider_builder_.get();
+  }
+
+  void SetLoggerProviderBuilder(std::unique_ptr<LoggerProviderBuilder> &&builder);
+
   /* Resource detectors. */
 
   const ContainerResourceDetectorBuilder *GetContainerResourceDetectorBuilder() const
@@ -469,6 +503,7 @@ private:
   std::unique_ptr<ConsoleLogRecordExporterBuilder> console_log_record_builder_;
 
   std::unique_ptr<AlwaysOnSamplerBuilder> always_on_sampler_builder_;
+  std::unique_ptr<AlwaysRecordSamplerBuilder> always_record_sampler_builder_;
   std::unique_ptr<AlwaysOffSamplerBuilder> always_off_sampler_builder_;
   std::unique_ptr<TraceIdRatioBasedSamplerBuilder> trace_id_ratio_based_sampler_builder_;
   std::unique_ptr<ProbabilitySamplerBuilder> probability_sampler_builder_;
@@ -491,6 +526,10 @@ private:
   std::unique_ptr<TracerConfiguratorBuilder> tracer_configurator_builder_;
   std::unique_ptr<MeterConfiguratorBuilder> meter_configurator_builder_;
   std::unique_ptr<LoggerConfiguratorBuilder> logger_configurator_builder_;
+
+  std::unique_ptr<TracerProviderBuilder> tracer_provider_builder_;
+  std::unique_ptr<MeterProviderBuilder> meter_provider_builder_;
+  std::unique_ptr<LoggerProviderBuilder> logger_provider_builder_;
 
   std::unique_ptr<OpenCensusMetricProducerBuilder> open_census_metric_producer_builder_;
 

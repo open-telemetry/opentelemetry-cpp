@@ -52,7 +52,8 @@ public:
       std::uint32_t max_attributes_per_event = (std::numeric_limits<std::uint32_t>::max)(),
       std::uint32_t max_attributes_per_link  = (std::numeric_limits<std::uint32_t>::max)())
       : span_limits_{max_attributes,
-                     (std::numeric_limits<std::size_t>::max)(),
+                     (std::numeric_limits<std::size_t>::max)(),  // attribute_value_length_limit
+                     (std::numeric_limits<std::size_t>::max)(),  // attribute_value_depth_limit
                      max_events,
                      max_links,
                      max_attributes_per_event,

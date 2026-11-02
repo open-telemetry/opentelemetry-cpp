@@ -124,7 +124,7 @@ TEST(RuntimeContextTest, DetachOutOfOrder)
   contexts.reserve(indices.size());
   for (auto i : indices)
   {
-    contexts.push_back(context::Context("index", static_cast<int64_t>(i)));
+    contexts.emplace_back("index", static_cast<int64_t>(i));
   }
 
   do

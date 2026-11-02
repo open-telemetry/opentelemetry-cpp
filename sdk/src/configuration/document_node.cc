@@ -1,12 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <cctype>
 #include <cstdint>
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
@@ -157,7 +157,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   }
 
   c = text[begin_name];
-  if (!std::isalpha(c) && c != '_')
+  if (!opentelemetry::common::detail::IsAsciiAlpha(c) && c != '_')
   {
     std::string message = illegal_msg;
     message.append(text);
@@ -169,7 +169,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   for (size_t i = begin_name + 1; i + 2 <= len; i++)
   {
     c = text[i];
-    if (std::isalnum(c) || (c == '_'))
+    if (opentelemetry::common::detail::IsAsciiAlnum(c) || (c == '_'))
     {
       end_name = i + 1;
     }

@@ -10,6 +10,7 @@
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/always_record_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_builder.h"
@@ -35,7 +36,9 @@
 #include "opentelemetry/sdk/configuration/host_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_builder.h"
+#include "opentelemetry/sdk/configuration/logger_provider_builder.h"
 #include "opentelemetry/sdk/configuration/meter_configurator_builder.h"
+#include "opentelemetry/sdk/configuration/meter_provider_builder.h"
 #include "opentelemetry/sdk/configuration/open_census_metric_producer_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_builder.h"
@@ -59,6 +62,7 @@
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_builder.h"
+#include "opentelemetry/sdk/configuration/tracer_provider_builder.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/propagation/jaeger.h"
@@ -232,6 +236,11 @@ void Registry::SetAlwaysOnSamplerBuilder(std::unique_ptr<AlwaysOnSamplerBuilder>
   always_on_sampler_builder_ = std::move(builder);
 }
 
+void Registry::SetAlwaysRecordSamplerBuilder(std::unique_ptr<AlwaysRecordSamplerBuilder> &&builder)
+{
+  always_record_sampler_builder_ = std::move(builder);
+}
+
 void Registry::SetAlwaysOffSamplerBuilder(std::unique_ptr<AlwaysOffSamplerBuilder> &&builder)
 {
   always_off_sampler_builder_ = std::move(builder);
@@ -328,6 +337,21 @@ void Registry::SetMeterConfiguratorBuilder(std::unique_ptr<MeterConfiguratorBuil
 void Registry::SetLoggerConfiguratorBuilder(std::unique_ptr<LoggerConfiguratorBuilder> &&builder)
 {
   logger_configurator_builder_ = std::move(builder);
+}
+
+void Registry::SetTracerProviderBuilder(std::unique_ptr<TracerProviderBuilder> &&builder)
+{
+  tracer_provider_builder_ = std::move(builder);
+}
+
+void Registry::SetMeterProviderBuilder(std::unique_ptr<MeterProviderBuilder> &&builder)
+{
+  meter_provider_builder_ = std::move(builder);
+}
+
+void Registry::SetLoggerProviderBuilder(std::unique_ptr<LoggerProviderBuilder> &&builder)
+{
+  logger_provider_builder_ = std::move(builder);
 }
 
 void Registry::SetContainerResourceDetectorBuilder(

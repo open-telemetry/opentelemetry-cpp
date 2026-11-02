@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-FROM otel/opentelemetry-collector:0.123.0@sha256:c8e36258c1b26927fb7b05c5186b90e9c3d77315efc24f65d6fddec1c14b60b3
+FROM otel/opentelemetry-collector:0.164.0@sha256:53dac600e3a37f69b3c4adda525504d156d7ec26868595b6317f1a73076e96f4
 COPY . .
 CMD ["--config", "/otel-cpp/otel-config.yaml"]
 EXPOSE 4317

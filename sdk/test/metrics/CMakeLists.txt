@@ -49,6 +49,10 @@ foreach(
   gtest_discover_tests(${testname} TEST_PREFIX metrics.)
 endforeach()
 
+set_tests_properties(
+  metrics.MeterProvider.ConstructionFailureDiagnosticsAllowProviderReentry
+  PROPERTIES TIMEOUT 10)
+
 if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
   add_executable(multi_observer_test multi_observer_test.cc)
   target_link_libraries(
@@ -102,6 +106,15 @@ if(OTELCPP_WITH_BENCHMARK)
   target_link_libraries(
     measurements_benchmark benchmark::benchmark opentelemetry_metrics
     opentelemetry_resources ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+  add_executable(sync_instruments_benchmark sync_instruments_benchmark.cc)
+  target_link_libraries(
+    sync_instruments_benchmark benchmark::benchmark opentelemetry_metrics
+    opentelemetry_resources ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+  add_executable(instrument_metadata_validator_benchmark
+                 instrument_metadata_validator_benchmark.cc)
+  target_link_libraries(
+    instrument_metadata_validator_benchmark benchmark::benchmark
+    opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
   add_executable(sum_aggregation_benchmark sum_aggregation_benchmark.cc)
   target_link_libraries(
     sum_aggregation_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}

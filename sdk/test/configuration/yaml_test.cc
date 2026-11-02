@@ -8,6 +8,8 @@
 
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
+#include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
@@ -86,7 +88,7 @@ file_format: "2.0"
 TEST(Yaml, unsupported_new_minor_format)
 {
   std::string yaml = R"(
-file_format: "1.2"
+file_format: "1.3"
 )";
 
   auto config = DoParse(yaml);
@@ -114,6 +116,18 @@ file_format: "1.1"
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_EQ(config->file_format, "1.1");
+}
+
+TEST(Yaml, just_format_1_2)
+{
+  // 1.2.0 released 2026-09-11
+  std::string yaml = R"(
+file_format: "1.2"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "1.2");
 }
 
 TEST(Yaml, disabled)
@@ -176,10 +190,8 @@ attribute_limits:
   ASSERT_NE(config, nullptr);
   ASSERT_EQ(config->file_format, "1.0");
   ASSERT_NE(config->attribute_limits, nullptr);
-  const auto defaults = opentelemetry::sdk::configuration::AttributeLimitsConfiguration{};
-  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit,
-            defaults.attribute_value_length_limit);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
+  ASSERT_FALSE(config->attribute_limits->attribute_value_length_limit.HasValue());
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
 }
 
 TEST(Yaml, attribute_limits)
@@ -195,8 +207,41 @@ attribute_limits:
   ASSERT_NE(config, nullptr);
   ASSERT_EQ(config->file_format, "1.0");
   ASSERT_NE(config->attribute_limits, nullptr);
-  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit, 1234);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 5678);
+  ASSERT_TRUE(config->attribute_limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit.Value(), 1234);
+  ASSERT_TRUE(config->attribute_limits->attribute_count_limit.HasValue());
+  ASSERT_EQ(config->attribute_limits->attribute_count_limit.Value(), 5678);
+}
+
+TEST(Yaml, attribute_limits_null_fields)
+{
+  std::string yaml = R"(
+file_format: "1.0"
+attribute_limits:
+  attribute_value_length_limit: 4096
+  attribute_count_limit: null
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  ASSERT_TRUE(config->attribute_limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit.Value(), 4096);
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
+}
+
+TEST(Yaml, attribute_limits_tilde_null_field)
+{
+  std::string yaml = R"(
+file_format: "1.0"
+attribute_limits:
+  attribute_count_limit: ~
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
 }
 
 TEST(Yaml, no_optional_boolean)
@@ -511,7 +556,7 @@ attribute_limits:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->attribute_limits, nullptr);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
 }
 
 TEST(Yaml, illegal_integer)
@@ -539,7 +584,7 @@ attribute_limits:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->attribute_limits, nullptr);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
 }
 
 TEST(Yaml, empty_integer_substitution)
@@ -555,7 +600,7 @@ attribute_limits:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->attribute_limits, nullptr);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
 }
 
 TEST(Yaml, with_integer_substitution)
@@ -571,7 +616,8 @@ attribute_limits:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->attribute_limits, nullptr);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 7777);
+  ASSERT_TRUE(config->attribute_limits->attribute_count_limit.HasValue());
+  ASSERT_EQ(config->attribute_limits->attribute_count_limit.Value(), 7777);
 }
 
 TEST(Yaml, with_illegal_integer_substitution)
@@ -756,4 +802,66 @@ tracer_provider:
 
   auto config = DoParse(yaml);
   ASSERT_EQ(config, nullptr);
+}
+
+// --- empty env var with :- fallback tests ---
+
+TEST(Yaml, empty_string_substitution_with_fallback)
+{
+  setenv("ENV_NAME", "", 1);
+
+  std::string yaml = R"(
+file_format: ${ENV_NAME:-1.0}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "1.0");
+}
+
+TEST(Yaml, empty_boolean_substitution_with_fallback)
+{
+  setenv("ENV_NAME", "", 1);
+
+  std::string yaml = R"(
+file_format: "1.0"
+disabled: ${ENV_NAME:-true}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, true);
+}
+
+// --- GetString default-on-empty tests ---
+
+TEST(Yaml, optional_string_unset_env_var_uses_default)
+{
+  // An unset env var in an optional string field must produce the declared default,
+  // not an empty string that fails downstream parsing.
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: "1.0"
+log_level: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  // default log_level is "info" -> SeverityNumber::info
+  ASSERT_EQ(config->log_level, opentelemetry::sdk::configuration::SeverityNumber::info);
+}
+
+TEST(Yaml, optional_string_set_env_var_uses_value)
+{
+  setenv("ENV_NAME", "debug", 1);
+
+  std::string yaml = R"(
+file_format: "1.0"
+log_level: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->log_level, opentelemetry::sdk::configuration::SeverityNumber::debug);
 }

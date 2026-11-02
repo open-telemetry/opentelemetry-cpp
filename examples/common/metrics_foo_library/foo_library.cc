@@ -46,8 +46,8 @@ std::map<std::string, std::string> get_random_attr()
                                                                    {"key3", "value3"},
                                                                    {"key4", "value4"},
                                                                    {"key5", "value5"}};
-  return std::map<std::string, std::string>{labels[random_int() % (labels.size() - 1)],
-                                            labels[random_int() % (labels.size() - 1)]};
+  return std::map<std::string, std::string>{labels[random_int() % labels.size()],
+                                            labels[random_int() % labels.size()]};
 }
 
 class MeasurementFetcher

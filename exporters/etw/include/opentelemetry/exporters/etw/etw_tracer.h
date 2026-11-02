@@ -35,6 +35,7 @@
 #include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
+#include "opentelemetry/sdk/trace/span_status.h"
 
 #include "opentelemetry/exporters/etw/etw_config.h"
 #include "opentelemetry/exporters/etw/etw_fields.h"
@@ -509,8 +510,7 @@ public:
     if (sampling_result.decision == sdk::trace::Decision::DROP)
     {
       auto noopSpan = nostd::shared_ptr<opentelemetry::trace::Span>{
-          new (std::nothrow)
-              opentelemetry::trace::NoopSpan(this->shared_from_this(), std::move(spanContext))};
+          new (std::nothrow) opentelemetry::trace::NoopSpan(std::move(spanContext))};
       return noopSpan;
     }
 
@@ -952,8 +952,15 @@ public:
   void SetStatus(opentelemetry::trace::StatusCode code,
                  nostd::string_view description) noexcept override
   {
-    status_code_        = code;
-    status_description_ = description.data();
+    const auto transition =
+        sdk::trace::detail::ApplyStatusTransition(status_code_, code, description);
+    if (!transition.accepted)
+    {
+      return;
+    }
+
+    status_code_ = transition.code;
+    status_description_.assign(transition.description.data(), transition.description.size());
   }
 
   opentelemetry::trace::StatusCode GetStatus() { return status_code_; }

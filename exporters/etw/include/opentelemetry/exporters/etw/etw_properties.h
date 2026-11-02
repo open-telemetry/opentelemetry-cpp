@@ -93,10 +93,12 @@ class PropertyValue : public PropertyVariant
    */
   std::vector<std::string> static to_vector(const nostd::span<const nostd::string_view> &source)
   {
-    std::vector<std::string> result(source.size());
+    std::vector<std::string> result;
+    result.reserve(source.size());
     for (const auto &item : source)
     {
-      result.push_back(std::string(item.data()));
+      // Copy by length. string_view::data() is not required to be NUL-terminated.
+      result.push_back(static_cast<std::string>(item));
     }
     return result;
   }
@@ -223,8 +225,8 @@ public:
         break;
       }
       case opentelemetry::common::AttributeType::kTypeString: {
-        PropertyVariant::operator=(
-            std::string{nostd::string_view(nostd::get<nostd::string_view>(v)).data()});
+        // Copy by length. string_view::data() is not required to be NUL-terminated.
+        PropertyVariant::operator=(static_cast<std::string>(nostd::get<nostd::string_view>(v)));
         break;
       }
 

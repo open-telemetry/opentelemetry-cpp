@@ -10,6 +10,7 @@
 #include "opentelemetry/sdk/configuration/meter_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
+#include "opentelemetry/sdk/configuration/view_matching_mode.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -27,6 +28,7 @@ public:
   std::vector<std::unique_ptr<ViewConfiguration>> views;
   ExemplarFilter exemplar_filter{ExemplarFilter::trace_based};
   std::unique_ptr<MeterConfiguratorConfiguration> meter_configurator;
+  ViewMatchingMode view_matching_mode{ViewMatchingMode::independent};
 };
 
 }  // namespace configuration

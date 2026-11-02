@@ -15,7 +15,6 @@ cc_library(
     ],
     defines = [
         "ENABLE_HTTP_CLIENT_CURL",
-        "ENABLE_OTLP_RETRY_PREVIEW",
     ],
     include_prefix = "src/http/client/curl",
     linkopts = select({

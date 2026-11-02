@@ -55,10 +55,14 @@ Limitations:
 
 | Attribute | Description | Linux | macOS | Windows |
 | --- | --- | --- | --- | --- |
-| `container.id` | Container ID from `/proc/self/cgroup` | Yes | No | No |
+| `container.id` | Container ID from `/proc/self/cgroup`, falling back to container runtime bind mount paths in `/proc/self/mountinfo` | Yes | No | No |
 
-Limitation: this detector depends on Linux cgroup data and may return no value
-outside containers or when cgroup data is unavailable.
+Limitation: this detector depends on Linux `/proc` data and may return no value
+outside containers or when neither source contains the container ID. On cgroup
+v2 hosts with a private cgroup namespace `/proc/self/cgroup` does not contain
+the ID, so detection relies on the container runtime bind mounting files (such
+as `/etc/hostname` or `/run/secrets`) from a `.../containers/<id>/...` path, as
+Docker, Podman and CRI-O do.
 
 ### Host Resource Detector
 
@@ -81,6 +85,16 @@ or inaccessible.
 | --- | --- | --- | --- | --- |
 | `process.pid` | Process ID | Yes | Yes | Yes |
 | `process.executable.path` | Path via `/proc` (Linux) or Win32 APIs | Yes | Yes | Yes |
+| `process.executable.name` | Basename of the executable path | Yes | Yes | Yes |
+| `process.creation.time` | Process start time in ISO 8601 UTC | Yes | Yes | Yes |
+| `process.owner` | Username of the process owner | Yes | Yes | Yes |
+
+Limitations:
+
+- On macOS, `process.executable.path` and `process.executable.name`
+  are resolved via `_NSGetExecutablePath()`,
+  which only works for the **current process**. These attributes are always
+  populated for the running process, but cannot be resolved for an arbitrary PID.
 
 ### Env Entity Resource Detector (Experimental)
 

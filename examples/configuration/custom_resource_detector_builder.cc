@@ -8,6 +8,7 @@
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/resource/resource_detector.h"
 
 #include "custom_resource_detector.h"
 #include "custom_resource_detector_builder.h"

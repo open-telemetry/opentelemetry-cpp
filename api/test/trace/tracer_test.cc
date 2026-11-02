@@ -16,8 +16,8 @@ namespace nostd     = opentelemetry::nostd;
 TEST(TracerTest, GetCurrentSpan)
 {
   std::unique_ptr<trace_api::Tracer> tracer(new trace_api::NoopTracer());
-  nostd::shared_ptr<trace_api::Span> span_first(new trace_api::NoopSpan(nullptr));
-  nostd::shared_ptr<trace_api::Span> span_second(new trace_api::NoopSpan(nullptr));
+  nostd::shared_ptr<trace_api::Span> span_first(new trace_api::NoopSpan());
+  nostd::shared_ptr<trace_api::Span> span_second(new trace_api::NoopSpan());
 
   auto current = tracer->GetCurrentSpan();
   ASSERT_FALSE(current->GetContext().IsValid());

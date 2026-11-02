@@ -239,3 +239,18 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "provider_initialization_test",
+    srcs = ["provider_initialization_test.cc"],
+    # Preserve the test's new/delete overrides; libc malloc/free are still checked.
+    env = {"VALGRIND_OPTS": "--soname-synonyms=somalloc=nouserintercepts"},
+    tags = ["test"],
+    deps = [
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

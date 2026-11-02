@@ -8,6 +8,7 @@
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/trace/processor.h"
 
 #include "custom_span_processor.h"
 #include "custom_span_processor_builder.h"

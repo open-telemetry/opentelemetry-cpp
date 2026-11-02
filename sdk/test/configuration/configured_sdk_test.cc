@@ -47,7 +47,9 @@
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 
-#include "config_test_common.h"
+#include "config_test_logs.h"
+#include "config_test_metrics.h"
+#include "config_test_trace.h"
 
 namespace trace        = opentelemetry::trace;
 namespace logs         = opentelemetry::logs;

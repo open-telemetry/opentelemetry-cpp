@@ -6,17 +6,28 @@
 #include <memory>
 
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
-#include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace logs
+{
+class LoggerProvider;
+}  // namespace logs
+namespace metrics
+{
+class MeterProvider;
+}  // namespace metrics
+namespace trace
+{
+class TracerProvider;
+}  // namespace trace
+
 namespace configuration
 {
 

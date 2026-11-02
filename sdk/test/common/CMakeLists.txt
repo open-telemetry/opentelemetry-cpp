@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include(GoogleTest)
+
 foreach(
   testname
   wildcard_match_test
@@ -48,4 +50,13 @@ if(OTELCPP_WITH_BENCHMARK)
   add_executable(attributemap_hash_benchmark attributemap_hash_benchmark.cc)
   target_link_libraries(attributemap_hash_benchmark benchmark::benchmark
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+endif()
+
+# Executable allocation overrides cannot intercept Windows DLL allocations.
+if(NOT (WIN32 AND BUILD_SHARED_LIBS))
+  add_executable(provider_initialization_test provider_initialization_test.cc)
+  target_link_libraries(
+    provider_initialization_test ${GTEST_BOTH_LIBRARIES} opentelemetry_trace
+    opentelemetry_logs opentelemetry_metrics)
+  gtest_discover_tests(provider_initialization_test TEST_PREFIX common.)
 endif()

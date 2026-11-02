@@ -36,6 +36,7 @@ cc_library(
     tags = ["ostream"],
     deps = [
         ":ostream_log_record_exporter",
+        "//sdk/src/configuration:configuration_core",
     ],
 )
 
@@ -88,6 +89,7 @@ cc_library(
     ],
     deps = [
         ":ostream_metric_exporter",
+        "//sdk/src/configuration:configuration_core",
     ],
 )
 
@@ -134,6 +136,7 @@ cc_library(
     tags = ["ostream"],
     deps = [
         ":ostream_span_exporter",
+        "//sdk/src/configuration:configuration_core",
     ],
 )
 

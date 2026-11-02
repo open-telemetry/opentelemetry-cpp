@@ -17,8 +17,7 @@ include(GoogleTest)
 add_executable(configuration_test ${INSTALL_TEST_SRC_DIR}/test_configuration.cc)
 target_link_libraries(
   configuration_test
-  PRIVATE opentelemetry-cpp::configuration_registry_factory
-          opentelemetry-cpp::configuration
+  PRIVATE opentelemetry-cpp::configuration
           opentelemetry-cpp::ostream_log_record_exporter_builder
           opentelemetry-cpp::ostream_metrics_exporter_builder
           opentelemetry-cpp::ostream_span_exporter_builder

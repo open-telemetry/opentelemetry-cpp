@@ -10,15 +10,21 @@
 #include <vector>
 
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
@@ -99,13 +105,77 @@ TEST(NoopTest, CreateSpanValidSpanContext)
   auto span_id                  = trace_api::SpanId{buf_span};
   auto span_context             = nonstd::unique_ptr<trace_api::SpanContext>(
       new trace_api::SpanContext{trace_id, span_id, trace_api::TraceFlags{true}, false});
-  std::shared_ptr<trace_api::Tracer> tracer{new trace_api::NoopTracer{}};
-  auto s1 =
-      nonstd::shared_ptr<trace_api::Span>(new trace_api::NoopSpan(tracer, std::move(span_context)));
+  auto s1 = nonstd::shared_ptr<trace_api::Span>(new trace_api::NoopSpan(std::move(span_context)));
   auto stored_span_context = s1->GetContext();
   EXPECT_EQ(stored_span_context.span_id(), span_id);
   EXPECT_EQ(stored_span_context.trace_id(), trace_id);
 
   s1->AddEvent("even1");  // noop
   s1->End();              // noop
+}
+
+TEST(NoopTest, StartSpanPreservesParentSpanContext)
+{
+  constexpr uint8_t buf_span[]  = {1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t buf_trace[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+  const trace_api::SpanContext parent{trace_api::TraceId{buf_trace}, trace_api::SpanId{buf_span},
+                                      trace_api::TraceFlags{true}, false};
+  std::shared_ptr<trace_api::Tracer> tracer{new trace_api::NoopTracer()};
+
+  trace_api::StartSpanOptions parent_options;
+  parent_options.parent = parent;
+  auto child            = tracer->StartSpan("child", parent_options);
+  EXPECT_FALSE(child->IsRecording());
+  EXPECT_EQ(child->GetContext(), parent);
+
+  auto parent_span = nonstd::shared_ptr<trace_api::Span>(new trace_api::NoopSpan(
+      nonstd::unique_ptr<trace_api::SpanContext>(new trace_api::SpanContext(parent))));
+  opentelemetry::context::Context context;
+  context = trace_api::SetSpan(context, parent_span);
+
+  trace_api::StartSpanOptions context_options;
+  context_options.parent  = context;
+  auto child_from_context = tracer->StartSpan("child", context_options);
+  EXPECT_FALSE(child_from_context->IsRecording());
+  EXPECT_EQ(child_from_context->GetContext(), parent);
+
+  auto context_with_span_context = opentelemetry::context::Context{
+      trace_api::kSpanKey,
+      nonstd::shared_ptr<trace_api::SpanContext>(new trace_api::SpanContext(parent))};
+  context_options.parent              = context_with_span_context;
+  auto child_from_stored_span_context = tracer->StartSpan("child", context_options);
+  EXPECT_FALSE(child_from_stored_span_context->IsRecording());
+  EXPECT_EQ(child_from_stored_span_context->GetContext(), parent);
+
+  {
+    trace_api::Scope scope(parent_span);
+    auto child_from_current_context = tracer->StartSpan("child");
+    EXPECT_FALSE(child_from_current_context->IsRecording());
+    EXPECT_EQ(child_from_current_context->GetContext(), parent);
+
+    trace_api::StartSpanOptions invalid_span_context_options;
+    invalid_span_context_options.parent  = trace_api::SpanContext::GetInvalid();
+    auto child_from_invalid_span_context = tracer->StartSpan("child", invalid_span_context_options);
+    EXPECT_FALSE(child_from_invalid_span_context->IsRecording());
+    EXPECT_EQ(child_from_invalid_span_context->GetContext(), parent);
+
+    trace_api::StartSpanOptions empty_context_options;
+    empty_context_options.parent  = opentelemetry::context::Context{};
+    auto child_from_empty_context = tracer->StartSpan("child", empty_context_options);
+    EXPECT_FALSE(child_from_empty_context->IsRecording());
+    EXPECT_EQ(child_from_empty_context->GetContext(), parent);
+
+    trace_api::StartSpanOptions invalid_span_options;
+    invalid_span_options.parent = opentelemetry::context::Context{
+        trace_api::kSpanKey, nonstd::shared_ptr<trace_api::Span>(new trace_api::NoopSpan())};
+    auto child_from_invalid_span = tracer->StartSpan("child", invalid_span_options);
+    EXPECT_FALSE(child_from_invalid_span->IsRecording());
+    EXPECT_EQ(child_from_invalid_span->GetContext(), parent);
+
+    trace_api::StartSpanOptions root_context_options;
+    root_context_options.parent = opentelemetry::context::Context{trace_api::kIsRootSpanKey, true};
+    auto root_child             = tracer->StartSpan("root", root_context_options);
+    EXPECT_FALSE(root_child->IsRecording());
+    EXPECT_FALSE(root_child->GetContext().IsValid());
+  }
 }

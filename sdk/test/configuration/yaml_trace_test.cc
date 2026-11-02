@@ -21,10 +21,12 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
@@ -65,7 +67,10 @@ enum class SamplerType : std::uint8_t
   kComposableAlwaysOff       = 9,
   kComposableParentThreshold = 10,
   kProbability               = 11,
-  kComposableExtension       = 12
+  kExtension                 = 12,
+  kComposableExtension       = 13,
+  // Added in 1.2.0
+  kAlwaysRecord = 14
 };
 
 class TestComposableSamplerVisitor
@@ -136,6 +141,11 @@ public:
   {
     type_matched = SamplerType::kAlwaysOn;
   }
+  void VisitAlwaysRecord(
+      const opentelemetry::sdk::configuration::AlwaysRecordSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kAlwaysRecord;
+  }
   void VisitJaegerRemote(
       const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration *) override
   {
@@ -160,8 +170,11 @@ public:
     ratio        = model->ratio;
   }
   void VisitExtension(
-      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *) override
-  {}
+      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *model) override
+  {
+    type_matched   = SamplerType::kExtension;
+    extension_name = model->name;
+  }
 
   void VisitComposite(
       const opentelemetry::sdk::configuration::CompositeSamplerConfiguration *model) override
@@ -605,14 +618,12 @@ tracer_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->limits, nullptr);
-  const auto defaults = opentelemetry::sdk::configuration::SpanLimitsConfiguration{};
-  ASSERT_EQ(config->tracer_provider->limits->attribute_value_length_limit,
-            defaults.attribute_value_length_limit);
-  ASSERT_EQ(config->tracer_provider->limits->attribute_count_limit, 128);
-  ASSERT_EQ(config->tracer_provider->limits->event_count_limit, 128);
-  ASSERT_EQ(config->tracer_provider->limits->link_count_limit, 128);
-  ASSERT_EQ(config->tracer_provider->limits->event_attribute_count_limit, 128);
-  ASSERT_EQ(config->tracer_provider->limits->link_attribute_count_limit, 128);
+  ASSERT_FALSE(config->tracer_provider->limits->attribute_value_length_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->attribute_count_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->event_count_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->link_count_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->event_attribute_count_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->link_attribute_count_limit.HasValue());
 }
 
 TEST(YamlTrace, limits)
@@ -637,12 +648,43 @@ tracer_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->limits, nullptr);
-  ASSERT_EQ(config->tracer_provider->limits->attribute_value_length_limit, 1111);
-  ASSERT_EQ(config->tracer_provider->limits->attribute_count_limit, 2222);
-  ASSERT_EQ(config->tracer_provider->limits->event_count_limit, 3333);
-  ASSERT_EQ(config->tracer_provider->limits->link_count_limit, 4444);
-  ASSERT_EQ(config->tracer_provider->limits->event_attribute_count_limit, 5555);
-  ASSERT_EQ(config->tracer_provider->limits->link_attribute_count_limit, 6666);
+  ASSERT_TRUE(config->tracer_provider->limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->attribute_value_length_limit.Value(), 1111);
+  ASSERT_TRUE(config->tracer_provider->limits->attribute_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->attribute_count_limit.Value(), 2222);
+  ASSERT_TRUE(config->tracer_provider->limits->event_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->event_count_limit.Value(), 3333);
+  ASSERT_TRUE(config->tracer_provider->limits->link_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->link_count_limit.Value(), 4444);
+  ASSERT_TRUE(config->tracer_provider->limits->event_attribute_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->event_attribute_count_limit.Value(), 5555);
+  ASSERT_TRUE(config->tracer_provider->limits->link_attribute_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->link_attribute_count_limit.Value(), 6666);
+}
+
+TEST(YamlTrace, limits_null_fields)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: null
+    attribute_count_limit: null
+    event_count_limit: 64
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->limits, nullptr);
+  ASSERT_FALSE(config->tracer_provider->limits->attribute_value_length_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->attribute_count_limit.HasValue());
+  ASSERT_TRUE(config->tracer_provider->limits->event_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->event_count_limit.Value(), 64);
 }
 
 TEST(YamlTrace, limits_with_invalid_values)
@@ -823,6 +865,54 @@ tracer_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->sampler, nullptr);
+}
+
+TEST(YamlTrace, always_record_sampler_1_1)
+{
+  std::string yaml = R"(
+file_format: "1.1-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    always_record:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  // always_record not a builtin, seen as extension
+  EXPECT_EQ(visitor.type_matched, SamplerType::kExtension);
+  EXPECT_EQ(visitor.extension_name, "always_record");
+}
+
+TEST(YamlTrace, always_record_sampler_1_2)
+{
+  std::string yaml = R"(
+file_format: "1.2-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    always_record:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kAlwaysRecord);
 }
 
 TEST(YamlTrace, jaeger_remote_sampler)

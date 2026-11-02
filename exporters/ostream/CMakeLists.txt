@@ -16,7 +16,8 @@ set_target_version(opentelemetry_exporter_ostream_span)
 
 target_include_directories(
   opentelemetry_exporter_ostream_span
-  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
 
 target_link_libraries(opentelemetry_exporter_ostream_span
                       PUBLIC opentelemetry_trace)
@@ -48,8 +49,8 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_exporter_ostream_span_builder
-  PUBLIC opentelemetry_exporter_ostream_span
-  PRIVATE opentelemetry_configuration_core)
+  PUBLIC opentelemetry_configuration_core opentelemetry_trace
+  PRIVATE opentelemetry_exporter_ostream_span)
 
 list(APPEND OPENTELEMETRY_OSTREAM_BUILDER_TARGETS
      opentelemetry_exporter_ostream_span_builder)
@@ -66,7 +67,9 @@ set_target_version(opentelemetry_exporter_ostream_metrics)
 
 target_include_directories(
   opentelemetry_exporter_ostream_metrics
-  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
 target_link_libraries(opentelemetry_exporter_ostream_metrics
                       PUBLIC opentelemetry_metrics)
 
@@ -97,8 +100,8 @@ target_include_directories(
          "$<INSTALL_INTERFACE:include>")
 target_link_libraries(
   opentelemetry_exporter_ostream_metrics_builder
-  PUBLIC opentelemetry_exporter_ostream_metrics
-  PRIVATE opentelemetry_configuration_core)
+  PUBLIC opentelemetry_configuration_core opentelemetry_metrics
+  PRIVATE opentelemetry_exporter_ostream_metrics)
 
 list(APPEND OPENTELEMETRY_OSTREAM_BUILDER_TARGETS
      opentelemetry_exporter_ostream_metrics_builder)
@@ -115,7 +118,8 @@ set_target_version(opentelemetry_exporter_ostream_logs)
 
 target_include_directories(
   opentelemetry_exporter_ostream_logs
-  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
 target_link_libraries(opentelemetry_exporter_ostream_logs
                       PUBLIC opentelemetry_logs)
 list(APPEND OPENTELEMETRY_OSTREAM_TARGETS opentelemetry_exporter_ostream_logs)
@@ -144,8 +148,8 @@ target_include_directories(
          "$<INSTALL_INTERFACE:include>")
 target_link_libraries(
   opentelemetry_exporter_ostream_logs_builder
-  PUBLIC opentelemetry_exporter_ostream_logs
-  PRIVATE opentelemetry_configuration_core)
+  PUBLIC opentelemetry_configuration_core opentelemetry_logs
+  PRIVATE opentelemetry_exporter_ostream_logs)
 list(APPEND OPENTELEMETRY_OSTREAM_BUILDER_TARGETS
      opentelemetry_exporter_ostream_logs_builder)
 
@@ -173,7 +177,8 @@ if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     exporter_ostream_span_builder
     "OpenTelemetry Exporter - OStream Span Builder"
-    "Builder for OStream span exporter." "opentelemetry_exporter_ostream_span")
+    "Builder for OStream span exporter."
+    "opentelemetry_exporter_ostream_span opentelemetry_configuration_core")
 
   opentelemetry_add_pkgconfig(
     exporter_ostream_metrics "OpenTelemetry Exporter - OStream Metrics"
@@ -183,7 +188,7 @@ if(OTELCPP_INSTALL)
     exporter_ostream_metrics_builder
     "OpenTelemetry Exporter - OStream Metrics Builder"
     "Builder for OStream metrics exporter."
-    "opentelemetry_exporter_ostream_metrics")
+    "opentelemetry_exporter_ostream_metrics opentelemetry_configuration_core")
 
   opentelemetry_add_pkgconfig(
     exporter_ostream_logs "OpenTelemetry Exporter - OStream Logs"
@@ -193,5 +198,5 @@ if(OTELCPP_INSTALL)
     exporter_ostream_logs_builder
     "OpenTelemetry Exporter - OStream Logs Builder"
     "Builder for OStream log record exporter."
-    "opentelemetry_exporter_ostream_logs")
+    "opentelemetry_exporter_ostream_logs opentelemetry_configuration_core")
 endif()
