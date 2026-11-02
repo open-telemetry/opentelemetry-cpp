@@ -93,4 +93,19 @@ TEST(ETWProvider, CheckCloseRefCountUnderflow)
   ASSERT_EQ(result, etw.STATUS_ERROR);
 }
 
+TEST(ETWProvider, BorrowedEventNameDoesNotModifyEitherMap)
+{
+  ETWProvider provider;
+  auto handle = provider.open("BorrowedEventName", ETWProvider::ETW_MANIFEST);
+  exporter::etw::Properties attributes{{ETW_FIELD_NAME, "borrowed"}};
+  exporter::etw::Properties fields;
+  EXPECT_EQ(
+      provider.write(handle, fields, nullptr, nullptr, 0, ETWProvider::ETW_MANIFEST, attributes),
+      provider.STATUS_OK);
+  EXPECT_TRUE(fields.empty());
+  ASSERT_EQ(attributes.size(), 1u);
+  EXPECT_EQ(nostd::get<std::string>(attributes.at(ETW_FIELD_NAME)), "borrowed");
+  provider.close(handle);
+}
+
 #endif

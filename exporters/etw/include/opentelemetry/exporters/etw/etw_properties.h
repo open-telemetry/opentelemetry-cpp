@@ -458,11 +458,13 @@ public:
 
 namespace detail
 {
-// Own only the generated fields; borrow span attributes for synchronous encoding.
-class SpanPropertiesView : public Properties
+// Read-only merge for synchronous encoding; overrides take precedence over source fields.
+class SpanPropertiesView : public common::KeyValueIterable
 {
 public:
-  explicit SpanPropertiesView(const Properties &source) : source_(source) {}
+  SpanPropertiesView(const Properties &source, const Properties &overrides)
+      : source_(source), overrides_(overrides)
+  {}
 
   class Iterator
   {
@@ -512,23 +514,26 @@ public:
 
   Iterator begin() const
   {
-    return {source_.begin(), source_.end(), Properties::begin(), Properties::end()};
+    return {source_.begin(), source_.end(), overrides_.begin(), overrides_.end()};
   }
 
   Iterator end() const
   {
-    return {source_.end(), source_.end(), Properties::end(), Properties::end()};
+    return {source_.end(), source_.end(), overrides_.end(), overrides_.end()};
   }
 
-  Properties Materialize() const
+  const PropertyValue *Find(const std::string &key) const
   {
-    Properties result;
-    for (const auto &entry : *this)
+    const auto added = overrides_.find(key);
+    if (added != overrides_.end())
     {
-      result[entry.first] = entry.second;
+      return &added->second;
     }
-    return result;
+    const auto original = source_.find(key);
+    return original == source_.end() ? nullptr : &original->second;
   }
+
+  bool empty() const noexcept { return source_.empty() && overrides_.empty(); }
 
   size_t size() const noexcept override
   {
@@ -555,6 +560,7 @@ public:
 
 private:
   const Properties &source_;
+  const Properties &overrides_;
 };
 }  // namespace detail
 

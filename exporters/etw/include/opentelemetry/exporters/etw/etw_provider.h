@@ -450,6 +450,19 @@ public:
   }
 
 private:
+  static const exporter_etw::PropertyValue &GetEventName(exporter_etw::Properties &properties)
+  {
+    return properties[ETW_FIELD_NAME];
+  }
+
+  static const exporter_etw::PropertyValue &GetEventName(
+      const exporter_etw::detail::SpanPropertiesView &properties)
+  {
+    const auto *name = properties.Find(ETW_FIELD_NAME);
+    static const exporter_etw::PropertyValue missing;
+    return name != nullptr ? *name : missing;
+  }
+
   template <typename EventProperties>
   unsigned long writeTldImpl(Handle &providerData,
                              EventProperties &eventData,
@@ -468,15 +481,14 @@ private:
 
     std::vector<BYTE> byteVector;
     std::vector<BYTE> byteDataVector;
-    // Initial capacity only; larger events still grow normally.
+    // Avoid repeated growth for small TLD events; 512 is an initial capacity, not a limit.
     byteVector.reserve(512);
     byteDataVector.reserve(512);
     tld::EventMetadataBuilder<std::vector<BYTE>> builder(byteVector);
     tld::EventDataBuilder<std::vector<BYTE>> dbuilder(byteDataVector);
 
-    const std::string EVENT_NAME = ETW_FIELD_NAME;
-    std::string eventName        = "NoName";
-    auto nameField               = eventData[EVENT_NAME];
+    std::string eventName = "NoName";
+    const auto &nameField = GetEventName(eventData);
     switch (nameField.index())
     {
       case exporter_etw::PropertyType::kTypeString:
@@ -609,18 +621,19 @@ private:
 
 public:
   unsigned long write(Handle &providerData,
-                      exporter_etw::detail::SpanPropertiesView &eventData,
+                      exporter_etw::Properties &eventData,
                       LPCGUID ActivityId,
                       LPCGUID RelatedActivityId,
                       uint8_t Opcode,
-                      ETWProvider::EventFormat format)
+                      ETWProvider::EventFormat format,
+                      const exporter_etw::Properties &attributes)
   {
     if (format == ETWProvider::EventFormat::ETW_MANIFEST)
     {
-      return writeTldImpl(providerData, eventData, ActivityId, RelatedActivityId, Opcode);
+      exporter_etw::detail::SpanPropertiesView view(attributes, eventData);
+      return writeTldImpl(providerData, view, ActivityId, RelatedActivityId, Opcode);
     }
-    auto owned = eventData.Materialize();
-    return write(providerData, owned, ActivityId, RelatedActivityId, Opcode, format);
+    return write(providerData, eventData, ActivityId, RelatedActivityId, Opcode, format);
   }
 
   unsigned long write(Handle &providerData,

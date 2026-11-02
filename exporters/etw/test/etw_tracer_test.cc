@@ -113,14 +113,14 @@ TEST(ETWTracer, EndSpanIdsReuseMatchingAttributes)
   const auto trace_id = generator.GenerateTraceId();
   Properties source{{ETW_FIELD_SPAN_ID, ToLowerBase16(span_id)},
                     {ETW_FIELD_TRACE_ID, ToLowerBase16(trace_id)}};
-  exporter::etw::detail::SpanPropertiesView view(source);
-  exporter::etw::detail::SetSpanIdIfChanged(view, source, ETW_FIELD_SPAN_ID, span_id);
-  exporter::etw::detail::SetSpanIdIfChanged(view, source, ETW_FIELD_TRACE_ID, trace_id);
-  EXPECT_TRUE(view.PropertyValueMap::empty());
+  Properties overrides;
+  exporter::etw::detail::SpanPropertiesView view(source, overrides);
+  exporter::etw::detail::SetSpanIdIfChanged(overrides, source, ETW_FIELD_SPAN_ID, span_id);
+  exporter::etw::detail::SetSpanIdIfChanged(overrides, source, ETW_FIELD_TRACE_ID, trace_id);
+  EXPECT_TRUE(overrides.empty());
   EXPECT_EQ(view.size(), 2u);
-  const auto materialized = view.Materialize();
-  EXPECT_EQ(nostd::get<std::string>(materialized.at(ETW_FIELD_SPAN_ID)), ToLowerBase16(span_id));
-  EXPECT_EQ(nostd::get<std::string>(materialized.at(ETW_FIELD_TRACE_ID)), ToLowerBase16(trace_id));
+  EXPECT_EQ(view.Find(ETW_FIELD_SPAN_ID), &source.at(ETW_FIELD_SPAN_ID));
+  EXPECT_EQ(view.Find(ETW_FIELD_TRACE_ID), &source.at(ETW_FIELD_TRACE_ID));
 }
 
 TEST(ETWTracer, EndSpanIdsRepairMissingOrModifiedAttributes)
@@ -131,16 +131,20 @@ TEST(ETWTracer, EndSpanIdsRepairMissingOrModifiedAttributes)
   const PropertyValue invalid[] = {42, "wrong", std::string(expected.size(), 'x'),
                                    std::string(expected.size(), '\0')};
   Properties source;
-  exporter::etw::detail::SpanPropertiesView missing(source);
-  exporter::etw::detail::SetSpanIdIfChanged(missing, source, ETW_FIELD_TRACE_ID, id);
-  EXPECT_EQ(nostd::get<std::string>(missing.Materialize().at(ETW_FIELD_TRACE_ID)), expected);
+  Properties overrides;
+  exporter::etw::detail::SpanPropertiesView missing(source, overrides);
+  exporter::etw::detail::SetSpanIdIfChanged(overrides, source, ETW_FIELD_TRACE_ID, id);
+  ASSERT_NE(missing.Find(ETW_FIELD_TRACE_ID), nullptr);
+  EXPECT_EQ(nostd::get<std::string>(*missing.Find(ETW_FIELD_TRACE_ID)), expected);
   EXPECT_TRUE(source.empty());
   for (const auto &value : invalid)
   {
     source[ETW_FIELD_TRACE_ID] = value;
-    exporter::etw::detail::SpanPropertiesView view(source);
-    exporter::etw::detail::SetSpanIdIfChanged(view, source, ETW_FIELD_TRACE_ID, id);
-    EXPECT_EQ(nostd::get<std::string>(view.Materialize().at(ETW_FIELD_TRACE_ID)), expected);
+    overrides.clear();
+    exporter::etw::detail::SpanPropertiesView view(source, overrides);
+    exporter::etw::detail::SetSpanIdIfChanged(overrides, source, ETW_FIELD_TRACE_ID, id);
+    ASSERT_NE(view.Find(ETW_FIELD_TRACE_ID), nullptr);
+    EXPECT_EQ(nostd::get<std::string>(*view.Find(ETW_FIELD_TRACE_ID)), expected);
     EXPECT_EQ(source.at(ETW_FIELD_TRACE_ID).index(), value.index());
     if (nostd::holds_alternative<std::string>(value))
     {

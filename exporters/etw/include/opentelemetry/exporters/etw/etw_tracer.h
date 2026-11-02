@@ -304,15 +304,11 @@ private:
     auto spanContext = spanBase.GetContext();
 
     // Populate Span with presaved attributes
-    Span &currentSpan = const_cast<Span &>(span);
+    Span &currentSpan      = const_cast<Span &>(span);
+    const auto &attributes = GetSpanAttributes(currentSpan);
+    Properties evt;
 #if defined(ENABLE_ENV_PROPERTIES)
-    Properties evt = GetSpanAttributes(currentSpan);
-#else
-    detail::SpanPropertiesView evt(GetSpanAttributes(currentSpan));
-#endif
-
-#if defined(ENABLE_ENV_PROPERTIES)
-
+    evt                           = attributes;
     Properties env_properties_env = {};
     if (evt.size() > 0)
     {
@@ -341,20 +337,24 @@ private:
       }
     }
 
+#else
+    // MessagePack may add fields during Stop that must survive the final Span write.
+    if (encoding != ETWProvider::EventFormat::ETW_MANIFEST)
+    {
+      evt = attributes;
+    }
 #endif  // defined(ENABLE_ENV_PROPERTIES)
 
     evt[ETW_FIELD_NAME] = GetName(span);
 
     if (cfg.enableSpanId)
     {
-      detail::SetSpanIdIfChanged(evt, GetSpanAttributes(currentSpan), ETW_FIELD_SPAN_ID,
-                                 spanContext.span_id());
+      detail::SetSpanIdIfChanged(evt, attributes, ETW_FIELD_SPAN_ID, spanContext.span_id());
     }
 
     if (cfg.enableTraceId)
     {
-      detail::SetSpanIdIfChanged(evt, GetSpanAttributes(currentSpan), ETW_FIELD_TRACE_ID,
-                                 spanContext.trace_id());
+      detail::SetSpanIdIfChanged(evt, attributes, ETW_FIELD_TRACE_ID, spanContext.trace_id());
     }
 
     // Populate ActivityId if enabled
@@ -382,6 +382,15 @@ private:
       }
     }
 
+    auto write_event = [&](uint8_t opcode) {
+#if defined(ENABLE_ENV_PROPERTIES)
+      etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, opcode, encoding);
+#else
+      etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, opcode, encoding,
+                          attributes);
+#endif
+    };
+
     if (cfg.enableActivityTracking)
     {
       // TODO: check what EndSpanOptions should be supported for this exporter.
@@ -390,7 +399,7 @@ private:
       // This event on Span Stop enables generation of "non-transactional"
       // OpCode=Stop in alignment with TraceLogging Activity "EventSource"
       // spec.
-      etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 2, encoding);
+      write_event(2);
     }
 
     {
@@ -426,7 +435,7 @@ private:
       // Presently we assume that all spans are server spans
       evt[ETW_FIELD_SPAN_KIND] = uint32_t(opentelemetry::trace::SpanKind::kServer);
       UpdateStatus(currentSpan, evt);
-      etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 0, encoding);
+      write_event(0);
     }
   }
 
