@@ -290,9 +290,9 @@ jobs:
       - name: Run OpenTracing Shim Test
         run: ./ci/do_ci.sh cmake.opentracing_shim.install.test
 
-  macos_14_conan_stable:
-    name: macOS 14 conan stable versions cxx17 (static libs)
-    runs-on: macos-14
+  macos_conan_stable:
+    name: macOS conan stable versions cxx17 (static libs)
+    runs-on: macos-15
     env:
       INSTALL_TEST_DIR: '/Users/runner/install_test'
       CXX_STANDARD: '17'
@@ -327,9 +327,9 @@ jobs:
         BUILD_SHARED_LIBS: 'OFF'
       run: ./ci/do_ci.sh cmake.install.test
 
-  macos_14_brew_packages:
-    name: macOS 14 brew latest versions cxx17 (static libs)
-    runs-on: macos-14
+  macos_brew_packages:
+    name: macOS brew latest versions cxx17 (static libs)
+    runs-on: macos-15
     env:
       INSTALL_TEST_DIR: '/Users/runner/install_test'
       CXX_STANDARD: '17'
