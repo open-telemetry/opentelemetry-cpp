@@ -1,9 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-add_subdirectory(propagation)
-
 include(GoogleTest)
+
+add_subdirectory(propagation)
 
 foreach(testname context_test runtime_context_test)
   add_executable(${testname} "${testname}.cc")

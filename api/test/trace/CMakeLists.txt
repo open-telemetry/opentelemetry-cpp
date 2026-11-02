@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include(GoogleTest)
+
 add_subdirectory(propagation)
 
 foreach(
