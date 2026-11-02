@@ -306,7 +306,7 @@ private:
     // Populate Span with presaved attributes
     Span &currentSpan = const_cast<Span &>(span);
 #if defined(ENABLE_ENV_PROPERTIES)
-    Properties evt    = GetSpanAttributes(currentSpan);
+    Properties evt = GetSpanAttributes(currentSpan);
 #else
     detail::SpanPropertiesView evt(GetSpanAttributes(currentSpan));
 #endif
