@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 #include <fstream>
 #include <iomanip>
@@ -52,6 +53,30 @@ namespace etw
 {
 
 class Span;
+
+namespace detail
+{
+template <typename Id>
+void SetSpanIdIfChanged(Properties &fields,
+                        const Properties &attributes,
+                        const char *key,
+                        const Id &id)
+{
+  // GetAttributes() is mutable, so validate the saved value against the span context.
+  char text[2 * Id::kSize];
+  id.ToLowerBase16(text);
+  const auto found = attributes.find(key);
+  if (found != attributes.end() && nostd::holds_alternative<std::string>(found->second))
+  {
+    const auto &value = nostd::get<std::string>(found->second);
+    if (value.size() == sizeof(text) && std::memcmp(value.data(), text, sizeof(text)) == 0)
+    {
+      return;
+    }
+  }
+  fields[key] = std::string(text, sizeof(text));
+}
+}  // namespace detail
 
 /**
  * @brief Template that allows to instantiate new Span object for header-only forward-declared
@@ -280,7 +305,11 @@ private:
 
     // Populate Span with presaved attributes
     Span &currentSpan = const_cast<Span &>(span);
+#if defined(ENABLE_ENV_PROPERTIES)
     Properties evt    = GetSpanAttributes(currentSpan);
+#else
+    detail::SpanPropertiesView evt(GetSpanAttributes(currentSpan));
+#endif
 
 #if defined(ENABLE_ENV_PROPERTIES)
 
@@ -318,12 +347,14 @@ private:
 
     if (cfg.enableSpanId)
     {
-      evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
+      detail::SetSpanIdIfChanged(evt, GetSpanAttributes(currentSpan), ETW_FIELD_SPAN_ID,
+                                 spanContext.span_id());
     }
 
     if (cfg.enableTraceId)
     {
-      evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
+      detail::SetSpanIdIfChanged(evt, GetSpanAttributes(currentSpan), ETW_FIELD_TRACE_ID,
+                                 spanContext.trace_id());
     }
 
     // Populate ActivityId if enabled
@@ -965,7 +996,7 @@ public:
 
   opentelemetry::trace::StatusCode GetStatus() { return status_code_; }
 
-  void SetAttributes(Properties attributes) { attributes_ = attributes; }
+  void SetAttributes(const Properties &attributes) { attributes_ = attributes; }
 
   /**
    * @brief Obtain span attributes specified at Span start.

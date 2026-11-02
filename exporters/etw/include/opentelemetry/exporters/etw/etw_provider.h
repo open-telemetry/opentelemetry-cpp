@@ -446,6 +446,17 @@ public:
                          LPCGUID RelatedActivityId = nullptr,
                          uint8_t Opcode            = 0 /* Information */)
   {
+    return writeTldImpl(providerData, eventData, ActivityId, RelatedActivityId, Opcode);
+  }
+
+private:
+  template <typename EventProperties>
+  unsigned long writeTldImpl(Handle &providerData,
+                             EventProperties &eventData,
+                             LPCGUID ActivityId,
+                             LPCGUID RelatedActivityId,
+                             uint8_t Opcode)
+  {
     // Make sure you stop sending event before register unregistering providerData
     if (providerData.providerHandle == INVALID_HANDLE)
     {
@@ -457,6 +468,9 @@ public:
 
     std::vector<BYTE> byteVector;
     std::vector<BYTE> byteDataVector;
+    // Initial capacity only; larger events still grow normally.
+    byteVector.reserve(512);
+    byteDataVector.reserve(512);
     tld::EventMetadataBuilder<std::vector<BYTE>> builder(byteVector);
     tld::EventDataBuilder<std::vector<BYTE>> dbuilder(byteDataVector);
 
@@ -591,6 +605,22 @@ public:
     }
 
     return (unsigned long)(writeResponse);
+  }
+
+public:
+  unsigned long write(Handle &providerData,
+                      exporter_etw::detail::SpanPropertiesView &eventData,
+                      LPCGUID ActivityId,
+                      LPCGUID RelatedActivityId,
+                      uint8_t Opcode,
+                      ETWProvider::EventFormat format)
+  {
+    if (format == ETWProvider::EventFormat::ETW_MANIFEST)
+    {
+      return writeTldImpl(providerData, eventData, ActivityId, RelatedActivityId, Opcode);
+    }
+    auto owned = eventData.Materialize();
+    return write(providerData, owned, ActivityId, RelatedActivityId, Opcode, format);
   }
 
   unsigned long write(Handle &providerData,

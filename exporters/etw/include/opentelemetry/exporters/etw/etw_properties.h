@@ -456,6 +456,108 @@ public:
   size_t size() const noexcept override { return PropertyValueMap::size(); }
 };
 
+namespace detail
+{
+// Own only the generated fields; borrow span attributes for synchronous encoding.
+class SpanPropertiesView : public Properties
+{
+public:
+  explicit SpanPropertiesView(const Properties &source) : source_(source) {}
+
+  class Iterator
+  {
+  public:
+    Iterator(PropertyValueMap::const_iterator source,
+             PropertyValueMap::const_iterator source_end,
+             PropertyValueMap::const_iterator added,
+             PropertyValueMap::const_iterator added_end)
+        : source_(source), source_end_(source_end), added_(added), added_end_(added_end)
+    {}
+
+    const PropertyValueMap::value_type &operator*() const
+    {
+      return UseSource() ? *source_ : *added_;
+    }
+
+    Iterator &operator++()
+    {
+      if (UseSource())
+      {
+        ++source_;
+      }
+      else
+      {
+        if (source_ != source_end_ && source_->first == added_->first)
+        {
+          ++source_;
+        }
+        ++added_;
+      }
+      return *this;
+    }
+
+    bool operator!=(const Iterator &other) const
+    {
+      return source_ != other.source_ || added_ != other.added_;
+    }
+
+  private:
+    bool UseSource() const
+    {
+      return source_ != source_end_ && (added_ == added_end_ || source_->first < added_->first);
+    }
+
+    PropertyValueMap::const_iterator source_, source_end_, added_, added_end_;
+  };
+
+  Iterator begin() const
+  {
+    return {source_.begin(), source_.end(), Properties::begin(), Properties::end()};
+  }
+
+  Iterator end() const
+  {
+    return {source_.end(), source_.end(), Properties::end(), Properties::end()};
+  }
+
+  Properties Materialize() const
+  {
+    Properties result;
+    for (const auto &entry : *this)
+    {
+      result[entry.first] = entry.second;
+    }
+    return result;
+  }
+
+  size_t size() const noexcept override
+  {
+    size_t count = 0;
+    for (auto it = begin(); it != end(); ++it)
+    {
+      ++count;
+    }
+    return count;
+  }
+
+  bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>
+                           callback) const noexcept override
+  {
+    for (const auto &entry : *this)
+    {
+      if (!callback(entry.first, entry.second.ToAttributeValue()))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+private:
+  const Properties &source_;
+};
+}  // namespace detail
+
 }  // namespace etw
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

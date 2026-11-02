@@ -88,3 +88,58 @@ TEST(ETWProperties, PropertiesMapPreservesSpanStringAttribute)
   EXPECT_EQ(owned[0], "one");
   EXPECT_EQ(owned[1], "two");
 }
+
+TEST(ETWProperties, SpanViewBorrowsAttributesAndOverridesInSortedOrder)
+{
+  Properties source{{"b", std::string(1024, 'x')}, {"d", 4}, {"f", 6}};
+  exporter::etw::detail::SpanPropertiesView view(source);
+  view["a"] = 1;
+  view["d"] = 40;
+  view["e"] = 5;
+  view["g"] = 7;
+
+  std::vector<std::string> keys;
+  for (const auto &entry : view)
+  {
+    keys.push_back(entry.first);
+    if (entry.first == "b")
+    {
+      EXPECT_EQ(&entry.second, &source.at("b"));
+    }
+  }
+  EXPECT_EQ(keys, (std::vector<std::string>{"a", "b", "d", "e", "f", "g"}));
+  EXPECT_EQ(view.size(), 6u);
+  const auto materialized = view.Materialize();
+  EXPECT_EQ(nostd::get<int32_t>(materialized.at("d")), 40);
+  EXPECT_EQ(nostd::get<int32_t>(source.at("d")), 4);
+  EXPECT_EQ(source.size(), 3u);
+  EXPECT_EQ(nostd::get<std::string>(materialized.at("b")), std::string(1024, 'x'));
+
+  const common::KeyValueIterable &iterable = view;
+  size_t visited                           = 0;
+  EXPECT_FALSE(iterable.ForEachKeyValue(
+      [&](nostd::string_view, common::AttributeValue) { return ++visited < 2; }));
+  EXPECT_EQ(visited, 2u);
+}
+
+TEST(ETWProperties, SpanViewHandlesEmptyInputsAndCompleteOverlap)
+{
+  Properties source;
+  exporter::etw::detail::SpanPropertiesView view(source);
+  EXPECT_EQ(view.size(), 0u);
+  EXPECT_TRUE(view.Materialize().empty());
+  view["key"] = 2;
+  EXPECT_EQ(view.size(), 1u);
+  source["key"] = 1;
+  EXPECT_EQ(view.size(), 1u);
+  EXPECT_EQ(nostd::get<int32_t>(view.Materialize().at("key")), 2);
+
+  size_t visited = 0;
+  EXPECT_TRUE(view.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) {
+    ++visited;
+    EXPECT_EQ(key, "key");
+    EXPECT_EQ(nostd::get<int32_t>(value), 2);
+    return true;
+  }));
+  EXPECT_EQ(visited, 1u);
+}
