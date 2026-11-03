@@ -205,15 +205,22 @@ private:
       auto previous = last_observed.find(attributes);
       if (previous != last_observed.end())
       {
-        delta = previous->second->Diff(*observed->second);
+        delta            = previous->second->Diff(*observed->second);
+        previous->second = DefaultAggregation::CloneAggregation(
+            aggregation_type_, instrument_descriptor_, *observed->second);
       }
       else
       {
         delta = DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_,
                                                      *observed->second);
+        // Keep only first-observed baselines up to this reader's cardinality limit.
+        if (last_observed.size() < aggregation_config_->cardinality_limit_)
+        {
+          last_observed.emplace(attributes,
+                                DefaultAggregation::CloneAggregation(
+                                    aggregation_type_, instrument_descriptor_, *observed->second));
+        }
       }
-      last_observed[attributes] = DefaultAggregation::CloneAggregation(
-          aggregation_type_, instrument_descriptor_, *observed->second);
       AccumulateDelta(FilterAttributes(attributes), *delta);
     }
 
@@ -322,6 +329,9 @@ private:
       CollectorHandle *,
       std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, AttributeHashGenerator>>
       last_observed_monotonic_hash_maps_;
+#ifdef UNIT_TESTING
+  friend class AsyncMetricStorageTestPeer;
+#endif
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
   std::unique_ptr<AttributesHashMap> round_hash_map_;
 

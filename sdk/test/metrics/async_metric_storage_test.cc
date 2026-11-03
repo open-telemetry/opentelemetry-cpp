@@ -8,6 +8,7 @@
 #include <initializer_list>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -36,6 +37,28 @@
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace metrics
+{
+
+class AsyncMetricStorageTestPeer
+{
+public:
+  static size_t GetLastObservedMonotonicCount(AsyncMetricStorage &storage,
+                                              CollectorHandle *collector)
+  {
+    std::lock_guard<std::mutex> guard(storage.hashmap_lock_);
+    auto it = storage.last_observed_monotonic_hash_maps_.find(collector);
+    return it == storage.last_observed_monotonic_hash_maps_.end() ? 0 : it->second.size();
+  }
+};
+
+}  // namespace metrics
+}  // namespace sdk
+OPENTELEMETRY_END_NAMESPACE
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -1421,7 +1444,7 @@ TEST(WritableMetricStorageCardinalityLimit,
   EXPECT_EQ(3, values["y"]);
 }
 
-TEST_P(AsyncWritableMetricStorageTestFixture, CardinalityLimitPreservesCounterBaseline)
+TEST_P(AsyncWritableMetricStorageTestFixture, CardinalityLimitCapsCounterBaselines)
 {
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kObservableCounter,
                                      InstrumentValueType::kLong};
@@ -1447,6 +1470,8 @@ TEST_P(AsyncWritableMetricStorageTestFixture, CardinalityLimitPreservesCounterBa
       {{{"id", "a"}}, 1}, {{{"id", "b"}}, 2}};
   record(first_round);
   EXPECT_EQ(2U, collect().size());
+  EXPECT_EQ(kCardinalityLimit,
+            AsyncMetricStorageTestPeer::GetLastObservedMonotonicCount(storage, collector.get()));
 
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> second_round = {
       {{{"id", "x"}}, 7}};
@@ -1456,6 +1481,8 @@ TEST_P(AsyncWritableMetricStorageTestFixture, CardinalityLimitPreservesCounterBa
   ASSERT_NE(points[0].first.find("id"), points[0].first.end());
   EXPECT_EQ("x", opentelemetry::nostd::get<std::string>(points[0].first.find("id")->second));
   EXPECT_EQ(7, points[0].second);
+  EXPECT_EQ(kCardinalityLimit,
+            AsyncMetricStorageTestPeer::GetLastObservedMonotonicCount(storage, collector.get()));
 
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> third_round = {
       {{{"id", "x"}}, 8}, {{{"id", "y"}}, 3}};
@@ -1467,8 +1494,18 @@ TEST_P(AsyncWritableMetricStorageTestFixture, CardinalityLimitPreservesCounterBa
   {
     values[opentelemetry::nostd::get<std::string>(point.first.find("id")->second)] = point.second;
   }
-  EXPECT_EQ(GetParam() == AggregationTemporality::kCumulative ? 8 : 1, values["x"]);
+  EXPECT_EQ(GetParam() == AggregationTemporality::kCumulative ? 15 : 8, values["x"]);
   EXPECT_EQ(3, values["y"]);
+
+  for (int i = 0; i < 100; ++i)
+  {
+    std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> churn_round = {
+        {{{"id", std::to_string(i)}}, i + 1}};
+    record(churn_round);
+    collect();
+    EXPECT_LE(AsyncMetricStorageTestPeer::GetLastObservedMonotonicCount(storage, collector.get()),
+              kCardinalityLimit);
+  }
 }
 
 }  // namespace
