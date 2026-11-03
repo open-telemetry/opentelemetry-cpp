@@ -4,7 +4,6 @@
 #pragma once
 
 #include <new>
-#include <type_traits>
 
 #include "opentelemetry/exporters/etw/etw_fields.h"
 #include "opentelemetry/exporters/etw/etw_properties.h"
@@ -23,14 +22,24 @@ class SpanEndProperties
 {
   struct Cache
   {
+    explicit Cache(bool &destroyed) : destroyed_(destroyed) {}
+    ~Cache() { destroyed_ = true; }
+
     Properties fields;
     bool busy = false;
+    bool &destroyed_;
   };
 
-  static Cache &ThreadCache()
+  static Cache *ThreadCache()
   {
-    static thread_local Cache cache;
-    return cache;
+    // Trivial TLS state remains valid while other thread-local destructors run.
+    static thread_local bool destroyed = false;
+    if (destroyed)
+    {
+      return nullptr;
+    }
+    static thread_local Cache cache(destroyed);
+    return &cache;
   }
 
 public:
@@ -38,19 +47,19 @@ public:
   {
     if (reusable)
     {
-      auto &candidate = ThreadCache();
-      if (!candidate.busy)
+      auto *candidate = ThreadCache();
+      if (candidate != nullptr && !candidate->busy)
       {
-        candidate.busy = true;
-        cache_         = &candidate;
-        fields_        = &candidate.fields;
+        candidate->busy = true;
+        cache_          = candidate;
+        fields_         = &candidate->fields;
         // ID overrides are only added when saved IDs are absent or modified.
         fields_->erase(ETW_FIELD_SPAN_ID);
         fields_->erase(ETW_FIELD_TRACE_ID);
         return;
       }
     }
-    fields_ = new (&fallback_) Properties;
+    fields_ = new (fallback_) Properties;
   }
 
   ~SpanEndProperties()
@@ -76,7 +85,7 @@ public:
   Properties &Get() { return *fields_; }
 
 private:
-  std::aligned_storage<sizeof(Properties), alignof(Properties)>::type fallback_;
+  alignas(Properties) unsigned char fallback_[sizeof(Properties)];
   Cache *cache_       = nullptr;
   Properties *fields_ = nullptr;
 };

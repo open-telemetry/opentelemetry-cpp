@@ -428,6 +428,8 @@ private:
     {
       // Now since the span has ended, we need to emit the "Span" event that
       // contains the entire span information, attributes, time, etc. on it.
+      // Reused map keys must all be overwritten before writing. Any optional
+      // generated fields must be removed before reuse to avoid stale values.
       evt[ETW_FIELD_NAME]         = ETW_VALUE_SPAN;
       evt[ETW_FIELD_PAYLOAD_NAME] = GetName(span);
 

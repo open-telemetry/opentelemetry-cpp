@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -149,4 +150,22 @@ TEST(ETWTldTracer, ReusedFieldsMatchFreshEncodingWithoutStaleData)
 TEST(ETWTldTracer, ActivityTrackingPreservesSeparateStopAndSpanFields)
 {
   CheckSpanEndEvents(true);
+}
+
+TEST(ETWTldTracer, UnfinishedThreadLocalSpanExportsAfterCacheTeardown)
+{
+  etw::TracerProvider provider({{"enableActivityTracking", false}});
+  auto tracer = provider.GetTracer("TldThreadTeardown");
+  events.clear();
+  std::thread worker([&] {
+    // This owner must be destroyed after the cache initialized by the next End().
+    thread_local nostd::shared_ptr<trace::Span> pending;
+    pending       = tracer->StartSpan("thread-exit-span");
+    auto finished = tracer->StartSpan("before-thread-exit");
+    finished->End();
+  });
+  worker.join();
+  ASSERT_EQ(events.size(), 2u);
+  EXPECT_EQ(events[0].opcode, 0);
+  EXPECT_EQ(events[1].opcode, 0);
 }
