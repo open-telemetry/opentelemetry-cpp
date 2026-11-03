@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
+  returns `false` when the Meter is disabled or every matching view uses the
+  Drop aggregation
+  [#4721](https://github.com/open-telemetry/opentelemetry-cpp/pull/4721)
+
 * [SDK] `BatchLogRecordProcessor` now exports at most one batch on normal
   wakeups instead of continuously draining the buffer, matching
   `BatchSpanProcessor`
@@ -36,6 +41,11 @@ Increment the:
 * [EXPORTER] Prometheus exporter: fix attribute serialization, label collision,
   and empty point guards
   [#4738](https://github.com/open-telemetry/opentelemetry-cpp/pull/4738)
+
+* [SDK] Fix lost wakeup in BatchSpanProcessor `OnEnd` notify when a span
+  fills the queue, which could stall the export and drop spans until the
+  schedule delay.
+  [#4741](https://github.com/open-telemetry/opentelemetry-cpp/pull/4741)
 
 ## [1.30.0] 2026-10-22
 
