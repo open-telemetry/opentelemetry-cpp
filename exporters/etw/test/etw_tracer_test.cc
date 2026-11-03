@@ -9,8 +9,11 @@
 #  include <string>
 #  include "opentelemetry//sdk/trace/sampler.h"
 #  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
+#  include "opentelemetry/exporters/etw/span_end_properties.h"
 #  include "opentelemetry/sdk/trace/samplers/always_off.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
+#  include "opentelemetry/trace/default_span.h"
+#  include "opentelemetry/trace/scope.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
@@ -155,6 +158,95 @@ TEST(ETWTracer, EndSpanIdsRepairMissingOrModifiedAttributes)
     Properties owned = source;
     exporter::etw::detail::SetSpanIdIfChanged(owned, source, ETW_FIELD_TRACE_ID, id);
     EXPECT_EQ(nostd::get<std::string>(owned.at(ETW_FIELD_TRACE_ID)), expected);
+  }
+}
+
+TEST(ETWTracer, ExplicitParentSkipsActiveSpanLookupAndInvalidParentFallsBack)
+{
+  class CountingSpan : public trace::DefaultSpan
+  {
+  public:
+    CountingSpan(const trace::SpanContext &context, size_t &calls)
+        : trace::DefaultSpan(context), calls_(calls)
+    {}
+    trace::SpanContext GetContext() const noexcept override
+    {
+      ++calls_;
+      return trace::DefaultSpan::GetContext();
+    }
+
+  private:
+    size_t &calls_;
+  };
+  const uint8_t explicit_trace[16] = {1, 2, 3};
+  const uint8_t explicit_span[8]   = {4, 5, 6};
+  const uint8_t active_trace[16]   = {7, 8, 9};
+  const uint8_t active_span[8]     = {10, 11, 12};
+  const trace::SpanContext explicit_parent(
+      trace::TraceId(explicit_trace), trace::SpanId(explicit_span), trace::TraceFlags(1), false);
+  const trace::SpanContext active_parent(trace::TraceId(active_trace), trace::SpanId(active_span),
+                                         trace::TraceFlags(1), false);
+  exporter::etw::TracerProvider provider({{"enableTraceId", true}, {"enableSpanId", true}});
+  auto tracer  = provider.GetTracer("ExplicitParentLookup");
+  size_t calls = 0;
+  nostd::shared_ptr<trace::Span> active(new CountingSpan(active_parent, calls));
+  trace::Scope scope(active);
+  trace::StartSpanOptions options;
+  options.parent = explicit_parent;
+  auto child     = tracer->StartSpan("explicit", options);
+  EXPECT_EQ(calls, 0u);
+  EXPECT_EQ(child->GetContext().trace_id(), explicit_parent.trace_id());
+  EXPECT_EQ(nostd::get<std::string>(static_cast<exporter::etw::Span *>(child.get())
+                                        ->GetAttributes()
+                                        .at(ETW_FIELD_SPAN_PARENTID)),
+            ToLowerBase16(explicit_parent.span_id()));
+  child->End();
+
+  options.parent = trace::SpanContext::GetInvalid();
+  auto fallback  = tracer->StartSpan("fallback", options);
+  EXPECT_EQ(calls, 1u);
+  EXPECT_EQ(fallback->GetContext().trace_id(), active_parent.trace_id());
+  EXPECT_EQ(nostd::get<std::string>(static_cast<exporter::etw::Span *>(fallback.get())
+                                        ->GetAttributes()
+                                        .at(ETW_FIELD_SPAN_PARENTID)),
+            ToLowerBase16(active_parent.span_id()));
+  fallback->End();
+}
+
+TEST(ETWTracer, ReusedEndFieldsReleasePayloadsAndForgetIdOverrides)
+{
+  const PropertyValue *retained = nullptr;
+  {
+    exporter::etw::detail::SpanEndProperties fields(true);
+    fields.Get()[ETW_FIELD_STATUSMESSAGE] = std::string(4096, 'x');
+    fields.Get()[ETW_FIELD_SPAN_ID]       = "old-span-id";
+    fields.Get()[ETW_FIELD_TRACE_ID]      = "old-trace-id";
+    retained                              = &fields.Get().at(ETW_FIELD_STATUSMESSAGE);
+  }
+  {
+    exporter::etw::detail::SpanEndProperties fields(true);
+    const auto found = fields.Get().find(ETW_FIELD_STATUSMESSAGE);
+    ASSERT_NE(found, fields.Get().end());
+    EXPECT_EQ(&found->second, retained);
+    EXPECT_FALSE(nostd::holds_alternative<std::string>(found->second));
+    EXPECT_EQ(fields.Get().count(ETW_FIELD_SPAN_ID), 0u);
+    EXPECT_EQ(fields.Get().count(ETW_FIELD_TRACE_ID), 0u);
+  }
+  exporter::etw::detail::SpanEndProperties owned(false);
+  EXPECT_TRUE(owned.Get().empty());
+}
+
+TEST(ETWTracer, ReentrantEndFieldsDoNotModifyTheOuterLease)
+{
+  exporter::etw::detail::SpanEndProperties outer(true);
+  outer.Get()[ETW_FIELD_STATUSMESSAGE] = "outer";
+  for (int i = 0; i < 2; ++i)
+  {
+    exporter::etw::detail::SpanEndProperties nested(true);
+    EXPECT_NE(&nested.Get(), &outer.Get());
+    EXPECT_TRUE(nested.Get().empty());
+    nested.Get()[ETW_FIELD_STATUSMESSAGE] = "nested";
+    EXPECT_EQ(nostd::get<std::string>(outer.Get().at(ETW_FIELD_STATUSMESSAGE)), "outer");
   }
 }
 

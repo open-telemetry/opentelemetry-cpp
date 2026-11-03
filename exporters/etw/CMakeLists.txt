@@ -32,6 +32,7 @@ otel_add_component(
 if(OTELCPP_BUILD_TESTING)
   add_executable(etw_provider_test test/etw_provider_test.cc)
   add_executable(etw_tracer_test test/etw_tracer_test.cc)
+  add_executable(etw_tracer_tld_test test/etw_tracer_tld_test.cc)
   add_executable(etw_tracer_msgpack_test test/etw_tracer_msgpack_test.cc)
   target_compile_definitions(etw_tracer_msgpack_test PRIVATE HAVE_MSGPACK
                                                              HAVE_FIELD_TIME)
@@ -44,6 +45,9 @@ if(OTELCPP_BUILD_TESTING)
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
   target_link_libraries(etw_tracer_test ${GTEST_BOTH_LIBRARIES}
+                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+
+  target_link_libraries(etw_tracer_tld_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
   target_link_libraries(etw_tracer_msgpack_test ${GTEST_BOTH_LIBRARIES}
@@ -86,6 +90,10 @@ if(OTELCPP_BUILD_TESTING)
     TARGET etw_tracer_msgpack_test
     TEST_PREFIX exporter.
     TEST_LIST etw_tracer_msgpack_test)
+  gtest_add_tests(
+    TARGET etw_tracer_tld_test
+    TEST_PREFIX exporter.
+    TEST_LIST etw_tracer_tld_test)
   gtest_add_tests(
     TARGET etw_logger_test
     TEST_PREFIX exporter.

@@ -44,6 +44,7 @@
 #include "opentelemetry/exporters/etw/etw_provider.h"
 #include "opentelemetry/exporters/etw/etw_random_id_generator.h"
 #include "opentelemetry/exporters/etw/etw_tail_sampler.h"
+#include "opentelemetry/exporters/etw/span_end_properties.h"
 #include "opentelemetry/exporters/etw/utils.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -56,6 +57,19 @@ class Span;
 
 namespace detail
 {
+template <class SpanType, class TracerType>
+nostd::shared_ptr<opentelemetry::trace::Span> MakeSharedSpan(
+    TracerType *owner,
+    nostd::string_view name,
+    const opentelemetry::trace::StartSpanOptions &options,
+    std::unique_ptr<opentelemetry::trace::SpanContext> context,
+    SpanType *&raw)
+{
+  auto owned = std::make_shared<SpanType>(*owner, name, options, std::move(context));
+  raw        = owned.get();
+  return nostd::shared_ptr<opentelemetry::trace::Span>(std::move(owned));
+}
+
 template <typename Id>
 void SetSpanIdIfChanged(Properties &fields,
                         const Properties &attributes,
@@ -306,7 +320,13 @@ private:
     // Populate Span with presaved attributes
     Span &currentSpan      = const_cast<Span &>(span);
     const auto &attributes = GetSpanAttributes(currentSpan);
-    Properties evt;
+#if defined(ENABLE_ENV_PROPERTIES)
+    detail::SpanEndProperties fields(false);
+#else
+    detail::SpanEndProperties fields(encoding == ETWProvider::ETW_MANIFEST &&
+                                     !cfg.enableActivityTracking);
+#endif
+    Properties &evt = fields.Get();
 #if defined(ENABLE_ENV_PROPERTIES)
     evt                           = attributes;
     Properties env_properties_env = {};
@@ -345,7 +365,10 @@ private:
     }
 #endif  // defined(ENABLE_ENV_PROPERTIES)
 
-    evt[ETW_FIELD_NAME] = GetName(span);
+    if (cfg.enableActivityTracking)
+    {
+      evt[ETW_FIELD_NAME] = GetName(span);
+    }
 
     if (cfg.enableSpanId)
     {
@@ -515,19 +538,29 @@ public:
     // Parent Context:
     // - either use current span
     // - or attach to parent SpanContext specified in options
-    opentelemetry::trace::SpanContext parentContext = GetCurrentSpan()->GetContext();
-    if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(options.parent))
-    {
-      auto spanContext = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
-      if (spanContext.IsValid())
+    auto parentContext = [&]() {
+      if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(options.parent))
       {
-        parentContext = spanContext;
+        const auto &explicitParent = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
+        if (explicitParent.IsValid())
+        {
+          return explicitParent;
+        }
       }
-    }
+      // Avoid constructing a DefaultSpan when there is no active span.
+      auto current = opentelemetry::context::RuntimeContext::GetCurrent();
+      auto value   = current.GetValue(opentelemetry::trace::kSpanKey);
+      if (const auto *active = nostd::get_if<nostd::shared_ptr<opentelemetry::trace::Span>>(&value))
+      {
+        return (*active)->GetContext();
+      }
+      return opentelemetry::trace::SpanContext::GetInvalid();
+    }();
     auto traceId = parentContext.IsValid() ? parentContext.trace_id() : traceId_;
 
     // Sampling based on attributes is not supported for now, so passing empty below.
-    std::map<std::string, int> emptyAttributes = {{}};
+    // Keep the existing sampler input, but do not allocate it for every span.
+    static const std::map<std::string, int> emptyAttributes = {{}};
     opentelemetry::sdk::trace::SamplingResult sampling_result =
         GetSampler(tracerProvider_)
             .ShouldSample(parentContext, traceId, name, options.kind,
@@ -570,8 +603,9 @@ public:
 
     // This template pattern allows us to forward-declare the etw::Span,
     // create an instance of it, then assign it to tracer::Span result.
-    auto currentSpan = new_span<Span, Tracer>(this, name, options, std::move(spanContext));
-    nostd::shared_ptr<opentelemetry::trace::Span> result = to_span_ptr<Span>(currentSpan);
+    Span *currentSpan = nullptr;
+    auto result = detail::MakeSharedSpan<Span, Tracer>(this, name, options, std::move(spanContext),
+                                                       currentSpan);
 
     // Decorate with additional standard fields
     std::string eventName = name.data();

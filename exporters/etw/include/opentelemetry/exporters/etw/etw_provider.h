@@ -620,6 +620,8 @@ private:
   }
 
 public:
+  // TLD merges generated eventData fields over borrowed attributes. Other encodings
+  // require a complete owned eventData map, retaining serializer mutations across writes.
   unsigned long write(Handle &providerData,
                       exporter_etw::Properties &eventData,
                       LPCGUID ActivityId,
