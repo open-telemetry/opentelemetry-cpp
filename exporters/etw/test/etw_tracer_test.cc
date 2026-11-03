@@ -213,41 +213,89 @@ TEST(ETWTracer, ExplicitParentSkipsActiveSpanLookupAndInvalidParentFallsBack)
   fallback->End();
 }
 
-TEST(ETWTracer, ReusedEndFieldsReleasePayloadsAndForgetIdOverrides)
+TEST(ETWTracer, InlineEndFieldsOwnKeysAndValuesAndMergeInOrder)
 {
-  const PropertyValue *retained = nullptr;
+  exporter::etw::detail::SpanEndProperties fields;
+  std::string key = "temporary-custom-field-name";
+  std::string value(4096, 'x');
+  fields[key] = value;
+  key.assign("changed");
+  value.clear();
+  fields["z"]              = 1;
+  fields[std::string("z")] = 2;
+  fields["a"]              = 3;
+  fields.Sort();
+  Properties attributes{{"a", 9}, {"b", 4}};
+  exporter::etw::detail::SpanPropertiesViewImpl<exporter::etw::detail::SpanEndProperties> view(
+      attributes, fields);
+  std::vector<std::string> keys;
+  for (const auto &entry : view)
   {
-    exporter::etw::detail::SpanEndProperties fields(true);
-    fields.Get()[ETW_FIELD_STATUSMESSAGE] = std::string(4096, 'x');
-    fields.Get()[ETW_FIELD_SPAN_ID]       = "old-span-id";
-    fields.Get()[ETW_FIELD_TRACE_ID]      = "old-trace-id";
-    retained                              = &fields.Get().at(ETW_FIELD_STATUSMESSAGE);
+    keys.push_back(entry.first);
   }
-  {
-    exporter::etw::detail::SpanEndProperties fields(true);
-    const auto found = fields.Get().find(ETW_FIELD_STATUSMESSAGE);
-    ASSERT_NE(found, fields.Get().end());
-    EXPECT_EQ(&found->second, retained);
-    EXPECT_FALSE(nostd::holds_alternative<std::string>(found->second));
-    EXPECT_EQ(fields.Get().count(ETW_FIELD_SPAN_ID), 0u);
-    EXPECT_EQ(fields.Get().count(ETW_FIELD_TRACE_ID), 0u);
-  }
-  exporter::etw::detail::SpanEndProperties owned(false);
-  EXPECT_TRUE(owned.Get().empty());
+  EXPECT_EQ(keys, (std::vector<std::string>{"a", "b", "temporary-custom-field-name", "z"}));
+  EXPECT_EQ(nostd::get<int32_t>(*view.Find("a")), 3);
+  EXPECT_EQ(nostd::get<int32_t>(*view.Find("z")), 2);
+  EXPECT_EQ(nostd::get<std::string>(*view.Find("temporary-custom-field-name")),
+            std::string(4096, 'x'));
+  EXPECT_EQ(nostd::get<int32_t>(attributes.at("a")), 9);
 }
 
-TEST(ETWTracer, ReentrantEndFieldsDoNotModifyTheOuterLease)
+TEST(ETWTracer, InlineEndFieldsOverflowPreservesEntriesAndSubsequentUpserts)
 {
-  exporter::etw::detail::SpanEndProperties outer(true);
-  outer.Get()[ETW_FIELD_STATUSMESSAGE] = "outer";
-  for (int i = 0; i < 2; ++i)
+  exporter::etw::detail::SpanEndProperties fields;
+  Properties expected;
+  for (size_t i = 0; i < exporter::etw::detail::SpanEndProperties::kCapacity + 4; ++i)
   {
-    exporter::etw::detail::SpanEndProperties nested(true);
-    EXPECT_NE(&nested.Get(), &outer.Get());
-    EXPECT_TRUE(nested.Get().empty());
-    nested.Get()[ETW_FIELD_STATUSMESSAGE] = "nested";
-    EXPECT_EQ(nostd::get<std::string>(outer.Get().at(ETW_FIELD_STATUSMESSAGE)), "outer");
+    const auto key = "field-" + std::to_string(i);
+    fields[key]    = static_cast<int32_t>(i);
+    expected[key]  = static_cast<int32_t>(i);
   }
+  fields["field-0"] = expected["field-0"] = int32_t{42};
+  fields["field-13"] = expected["field-13"] = int32_t{43};
+  fields.Sort();
+  ASSERT_EQ(fields.size(), expected.size());
+  auto reference = expected.begin();
+  for (const auto &entry : fields)
+  {
+    ASSERT_NE(reference, expected.end());
+    EXPECT_EQ(entry.first, reference->first);
+    EXPECT_EQ(nostd::get<int32_t>(entry.second), nostd::get<int32_t>(reference->second));
+    ++reference;
+  }
+  EXPECT_EQ(reference, expected.end());
+  Properties attributes{{"field-0", int32_t{-1}}, {"source-only", int32_t{-2}}};
+  exporter::etw::detail::SpanPropertiesViewImpl<exporter::etw::detail::SpanEndProperties> view(
+      attributes, fields);
+  EXPECT_EQ(view.size(), expected.size() + 1);
+  EXPECT_EQ(nostd::get<int32_t>(*view.Find("field-0")), 42);
+  EXPECT_EQ(nostd::get<int32_t>(*view.Find("source-only")), -2);
+}
+
+TEST(ETWTracer, EndSpanIdReuseChecksGeneratedOverridesBeforeSavedAttributes)
+{
+  const uint8_t bytes[8] = {1, 2, 3};
+  const trace::SpanId id(bytes);
+  const auto text               = ToLowerBase16(id);
+  const uint8_t trace_bytes[16] = {4, 5, 6};
+  const trace::TraceId trace_id(trace_bytes);
+  const auto trace_text = ToLowerBase16(trace_id);
+  Properties saved{{"shared-name-and-id", text}};
+  auto check = [&](auto &fields) {
+    fields["shared-name-and-id"] = "operation";
+    exporter::etw::detail::SetSpanIdIfChanged(fields, saved, "shared-name-and-id", id);
+    const auto found = fields.find("shared-name-and-id");
+    ASSERT_TRUE(found != fields.end());
+    EXPECT_EQ(nostd::get<std::string>((*found).second), text);
+    saved["shared-name-and-id"] = trace_text;
+    exporter::etw::detail::SetSpanIdIfChanged(fields, saved, "shared-name-and-id", trace_id);
+    EXPECT_EQ(nostd::get<std::string>((*fields.find("shared-name-and-id")).second), trace_text);
+    saved["shared-name-and-id"] = text;
+  };
+  Properties owned;
+  check(owned);
+  exporter::etw::detail::SpanEndProperties inlined;
+  check(inlined);
 }
 
 /* clang-format off */

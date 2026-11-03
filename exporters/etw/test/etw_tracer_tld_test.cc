@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 #include <thread>
@@ -23,6 +24,7 @@ struct CapturedEvent
   std::vector<std::vector<uint8_t>> data;
 };
 std::vector<CapturedEvent> events;
+std::function<void()> nested_write;
 
 ULONG CaptureEventWriteTransfer(REGHANDLE,
                                 const EVENT_DESCRIPTOR *descriptor,
@@ -38,6 +40,12 @@ ULONG CaptureEventWriteTransfer(REGHANDLE,
     event.data.emplace_back(bytes, bytes + data[i].Size);
   }
   events.push_back(std::move(event));
+  if (nested_write)
+  {
+    auto callback = std::move(nested_write);
+    nested_write  = nullptr;
+    callback();
+  }
   return ERROR_SUCCESS;
 }
 }  // namespace
@@ -64,11 +72,11 @@ public:
   }
 };
 
-void CheckSpanEndEvents(bool tracking)
+void CheckSpanEndEvents(bool tracking, bool ids = true)
 {
   constexpr char provider_name[] = "TldSpanEndFields";
-  etw::TracerProvider provider({{"enableTraceId", true},
-                                {"enableSpanId", true},
+  etw::TracerProvider provider({{"enableTraceId", ids},
+                                {"enableSpanId", ids},
                                 {"enableActivityId", false},
                                 {"enableRelatedActivityId", false},
                                 {"enableActivityTracking", tracking}});
@@ -109,10 +117,13 @@ void CheckSpanEndEvents(bool tracking)
     EXPECT_EQ(span.GetAttributes().size(), attributes.size());
 
     events.clear();
-    etw::Properties expected     = attributes;
-    expected[ETW_FIELD_NAME]     = "operation";
-    expected[ETW_FIELD_SPAN_ID]  = etw::ToLowerBase16(context.span_id());
-    expected[ETW_FIELD_TRACE_ID] = etw::ToLowerBase16(context.trace_id());
+    etw::Properties expected = attributes;
+    expected[ETW_FIELD_NAME] = "operation";
+    if (ids)
+    {
+      expected[ETW_FIELD_SPAN_ID]  = etw::ToLowerBase16(context.span_id());
+      expected[ETW_FIELD_TRACE_ID] = etw::ToLowerBase16(context.trace_id());
+    }
     if (tracking)
     {
       EXPECT_EQ(writer.write(handle, expected, nullptr, nullptr, 2, ETWProvider::ETW_MANIFEST),
@@ -126,9 +137,9 @@ void CheckSpanEndEvents(bool tracking)
 #endif
     expected[ETW_FIELD_DURATION]      = int64_t{end_ns - start_ns};
     expected[ETW_FIELD_SPAN_KIND]     = static_cast<uint32_t>(trace::SpanKind::kServer);
+    expected[ETW_FIELD_SUCCESS]       = scenario == 1 ? "False" : "True";
     expected[ETW_FIELD_STATUSCODE]    = static_cast<uint32_t>(status);
     expected[ETW_FIELD_STATUSMESSAGE] = description;
-    expected[ETW_FIELD_SUCCESS]       = scenario == 1 ? "False" : "True";
     EXPECT_EQ(writer.write(handle, expected, nullptr, nullptr, 0, ETWProvider::ETW_MANIFEST),
               writer.STATUS_OK);
     ASSERT_EQ(actual.size(), events.size());
@@ -142,23 +153,64 @@ void CheckSpanEndEvents(bool tracking)
 }
 }  // namespace
 
-TEST(ETWTldTracer, ReusedFieldsMatchFreshEncodingWithoutStaleData)
+TEST(ETWTldTracer, InlineFieldsMatchFreshEncodingWithoutStaleData)
 {
-  CheckSpanEndEvents(false);
+  CheckSpanEndEvents(false, true);
 }
 
 TEST(ETWTldTracer, ActivityTrackingPreservesSeparateStopAndSpanFields)
 {
-  CheckSpanEndEvents(true);
+  CheckSpanEndEvents(true, true);
 }
 
-TEST(ETWTldTracer, UnfinishedThreadLocalSpanExportsAfterCacheTeardown)
+TEST(ETWTldTracer, DisabledIdsMatchFreshEncoding)
+{
+  CheckSpanEndEvents(false, false);
+  CheckSpanEndEvents(true, false);
+}
+
+TEST(ETWTldTracer, ReentrantEndSpanPreservesBothOuterWrites)
+{
+  for (bool tracking : {false, true})
+  {
+    etw::TracerProvider provider({{"enableActivityTracking", tracking}});
+    auto tracer                   = provider.GetTracer("TldReentrantSpanEnd");
+    auto &owner                   = *static_cast<etw::Tracer *>(tracer.get());
+    const uint8_t trace_bytes[16] = {1};
+    const uint8_t span_bytes[8]   = {2};
+    const trace::SpanContext context(trace::TraceId(trace_bytes), trace::SpanId(span_bytes),
+                                     trace::TraceFlags(1), false);
+    trace::EndSpanOptions end;
+    end.end_steady_time = common::SteadyTimestamp(std::chrono::nanoseconds(end_ns));
+    auto emit           = [&](bool inner) {
+      FixedSpan span(owner, context);
+      etw::Properties attributes{{inner ? "inner" : "outer", std::string(1024, inner ? 'i' : 'o')}};
+      span.SetAttributes(attributes);
+      span.SetStatus(trace::StatusCode::kOk, "");
+      span.End(end);
+    };
+    events.clear();
+    emit(false);
+    const auto expected = events;
+    events.clear();
+    nested_write = [&] { emit(true); };
+    emit(false);
+    ASSERT_EQ(events.size(), 2 * expected.size());
+    EXPECT_EQ(events.front().data, expected.front().data);
+    if (tracking)
+    {
+      EXPECT_EQ(events.back().data, expected.back().data);
+    }
+  }
+}
+
+TEST(ETWTldTracer, UnfinishedThreadLocalSpanExportsDuringTeardown)
 {
   etw::TracerProvider provider({{"enableActivityTracking", false}});
   auto tracer = provider.GetTracer("TldThreadTeardown");
   events.clear();
   std::thread worker([&] {
-    // This owner must be destroyed after the cache initialized by the next End().
+    // Leave this span unfinished; the provider and tracer outlive worker teardown.
     thread_local nostd::shared_ptr<trace::Span> pending;
     pending       = tracer->StartSpan("thread-exit-span");
     auto finished = tracer->StartSpan("before-thread-exit");

@@ -10,6 +10,7 @@
 #include <opentelemetry/nostd/type_traits.h>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32
@@ -458,27 +459,41 @@ public:
 
 namespace detail
 {
+struct PropertyReference
+{
+  const std::string &first;
+  const PropertyValue &second;
+};
+
 // Read-only merge for synchronous encoding; overrides take precedence over source fields.
-class SpanPropertiesView : public common::KeyValueIterable
+template <typename Overrides>
+class SpanPropertiesViewImpl : public common::KeyValueIterable
 {
 public:
-  SpanPropertiesView(const Properties &source, const Properties &overrides)
+  SpanPropertiesViewImpl(const Properties &source, const Overrides &overrides)
       : source_(source), overrides_(overrides)
   {}
 
   class Iterator
   {
+    using AddedIterator = decltype(std::declval<const Overrides &>().begin());
+
   public:
     Iterator(PropertyValueMap::const_iterator source,
              PropertyValueMap::const_iterator source_end,
-             PropertyValueMap::const_iterator added,
-             PropertyValueMap::const_iterator added_end)
+             AddedIterator added,
+             AddedIterator added_end)
         : source_(source), source_end_(source_end), added_(added), added_end_(added_end)
     {}
 
-    const PropertyValueMap::value_type &operator*() const
+    PropertyReference operator*() const
     {
-      return UseSource() ? *source_ : *added_;
+      if (UseSource())
+      {
+        return {source_->first, source_->second};
+      }
+      const auto &entry = *added_;
+      return {entry.first, entry.second};
     }
 
     Iterator &operator++()
@@ -489,7 +504,8 @@ public:
       }
       else
       {
-        if (source_ != source_end_ && source_->first == added_->first)
+        if (source_ != source_end_ &&
+            nostd::string_view(source_->first) == nostd::string_view((*added_).first))
         {
           ++source_;
         }
@@ -506,10 +522,13 @@ public:
   private:
     bool UseSource() const
     {
-      return source_ != source_end_ && (added_ == added_end_ || source_->first < added_->first);
+      return source_ != source_end_ &&
+             (!(added_ != added_end_) ||
+              nostd::string_view(source_->first) < nostd::string_view((*added_).first));
     }
 
-    PropertyValueMap::const_iterator source_, source_end_, added_, added_end_;
+    PropertyValueMap::const_iterator source_, source_end_;
+    AddedIterator added_, added_end_;
   };
 
   Iterator begin() const
@@ -527,7 +546,7 @@ public:
     const auto added = overrides_.find(key);
     if (added != overrides_.end())
     {
-      return &added->second;
+      return &(*added).second;
     }
     const auto original = source_.find(key);
     return original == source_.end() ? nullptr : &original->second;
@@ -560,8 +579,9 @@ public:
 
 private:
   const Properties &source_;
-  const Properties &overrides_;
+  const Overrides &overrides_;
 };
+using SpanPropertiesView = SpanPropertiesViewImpl<Properties>;
 }  // namespace detail
 
 }  // namespace etw

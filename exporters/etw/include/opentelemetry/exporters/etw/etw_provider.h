@@ -27,6 +27,7 @@
 #endif
 
 #include "opentelemetry/exporters/etw/etw_properties.h"
+#include "opentelemetry/exporters/etw/span_end_properties.h"
 #include "opentelemetry/exporters/etw/uuid.h"
 #include "opentelemetry/version.h"
 
@@ -450,13 +451,29 @@ public:
   }
 
 private:
+  friend class exporter_etw::Tracer;
+
+  unsigned long writeSpan(Handle &providerData,
+                          exporter_etw::detail::SpanEndProperties &fields,
+                          const exporter_etw::Properties &attributes,
+                          LPCGUID activityId,
+                          LPCGUID relatedActivityId,
+                          uint8_t opcode)
+  {
+    fields.Sort();
+    exporter_etw::detail::SpanPropertiesViewImpl<exporter_etw::detail::SpanEndProperties> view(
+        attributes, fields);
+    return writeTldImpl(providerData, view, activityId, relatedActivityId, opcode);
+  }
+
   static const exporter_etw::PropertyValue &GetEventName(exporter_etw::Properties &properties)
   {
     return properties[ETW_FIELD_NAME];
   }
 
+  template <typename Overrides>
   static const exporter_etw::PropertyValue &GetEventName(
-      const exporter_etw::detail::SpanPropertiesView &properties)
+      const exporter_etw::detail::SpanPropertiesViewImpl<Overrides> &properties)
   {
     const auto *name = properties.Find(ETW_FIELD_NAME);
     static const exporter_etw::PropertyValue missing;
@@ -505,7 +522,7 @@ private:
 
     builder.Begin(eventName.c_str(), eventTags);
 
-    for (auto &kv : eventData)
+    for (const auto &kv : eventData)
     {
       const char *name = kv.first.data();
       auto &value      = kv.second;
