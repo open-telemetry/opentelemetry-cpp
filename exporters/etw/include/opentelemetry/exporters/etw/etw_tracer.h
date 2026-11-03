@@ -501,7 +501,6 @@ private:
     etwProvider().writeSpan(provHandle, fields, attributes, activityId, relatedActivityId, opcode);
   }
 
-public:
   const opentelemetry::trace::TraceId &trace_id() { return traceId_; }
 
   friend class Span;
