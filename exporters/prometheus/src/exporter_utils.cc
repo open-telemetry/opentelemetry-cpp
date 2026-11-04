@@ -902,13 +902,12 @@ void PrometheusExporterUtils::SetMetricBasic(
       {
         continue;
       }
-      std::string val = AttributeValueToString(attr.second);
-      bool merged     = false;
+      bool merged = false;
       for (const auto &entry : colliding_scope_entries)
       {
         if (metric.label[entry.label_index].name == sanitized)
         {
-          merge_colliding_label(entry.label_index, attr.first, std::move(val));
+          merge_colliding_label(entry.label_index, attr.first, AttributeValueToString(attr.second));
           merged = true;
           break;
         }
@@ -923,7 +922,7 @@ void PrometheusExporterUtils::SetMetricBasic(
         {
           colliding_scope_entries.push_back(
               {i, *scope_attr_original_keys[i - scope_attr_label_start], metric.label[i].value});
-          merge_colliding_label(i, attr.first, std::move(val));
+          merge_colliding_label(i, attr.first, AttributeValueToString(attr.second));
           merged = true;
           break;
         }
@@ -934,7 +933,7 @@ void PrometheusExporterUtils::SetMetricBasic(
         {
           scope_attr_original_keys.push_back(&attr.first);
         }
-        metric.label.push_back({std::move(sanitized), std::move(val)});
+        metric.label.push_back({std::move(sanitized), AttributeValueToString(attr.second)});
       }
     }
   }
