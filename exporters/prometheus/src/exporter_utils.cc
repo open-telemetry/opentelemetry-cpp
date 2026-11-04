@@ -828,49 +828,46 @@ void PrometheusExporterUtils::SetMetricBasic(
     return;
   }
 
-  const std::size_t point_label_count = metric.label.size();
-  auto add_or_merge_scope_label       = [&metric, &colliding_scope_entries, point_label_count](
+  auto merge_colliding_label = [&metric, &colliding_scope_entries](std::size_t target_index,
+                                                                   const std::string &original_key,
+                                                                   std::string value) {
+    colliding_scope_entries.push_back({target_index, original_key, std::move(value)});
+    std::vector<const LabelCollisionEntry *> matched;
+    for (const auto &candidate : colliding_scope_entries)
+    {
+      if (candidate.label_index == target_index)
+      {
+        matched.push_back(&candidate);
+      }
+    }
+    std::stable_sort(matched.begin(), matched.end(),
+                     [](const LabelCollisionEntry *a, const LabelCollisionEntry *b) {
+                       return a->original_key < b->original_key;
+                     });
+    std::string merged;
+    for (std::size_t j = 0; j < matched.size(); ++j)
+    {
+      if (j > 0)
+      {
+        merged.push_back(';');
+      }
+      merged.append(matched[j]->value);
+    }
+    metric.label[target_index].value = std::move(merged);
+  };
+
+  auto add_or_merge_scope_label = [&metric, &colliding_scope_entries, &merge_colliding_label](
                                       const std::string &sanitized_key,
                                       const std::string &original_key, const std::string &value) {
     for (const auto &entry : colliding_scope_entries)
     {
       if (metric.label[entry.label_index].name == sanitized_key)
       {
-        const std::size_t target_index = entry.label_index;
-        colliding_scope_entries.push_back({target_index, original_key, value});
-        std::vector<const LabelCollisionEntry *> matched;
-        for (const auto &candidate : colliding_scope_entries)
-        {
-          if (candidate.label_index == target_index)
-          {
-            matched.push_back(&candidate);
-          }
-        }
-        std::stable_sort(matched.begin(), matched.end(),
-                         [](const LabelCollisionEntry *a, const LabelCollisionEntry *b) {
-                           return a->original_key < b->original_key;
-                         });
-        std::string merged;
-        for (std::size_t j = 0; j < matched.size(); ++j)
-        {
-          if (j > 0)
-          {
-            merged.push_back(';');
-          }
-          merged.append(matched[j]->value);
-        }
-        metric.label[target_index].value = std::move(merged);
+        merge_colliding_label(entry.label_index, original_key, value);
         return;
       }
     }
-    if (metric.label.size() > point_label_count && metric.label.back().name == sanitized_key)
-    {
-      metric.label.back().value += ";" + value;
-    }
-    else
-    {
-      metric.label.push_back({sanitized_key, value});
-    }
+    metric.label.push_back({sanitized_key, value});
   };
 
   const auto &scope_name = scope->GetName();
@@ -891,14 +888,12 @@ void PrometheusExporterUtils::SetMetricBasic(
   const auto &scope_attributes = scope->GetAttributes();
   if (!scope_attributes.empty())
   {
-    struct ScopeAttrEntry
+    const std::size_t scope_attr_label_start = metric.label.size();
+    std::vector<const std::string *> scope_attr_original_keys;
+    if (scope_attributes.size() > 1U)
     {
-      std::string sanitized_key;
-      const std::string *original_key;
-      const opentelemetry::sdk::common::OwnedAttributeValue *value;
-    };
-    std::vector<ScopeAttrEntry> sorted_scope_attrs;
-    sorted_scope_attrs.reserve(scope_attributes.size());
+      scope_attr_original_keys.reserve(scope_attributes.size());
+    }
     for (const auto &attr : scope_attributes)
     {
       std::string sanitized = SanitizeLabel(std::string(kScopeLabelPrefix) + attr.first);
@@ -907,20 +902,40 @@ void PrometheusExporterUtils::SetMetricBasic(
       {
         continue;
       }
-      sorted_scope_attrs.push_back({std::move(sanitized), &attr.first, &attr.second});
-    }
-    std::sort(sorted_scope_attrs.begin(), sorted_scope_attrs.end(),
-              [](const ScopeAttrEntry &a, const ScopeAttrEntry &b) {
-                if (a.sanitized_key != b.sanitized_key)
-                {
-                  return a.sanitized_key < b.sanitized_key;
-                }
-                return *a.original_key < *b.original_key;
-              });
-    for (const auto &scope_attr : sorted_scope_attrs)
-    {
-      add_or_merge_scope_label(scope_attr.sanitized_key, *scope_attr.original_key,
-                               AttributeValueToString(*scope_attr.value));
+      std::string val = AttributeValueToString(attr.second);
+      bool merged     = false;
+      for (const auto &entry : colliding_scope_entries)
+      {
+        if (metric.label[entry.label_index].name == sanitized)
+        {
+          merge_colliding_label(entry.label_index, attr.first, std::move(val));
+          merged = true;
+          break;
+        }
+      }
+      if (merged)
+      {
+        continue;
+      }
+      for (std::size_t i = scope_attr_label_start; i < metric.label.size(); ++i)
+      {
+        if (metric.label[i].name == sanitized)
+        {
+          colliding_scope_entries.push_back(
+              {i, *scope_attr_original_keys[i - scope_attr_label_start], metric.label[i].value});
+          merge_colliding_label(i, attr.first, std::move(val));
+          merged = true;
+          break;
+        }
+      }
+      if (!merged)
+      {
+        if (scope_attributes.size() > 1U)
+        {
+          scope_attr_original_keys.push_back(&attr.first);
+        }
+        metric.label.push_back({std::move(sanitized), std::move(val)});
+      }
     }
   }
 }

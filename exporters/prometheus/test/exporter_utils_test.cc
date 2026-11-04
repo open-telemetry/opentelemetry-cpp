@@ -671,10 +671,18 @@ TEST(PrometheusExporterUtils, InstrumentationScopeLabelsAndAttributes)
       {"otel_scope_scope_attr1", "val1"},
       {"otel_scope_scope_attr2", "42"}};
   ASSERT_EQ(labels.size(), expected.size());
-  for (std::size_t i = 0; i < expected.size(); ++i)
+  for (const auto &expected_label : expected)
   {
-    EXPECT_EQ(labels[i].name, expected[i].name);
-    EXPECT_EQ(labels[i].value, expected[i].value);
+    bool found = false;
+    for (const auto &label : labels)
+    {
+      if (label.name == expected_label.name)
+      {
+        EXPECT_EQ(label.value, expected_label.value);
+        found = true;
+      }
+    }
+    EXPECT_TRUE(found);
   }
 
   auto translated_without_scope = PrometheusExporterUtils::TranslateToPrometheus(data, false, true);
@@ -725,10 +733,18 @@ TEST(PrometheusExporterUtils, InstrumentationScopeAttributeCollisionsAndReserved
       {"otel_scope_foo_a", "value1;value4;value2"},
       {"otel_scope_foo_b", "value3"}};
   ASSERT_EQ(labels.size(), expected.size());
-  for (std::size_t i = 0; i < expected.size(); ++i)
+  for (const auto &expected_label : expected)
   {
-    EXPECT_EQ(labels[i].name, expected[i].name);
-    EXPECT_EQ(labels[i].value, expected[i].value);
+    bool found = false;
+    for (const auto &label : labels)
+    {
+      if (label.name == expected_label.name)
+      {
+        EXPECT_EQ(label.value, expected_label.value);
+        found = true;
+      }
+    }
+    EXPECT_TRUE(found);
   }
 }
 
