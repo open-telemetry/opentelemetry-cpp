@@ -24,7 +24,6 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
 #include <functional>
 #include <limits>
 #include <map>
@@ -317,35 +316,13 @@ public:
 // disturb a client's background thread.
 extern "C" {
 static std::atomic<bool> g_curl_hooks_ran{false};
-static thread_local bool g_fail_curl_malloc = false;
 static thread_local bool g_fail_curl_calloc = false;
 
 // NOLINTBEGIN(cppcoreguidelines-no-malloc,hicpp-no-malloc): these are the allocator libcurl
 // is given, so reaching for the C allocation functions is the point of them.
-// The bound aims the failure at the curl_slist append, which allocates two pointers where an
-// easy handle allocates thousands of bytes.
-static const size_t kCurlSmallAllocation = 64;
-
-// Named rather than measured. A case that wants one particular append to fail says which header
-// it is, and the refusal happens when libcurl copies that exact string. Sizes and counts cannot
-// do this: a node's size is not part of libcurl's contract, and anything allocated before the
-// append can match the same size and consume the refusal, which leaves the list built and the
-// case asserting against a path it never took.
-static thread_local const char *g_refuse_strdup_of = nullptr;
-static thread_local const char *g_watch_strdup_of  = nullptr;
-static thread_local int g_strdup_calls             = 0;
-static thread_local int g_strdup_refusals          = 0;
-static thread_local int g_watched_at               = 0;
-static thread_local int g_refused_at               = 0;
-
 static void *CurlTestMalloc(size_t size)
 {
   g_curl_hooks_ran.store(true, std::memory_order_relaxed);
-
-  if (g_fail_curl_malloc && size <= kCurlSmallAllocation)
-  {
-    return nullptr;
-  }
   return std::malloc(size);
 }
 
@@ -361,29 +338,8 @@ static void *CurlTestRealloc(void *ptr, size_t size)
 
 // Not routed through CurlTestMalloc on purpose, so that a failing malloc cannot reach the
 // copies libcurl makes of the caller's strings and land somewhere other than the list node.
-// The one refusal it does make is aimed by content: curl_slist_append copies the string it is
-// given before it has a list to return, so refusing that copy is what makes that append, and no
-// other, return null.
 static char *CurlTestStrdup(const char *str)
 {
-  if (nullptr != str && (nullptr != g_watch_strdup_of || nullptr != g_refuse_strdup_of))
-  {
-    ++g_strdup_calls;
-
-    if (nullptr != g_watch_strdup_of && 0 == g_watched_at &&
-        0 == std::strcmp(str, g_watch_strdup_of))
-    {
-      g_watched_at = g_strdup_calls;
-    }
-
-    if (nullptr != g_refuse_strdup_of && 0 == std::strcmp(str, g_refuse_strdup_of))
-    {
-      ++g_strdup_refusals;
-      g_refused_at = g_strdup_calls;
-      return nullptr;
-    }
-  }
-
   const size_t length = std::strlen(str) + 1;
   char *copy          = static_cast<char *>(std::malloc(length));
   if (copy != nullptr)
@@ -427,16 +383,6 @@ namespace
 {
 bool g_curl_hooks_installed = false;
 
-struct FailCurlMalloc
-{
-  FailCurlMalloc() { g_fail_curl_malloc = true; }
-  ~FailCurlMalloc() { g_fail_curl_malloc = false; }
-  FailCurlMalloc(const FailCurlMalloc &)            = delete;
-  FailCurlMalloc(FailCurlMalloc &&)                 = delete;
-  FailCurlMalloc &operator=(const FailCurlMalloc &) = delete;
-  FailCurlMalloc &operator=(FailCurlMalloc &&)      = delete;
-};
-
 struct FailCurlCalloc
 {
   FailCurlCalloc() { g_fail_curl_calloc = true; }
@@ -445,34 +391,6 @@ struct FailCurlCalloc
   FailCurlCalloc(FailCurlCalloc &&)                 = delete;
   FailCurlCalloc &operator=(const FailCurlCalloc &) = delete;
   FailCurlCalloc &operator=(FailCurlCalloc &&)      = delete;
-};
-
-// Watches one header go on and refuses the next, both by name, and records the order the two
-// were copied in. A case reads those back to say three different things apart: a libcurl that
-// never routed an appended string here at all, an append that was refused as asked, and a
-// refusal that landed on the first header rather than part way through a list.
-struct RefuseSlistAppendOf
-{
-  RefuseSlistAppendOf(const char *let_through, const char *refuse)
-  {
-    g_strdup_calls     = 0;
-    g_strdup_refusals  = 0;
-    g_watched_at       = 0;
-    g_refused_at       = 0;
-    g_watch_strdup_of  = let_through;
-    g_refuse_strdup_of = refuse;
-  }
-
-  ~RefuseSlistAppendOf()
-  {
-    g_watch_strdup_of  = nullptr;
-    g_refuse_strdup_of = nullptr;
-  }
-
-  RefuseSlistAppendOf(const RefuseSlistAppendOf &)            = delete;
-  RefuseSlistAppendOf(RefuseSlistAppendOf &&)                 = delete;
-  RefuseSlistAppendOf &operator=(const RefuseSlistAppendOf &) = delete;
-  RefuseSlistAppendOf &operator=(RefuseSlistAppendOf &&)      = delete;
 };
 
 // The failure that reaches every thread, and the exemption for the one that armed it, since
