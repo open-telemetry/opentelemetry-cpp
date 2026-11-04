@@ -22,12 +22,70 @@ namespace metrics
 class SynchronousInstrument
 {
 public:
-  SynchronousInstrument()                                             = default;
+  SynchronousInstrument() = default;
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  // Copies share the SDK flag, but never point at the source's own flag, which is destroyed with
+  // the source.
+  SynchronousInstrument(const SynchronousInstrument &other) noexcept
+      : enabled_(other.EnabledFlagForCopy(*this))
+  {}
+  SynchronousInstrument(SynchronousInstrument &&other) noexcept
+      : enabled_(other.EnabledFlagForCopy(*this))
+  {}
+  SynchronousInstrument &operator=(const SynchronousInstrument &other) noexcept
+  {
+    if (this != &other)
+    {
+      enabled_ = other.EnabledFlagForCopy(*this);
+    }
+    return *this;
+  }
+  SynchronousInstrument &operator=(SynchronousInstrument &&other) noexcept
+  {
+    enabled_ = other.EnabledFlagForCopy(*this);
+    return *this;
+  }
+#else
   SynchronousInstrument(const SynchronousInstrument &)                = default;
   SynchronousInstrument(SynchronousInstrument &&) noexcept            = default;
   SynchronousInstrument &operator=(const SynchronousInstrument &)     = default;
   SynchronousInstrument &operator=(SynchronousInstrument &&) noexcept = default;
-  virtual ~SynchronousInstrument()                                    = default;
+#endif
+  virtual ~SynchronousInstrument() = default;
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  /**
+   * Reports if the instrument is enabled or not. A disabled instrument drops its measurements.
+   *
+   * The instrumentation authors should call this method each time before recording a
+   * measurement, to potentially avoid performing computationally expensive operations for
+   * disabled instruments. The returned value can change over time.
+   *
+   * @since ABI_VERSION 2
+   */
+  bool Enabled() const noexcept { return OPENTELEMETRY_ATOMIC_READ_RELAXED_8(enabled_) != 0; }
+
+protected:
+  /**
+   * Points Enabled() at a flag owned by the SDK. The flag must outlive this instrument, and must
+   * only be changed with atomic writes such as OPENTELEMETRY_ATOMIC_WRITE_8, since Enabled() can
+   * read it concurrently.
+   *
+   * @since ABI_VERSION 2
+   */
+  void SetEnabledFlag(const bool *enabled) noexcept { enabled_ = enabled; }
+
+private:
+  const bool *EnabledFlagForCopy(const SynchronousInstrument &copy) const noexcept
+  {
+    return enabled_ == &enabled_in_api_ ? &copy.enabled_in_api_ : enabled_;
+  }
+
+  // By default enabled_ points at enabled_in_api_, which is always false. An SDK points it at
+  // its own flag with SetEnabledFlag().
+  bool enabled_in_api_ = false;
+  const bool *enabled_ = &enabled_in_api_;
+#endif
 };
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
