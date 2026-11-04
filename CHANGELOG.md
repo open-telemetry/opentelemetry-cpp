@@ -23,9 +23,22 @@ Increment the:
   has its own deadline derived from the configured response timeout, so a
   non-responding client fails the export instead of hanging it. A
   `response_timeout` of 0 means no timeout, matching the curl client's own
-  `CURLOPT_TIMEOUT_MS` 0 semantics, so it no longer maps to a deadline
-  already in the past.
+  `CURLOPT_TIMEOUT_MS` 0 semantics.
   [#4530](https://github.com/open-telemetry/opentelemetry-cpp/pull/4530)
+
+* [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
+  returns `false` when the Meter is disabled or every matching view uses the
+  Drop aggregation
+  [#4721](https://github.com/open-telemetry/opentelemetry-cpp/pull/4721)
+
+* [SDK] `BatchLogRecordProcessor` now exports at most one batch on normal
+  wakeups instead of continuously draining the buffer, matching
+  `BatchSpanProcessor`
+  ([#4466](https://github.com/open-telemetry/opentelemetry-cpp/pull/4466)).
+  Scheduled exports and queue-pressure wakeups can still export partial batches.
+  `ForceFlush` and `Shutdown` drain buffered log records in batches respecting
+  `max_export_batch_size`.
+  [#4498](https://github.com/open-telemetry/opentelemetry-cpp/issues/4498)
 
 * [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
   so a larger value no longer stops spans from being exported until the
@@ -39,6 +52,11 @@ Increment the:
 * [EXPORTER] Prometheus exporter: fix attribute serialization, label collision,
   and empty point guards
   [#4738](https://github.com/open-telemetry/opentelemetry-cpp/pull/4738)
+
+* [SDK] Fix lost wakeup in BatchSpanProcessor `OnEnd` notify when a span
+  fills the queue, which could stall the export and drop spans until the
+  schedule delay.
+  [#4741](https://github.com/open-telemetry/opentelemetry-cpp/pull/4741)
 
 ## [1.30.0] 2026-10-22
 
