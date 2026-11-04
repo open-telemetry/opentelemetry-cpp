@@ -48,6 +48,9 @@ LongCounter::LongCounter(const InstrumentDescriptor &instrument_descriptor,
                          std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR("[LongCounter::LongCounter] - Error constructing LongCounter."
@@ -141,6 +144,9 @@ DoubleCounter::DoubleCounter(const InstrumentDescriptor &instrument_descriptor,
                              std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR("[DoubleCounter::DoubleCounter] - Error constructing DoubleCounter."
@@ -242,6 +248,9 @@ LongUpDownCounter::LongUpDownCounter(const InstrumentDescriptor &instrument_desc
                                      std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR(
@@ -323,6 +332,9 @@ DoubleUpDownCounter::DoubleUpDownCounter(const InstrumentDescriptor &instrument_
                                          std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR(
@@ -405,6 +417,7 @@ LongGauge::LongGauge(const InstrumentDescriptor &instrument_descriptor,
                      std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+  SetEnabledFlag(meter_enabled_state_->Flag());
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR("[LongGauge::LongGauge] - Error constructing LongGauge."
@@ -482,6 +495,7 @@ DoubleGauge::DoubleGauge(const InstrumentDescriptor &instrument_descriptor,
                          std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+  SetEnabledFlag(meter_enabled_state_->Flag());
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR("[DoubleGauge::DoubleGauge] - Error constructing DoubleUpDownCounter."
@@ -559,6 +573,9 @@ LongHistogram::LongHistogram(const InstrumentDescriptor &instrument_descriptor,
                              std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR("[LongHistogram::LongHistogram] - Error constructing LongHistogram."
@@ -655,6 +672,9 @@ DoubleHistogram::DoubleHistogram(const InstrumentDescriptor &instrument_descript
                                  std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR(
