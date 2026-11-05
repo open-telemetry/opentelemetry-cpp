@@ -32,6 +32,7 @@
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#include "opentelemetry/version.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
@@ -1403,13 +1404,13 @@ TEST(WritableMetricStorageCardinalityLimit,
   auto collect      = [&]() {
     std::vector<std::pair<PointAttributes, int64_t>> points;
     storage.Collect(collector.get(), collectors, sdk_start_ts,
-                    sdk_start_ts + std::chrono::seconds(5), [&](const MetricData &metric_data) {
+                         sdk_start_ts + std::chrono::seconds(5), [&](const MetricData &metric_data) {
                       for (const auto &point : metric_data.point_data_attr_)
                       {
                         const auto &last_value =
                             opentelemetry::nostd::get<LastValuePointData>(point.point_data);
                         points.emplace_back(point.attributes,
-                                            opentelemetry::nostd::get<int64_t>(last_value.value_));
+                                                 opentelemetry::nostd::get<int64_t>(last_value.value_));
                       }
                       return true;
                     });
