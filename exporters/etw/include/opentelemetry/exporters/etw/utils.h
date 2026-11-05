@@ -13,6 +13,7 @@
 #include <sstream>
 #include <string>
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/etw/uuid.h"
@@ -156,7 +157,7 @@ static inline GUID GetProviderGuid(const char *providerName)
 {
   std::string name(providerName);
   std::transform(name.begin(), name.end(), name.begin(),
-                 [](unsigned char c) { return (char)::toupper(c); });
+                 [](char c) { return opentelemetry::common::detail::ToAsciiUpper(c); });
 
   size_t len      = name.length() * 2 + 0x10;
   uint8_t *buffer = new uint8_t[len];

@@ -13,6 +13,7 @@ namespace configuration
 
 class AlwaysOffSamplerConfiguration;
 class AlwaysOnSamplerConfiguration;
+class AlwaysRecordSamplerConfiguration;
 class JaegerRemoteSamplerConfiguration;
 class ParentBasedSamplerConfiguration;
 class ProbabilitySamplerConfiguration;
@@ -32,6 +33,7 @@ public:
 
   virtual void VisitAlwaysOff(const AlwaysOffSamplerConfiguration *model)                 = 0;
   virtual void VisitAlwaysOn(const AlwaysOnSamplerConfiguration *model)                   = 0;
+  virtual void VisitAlwaysRecord(const AlwaysRecordSamplerConfiguration *model)           = 0;
   virtual void VisitJaegerRemote(const JaegerRemoteSamplerConfiguration *model)           = 0;
   virtual void VisitParentBased(const ParentBasedSamplerConfiguration *model)             = 0;
   virtual void VisitProbability(const ProbabilitySamplerConfiguration *model)             = 0;

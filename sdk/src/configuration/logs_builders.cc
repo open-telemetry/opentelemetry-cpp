@@ -233,24 +233,31 @@ private:
 
     opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
     OptionalValue<std::size_t> model_attribute_value_length_limit;
+    OptionalValue<std::size_t> model_attribute_value_depth_limit;
     OptionalValue<std::size_t> model_attribute_count_limit;
     if (model->limits)
     {
       model_attribute_value_length_limit = model->limits->attribute_value_length_limit;
+      model_attribute_value_depth_limit  = model->limits->attribute_value_depth_limit;
       model_attribute_count_limit        = model->limits->attribute_count_limit;
     }
 
     OptionalValue<std::size_t> general_attribute_value_length_limit;
+    OptionalValue<std::size_t> general_attribute_value_depth_limit;
     OptionalValue<std::size_t> general_attribute_count_limit;
     if (context.attribute_limits)
     {
       general_attribute_value_length_limit = context.attribute_limits->attribute_value_length_limit;
+      general_attribute_value_depth_limit  = context.attribute_limits->attribute_value_depth_limit;
       general_attribute_count_limit        = context.attribute_limits->attribute_count_limit;
     }
 
     using LogLimitDefaults = LogRecordLimitsConfiguration;
     log_record_limits.attribute_value_length_limit =
         ResolveLimit(model_attribute_value_length_limit, general_attribute_value_length_limit,
+                     LogLimitDefaults::kDefaultAttributeValueLengthLimit);
+    log_record_limits.attribute_value_depth_limit =
+        ResolveLimit(model_attribute_value_depth_limit, general_attribute_value_depth_limit,
                      LogLimitDefaults::kDefaultAttributeValueLengthLimit);
     log_record_limits.attribute_count_limit =
         ResolveLimit(model_attribute_count_limit, general_attribute_count_limit,

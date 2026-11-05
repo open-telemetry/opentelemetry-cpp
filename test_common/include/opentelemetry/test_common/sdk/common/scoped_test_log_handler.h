@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <functional>
 #include <mutex>
 #include <string>
 #include <utility>
@@ -30,14 +31,26 @@ private:
   class LogHandlerImpl : public sdk::common::internal_log::LogHandler
   {
   public:
+    explicit LogHandlerImpl(std::function<void(const Entry &)> callback)
+        : callback_(std::move(callback))
+    {}
+
     void Handle(sdk::common::internal_log::LogLevel level,
                 const char * /*file*/,
                 int /*line*/,
                 const char *msg,
                 const sdk::common::AttributeMap & /*attrs*/) noexcept override
     {
-      std::lock_guard<std::mutex> lk(mu_);
-      entries_.push_back({level, msg ? msg : ""});
+      Entry entry{level, msg ? msg : ""};
+      {
+        std::lock_guard<std::mutex> lk(mu_);
+        entries_.push_back(entry);
+      }
+      if (callback_)
+      {
+        // Allow callbacks to re-enter diagnostics or drain the captured entries.
+        callback_(entry);
+      }
     }
 
     std::vector<Entry> Drain()
@@ -47,16 +60,19 @@ private:
     }
 
   private:
+    std::function<void(const Entry &)> callback_;
     std::mutex mu_;
     std::vector<Entry> entries_;
   };
 
 public:
-  explicit ScopedTestLogHandler(sdk::common::internal_log::LogLevel level)
+  explicit ScopedTestLogHandler(sdk::common::internal_log::LogLevel level,
+                                std::function<void(const Entry &)> callback = {})
       : previous_handler_(sdk::common::internal_log::GlobalLogHandler::GetLogHandler()),
         previous_level_(sdk::common::internal_log::GlobalLogHandler::GetLogLevel())
   {
-    opentelemetry::nostd::shared_ptr<LogHandlerImpl> handler{new LogHandlerImpl{}};
+    opentelemetry::nostd::shared_ptr<LogHandlerImpl> handler{
+        new LogHandlerImpl{std::move(callback)}};
     handler_ = handler.get();
     sdk::common::internal_log::GlobalLogHandler::SetLogHandler(std::move(handler));
     sdk::common::internal_log::GlobalLogHandler::SetLogLevel(level);

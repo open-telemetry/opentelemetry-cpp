@@ -146,31 +146,32 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
     OTEL_INTERNAL_LOG_ERROR("[TracerProvider::GetTracer] Library name is empty.");
   }
 
-  const std::lock_guard<std::mutex> guard(lock_);
-
-  for (auto &tracer : tracers_)
-  {
-    auto &tracer_scope = tracer->GetInstrumentationScope();
-    if (tracer_scope.equal(name, version, schema_url, attributes))
-    {
-      return nostd::shared_ptr<trace_api::Tracer>{tracer};
-    }
-  }
-
-  // GetTracer is noexcept and does not surface an error, so callers cannot
-  // recover after a construction failure. Retrying would re-throw, catch, and
-  // log on hot paths such as GetTracer(...)->StartSpan(...). After the first
-  // failure, treat the provider as non-functional for new tracers.
-  if (!initialized_)
-  {
-    return noop_tracer_;
-  }
-
-  initialized_ = false;
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
 #endif
+    // Release the lock before construction-failure diagnostics can re-enter the provider.
+    const std::lock_guard<std::mutex> guard(lock_);
+
+    for (auto &tracer : tracers_)
+    {
+      auto &tracer_scope = tracer->GetInstrumentationScope();
+      if (tracer_scope.equal(name, version, schema_url, attributes))
+      {
+        return nostd::shared_ptr<trace_api::Tracer>{tracer};
+      }
+    }
+
+    // GetTracer is noexcept and does not surface an error, so callers cannot
+    // recover after a construction failure. Retrying would re-throw, catch, and
+    // log on hot paths such as GetTracer(...)->StartSpan(...). After the first
+    // failure, treat the provider as non-functional for new tracers.
+    if (!initialized_)
+    {
+      return noop_tracer_;
+    }
+
+    initialized_ = false;
     instrumentationscope::InstrumentationScopeAttributes attrs_map(attributes);
     auto scope =
         instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attrs_map);

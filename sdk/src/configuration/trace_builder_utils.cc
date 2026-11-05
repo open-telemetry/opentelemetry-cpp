@@ -15,6 +15,8 @@
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/always_record_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/always_record_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_builder.h"
@@ -287,6 +289,20 @@ static std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateAlwaysOnSampler
   throw UnsupportedException(message);
 }
 
+static std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateAlwaysRecordSampler(
+    const Registry *registry,
+    const opentelemetry::sdk::configuration::AlwaysRecordSamplerConfiguration *model)
+{
+  const AlwaysRecordSamplerBuilder *builder = registry->GetAlwaysRecordSamplerBuilder();
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateAlwaysRecordSampler() using registered builder");
+    return builder->Build(model);
+  }
+  static const std::string message("No builder for AlwaysRecordSampler");
+  throw UnsupportedException(message);
+}
+
 static std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateProbabilitySampler(
     const Registry *registry,
     const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model)
@@ -459,6 +475,12 @@ public:
       const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration *model) override
   {
     sampler = CreateAlwaysOnSampler(registry_, model);
+  }
+
+  void VisitAlwaysRecord(
+      const opentelemetry::sdk::configuration::AlwaysRecordSamplerConfiguration *model) override
+  {
+    sampler = CreateAlwaysRecordSampler(registry_, model);
   }
 
   void VisitJaegerRemote(

@@ -6,7 +6,7 @@
 set -e
 
 CMAKE_VERSION=${CMAKE_VERSION:-3.31.6}
-CMAKE_DIR="cmake-${CMAKE_VERSION}-linux-x86_64"
+CMAKE_DIR="cmake-${CMAKE_VERSION}-linux-$(uname -m)"
 CMAKE_TAR="${CMAKE_DIR}.tar.gz"
 CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${CMAKE_TAR}"
 

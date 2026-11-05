@@ -4,7 +4,9 @@
 #include <gtest/gtest.h>
 #include <cassert>
 #include <cstddef>
+#include <initializer_list>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "opentelemetry/baggage/baggage.h"
@@ -14,6 +16,135 @@
 #include "opentelemetry/nostd/string_view.h"
 
 using namespace opentelemetry::baggage;
+
+TEST(BaggageTest, RejectInvalidMetadataOnExtractAndInject)
+{
+  const std::vector<std::string> invalid = {
+      ";a\r\nX-Injected: 1",
+      ";a\r\n\r\nGET /smuggled HTTP/1.1\r\nHost: localhost\r\nX-Smuggled: 1",
+      ";a\rb",
+      ";a\nb",
+      std::string(";a\0b", 4),
+      ";a=\x7f",
+      ";a=\xc3\xa9",
+      ";",
+      ";a;;b",
+      ";=value",
+      ";bad key=value",
+      ";a=bad value",
+      ";a=bad\tvalue",
+      ";a=\"quoted\"",
+      ";a=back\\slash"};
+  for (const auto &metadata : invalid)
+  {
+    SCOPED_TRACE(metadata);
+    auto baggage = Baggage::FromHeader("before=ok,bad=value" + metadata + ",after=ok");
+    std::string value;
+    EXPECT_FALSE(baggage->GetValue("bad", value));
+    EXPECT_TRUE(baggage->GetValue("before", value));
+    EXPECT_TRUE(baggage->GetValue("after", value));
+    EXPECT_EQ(baggage->ToHeader(), "before=ok,after=ok");
+
+    // Direct construction does not validate input. Output must still be safe.
+    const std::vector<std::pair<std::string, std::string>> entries = {
+        {"before", "ok"}, {"bad", "value" + metadata}, {"after", "ok"}};
+    // KeyValueProperties exposes NUL-terminated strings, so direct construction
+    // already truncates at an embedded NUL. Extraction must reject it above.
+    if (metadata.find('\0') == std::string::npos)
+    {
+      EXPECT_EQ(Baggage(entries).ToHeader(), "before=ok,after=ok");
+    }
+    EXPECT_EQ(Baggage().Set("bad", "value" + metadata)->ToHeader(), "");
+  }
+}
+
+TEST(BaggageTest, RejectMemberInjectionFromSet)
+{
+  auto baggage = Baggage::FromHeader("good=ok")->Set("k", "v;a,evil=1");
+  EXPECT_EQ(baggage->ToHeader(), "good=ok");
+}
+
+TEST(BaggageTest, SetWithInvalidMetadataPreservesExistingEntry)
+{
+  auto original = Baggage::FromHeader("k=good;flag,other=kept");
+  for (const auto *invalid : {"v;a,evil=1", "v;", "v;;x", "v;p:x", "v;p=bad value"})
+  {
+    SCOPED_TRACE(invalid);
+    auto updated = original->Set("k", invalid);
+    std::string value;
+    ASSERT_TRUE(updated->GetValue("k", value));
+    EXPECT_EQ(value, "good;flag");
+    EXPECT_EQ(updated->ToHeader(), "k=good;flag,other=kept");
+    EXPECT_EQ(original->ToHeader(), "k=good;flag,other=kept");
+
+    auto inserted = original->Set("new", invalid);
+    EXPECT_FALSE(inserted->GetValue("new", value));
+    EXPECT_EQ(inserted->ToHeader(), "k=good;flag,other=kept");
+  }
+
+  // Valid metadata must still replace the existing value.
+  auto updated = original->Set("k", "replacement;p=100%");
+  std::string value;
+  ASSERT_TRUE(updated->GetValue("k", value));
+  EXPECT_EQ(value, "replacement;p=100%");
+  EXPECT_EQ(updated->ToHeader(), "k=replacement;p=100%,other=kept");
+}
+
+TEST(BaggageTest, RejectMemberInjectionFromDecodedDelimiters)
+{
+  // Decoding the value introduces a semicolon that output treats as metadata.
+  auto baggage = Baggage::FromHeader("k=a%3B%2Cx%3Dy,good=ok");
+  EXPECT_EQ(baggage->ToHeader(), "good=ok");
+}
+
+TEST(BaggageTest, PreserveValidMetadataWireRepresentation)
+{
+  for (const std::string metadata :
+       {";flag", ";empty=", ";a=b=c", ";p=100%", ";a=%20%0D%0A%25", "; flag \t; key \t=\t value",
+        ";a=!#$&'()*+-./:<=>?@[]^_`{|}~"})
+  {
+    SCOPED_TRACE(metadata);
+    const auto header = "key=value" + metadata;
+    EXPECT_EQ(Baggage::FromHeader(header)->ToHeader(), header);
+    const std::vector<std::pair<std::string, std::string>> entries = {{"key", "value" + metadata}};
+    EXPECT_EQ(Baggage(entries).ToHeader(), header);
+  }
+}
+
+TEST(BaggageTest, RejectUnsafeBytesAfterTokenization)
+{
+  for (int byte = 0; byte <= 255; ++byte)
+  {
+    if ((byte >= 0x20 && byte <= 0x7e) || byte == '\t')
+    {
+      continue;
+    }
+    SCOPED_TRACE(byte);
+    const std::string control(1, static_cast<char>(byte));
+    // Interior bytes must be checked in both the key and the complete value.
+    for (const auto &member :
+         {"bad" + control + "key=value;flag", "bad=value;flag=" + control + "value"})
+    {
+      EXPECT_EQ(Baggage::FromHeader(member + ",good=ok")->ToHeader(), "good=ok");
+    }
+    // The shared tokenizer has always normalized these whitespace bytes at edges.
+    const bool trimmed = byte >= 0x0a && byte <= 0x0d;
+    for (const auto &member : {control + "bad=value;flag", "bad=value;flag" + control})
+    {
+      EXPECT_EQ(Baggage::FromHeader(member + ",good=ok")->ToHeader(),
+                trimmed ? "bad=value;flag,good=ok" : "good=ok");
+    }
+  }
+}
+
+TEST(BaggageTest, PreserveTokenizerEdgeWhitespaceNormalization)
+{
+  EXPECT_EQ(Baggage::FromHeader(" \t\r\n\v\fk=v;flag\r\n\v\f \t,other=ok")->ToHeader(),
+            "k=v;flag,other=ok");
+  // Directly constructed metadata is not tokenizer-normalized and must remain rejected.
+  const std::vector<std::pair<std::string, std::string>> entries = {{"k", "v;flag\r\n"}};
+  EXPECT_EQ(Baggage(entries).ToHeader(), "");
+}
 
 static std::string header_with_custom_entries(size_t num_entries)
 {
@@ -127,8 +258,8 @@ TEST(BaggageTest, ValidateInjectHeader)
                     {"bar%1", "bar 4"},
                     "a%2A%2Ffoo-_%2Fbar=bar+4,1a-2f%40foo=bar%251"},  // encoding is done properly
                    {{"foo 1"},
-                    {"bar 1;  metadata ; ;;"},
-                    "foo+1=bar+1;  metadata ; ;;"}};  // metadata is added without encoding
+                    {"bar 1;  metadata ; flag=encoded%20value"},
+                    "foo+1=bar+1;  metadata ; flag=encoded%20value"}};
 
   for (auto &testcase : testcases)
   {

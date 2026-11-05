@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <algorithm>
-#include <cctype>
 #include <cstddef>
 #include <sstream>
 #include <string>
@@ -10,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/common/string_util.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
@@ -80,22 +80,15 @@ std::string PercentDecode(opentelemetry::nostd::string_view value) noexcept
   std::string result;
   result.reserve(value.size());
 
-  auto IsHex = [](char c) {
-    return std::isdigit(static_cast<unsigned char>(c)) || (c >= 'A' && c <= 'F') ||
-           (c >= 'a' && c <= 'f');
-  };
-
-  auto FromHex = [](char c) -> char {
-    return static_cast<char>(std::isdigit(static_cast<unsigned char>(c))
-                                 ? c - '0'
-                                 : std::toupper(static_cast<unsigned char>(c)) - 'A' + 10);
-  };
-
   for (size_t i = 0; i < value.size(); ++i)
   {
-    if (value[i] == '%' && i + 2 < value.size() && IsHex(value[i + 1]) && IsHex(value[i + 2]))
+    if (value[i] == '%' && i + 2 < value.size() &&
+        opentelemetry::common::detail::IsAsciiHexDigit(value[i + 1]) &&
+        opentelemetry::common::detail::IsAsciiHexDigit(value[i + 2]))
     {
-      result.push_back(static_cast<char>((FromHex(value[i + 1]) << 4) | FromHex(value[i + 2])));
+      result.push_back(
+          static_cast<char>((opentelemetry::common::detail::HexDigitValue(value[i + 1]) << 4) |
+                            opentelemetry::common::detail::HexDigitValue(value[i + 2])));
       i += 2;
     }
     else
@@ -123,7 +116,7 @@ bool IsValidSchemaUrl(const std::string &url) noexcept
       return false;  // Empty scheme or no content after ://
     }
     // Scheme must start with letter
-    if (!std::isalpha(static_cast<unsigned char>(url[0])))
+    if (!opentelemetry::common::detail::IsAsciiAlpha(url[0]))
     {
       return false;
     }
@@ -131,7 +124,7 @@ bool IsValidSchemaUrl(const std::string &url) noexcept
     for (size_t i = 1; i < scheme_end; ++i)
     {
       char c = url[i];
-      if (!(std::isalnum(static_cast<unsigned char>(c)) || c == '+' || c == '-' || c == '.'))
+      if (!(opentelemetry::common::detail::IsAsciiAlnum(c) || c == '+' || c == '-' || c == '.'))
       {
         return false;
       }
@@ -189,14 +182,14 @@ bool ParseSingleEntity(const std::string &entity_str, ParsedEntity &out)
   out.type = std::string{opentelemetry::common::StringUtil::Trim(entity_str.substr(0, brace_pos))};
 
   // Validate type matches [a-zA-Z][a-zA-Z0-9._-]*
-  if (out.type.empty() || !std::isalpha(static_cast<unsigned char>(out.type[0])))
+  if (out.type.empty() || !opentelemetry::common::detail::IsAsciiAlpha(out.type[0]))
   {
     return false;
   }
   for (size_t i = 1; i < out.type.size(); ++i)
   {
     char c = out.type[i];
-    if (!(std::isalnum(static_cast<unsigned char>(c)) || c == '.' || c == '_' || c == '-'))
+    if (!(opentelemetry::common::detail::IsAsciiAlnum(c) || c == '.' || c == '_' || c == '-'))
     {
       return false;
     }

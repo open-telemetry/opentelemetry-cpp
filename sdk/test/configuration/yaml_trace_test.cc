@@ -21,6 +21,7 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
@@ -66,7 +67,10 @@ enum class SamplerType : std::uint8_t
   kComposableAlwaysOff       = 9,
   kComposableParentThreshold = 10,
   kProbability               = 11,
-  kComposableExtension       = 12
+  kExtension                 = 12,
+  kComposableExtension       = 13,
+  // Added in 1.2.0
+  kAlwaysRecord = 14
 };
 
 class TestComposableSamplerVisitor
@@ -137,6 +141,11 @@ public:
   {
     type_matched = SamplerType::kAlwaysOn;
   }
+  void VisitAlwaysRecord(
+      const opentelemetry::sdk::configuration::AlwaysRecordSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kAlwaysRecord;
+  }
   void VisitJaegerRemote(
       const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration *) override
   {
@@ -161,8 +170,11 @@ public:
     ratio        = model->ratio;
   }
   void VisitExtension(
-      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *) override
-  {}
+      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *model) override
+  {
+    type_matched   = SamplerType::kExtension;
+    extension_name = model->name;
+  }
 
   void VisitComposite(
       const opentelemetry::sdk::configuration::CompositeSamplerConfiguration *model) override
@@ -853,6 +865,54 @@ tracer_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->sampler, nullptr);
+}
+
+TEST(YamlTrace, always_record_sampler_1_1)
+{
+  std::string yaml = R"(
+file_format: "1.1-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    always_record:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  // always_record not a builtin, seen as extension
+  EXPECT_EQ(visitor.type_matched, SamplerType::kExtension);
+  EXPECT_EQ(visitor.extension_name, "always_record");
+}
+
+TEST(YamlTrace, always_record_sampler_1_2)
+{
+  std::string yaml = R"(
+file_format: "1.2-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    always_record:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kAlwaysRecord);
 }
 
 TEST(YamlTrace, jaeger_remote_sampler)

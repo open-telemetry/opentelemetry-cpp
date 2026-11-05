@@ -17,6 +17,7 @@ cc_test(
         "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/resource",
         "//sdk/src/trace",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -109,6 +110,7 @@ cc_test(
     ],
     deps = [
         "//sdk/src/trace",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )

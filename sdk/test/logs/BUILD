@@ -15,6 +15,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk/src/logs",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
