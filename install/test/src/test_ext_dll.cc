@@ -113,4 +113,5 @@ TEST(ExtDllInstallTest, MeterProviderCheck)
     ASSERT_TRUE(counter != nullptr);
     counter->Add(1);
   }
+  metrics::Provider::SetMeterProvider({});
 }
