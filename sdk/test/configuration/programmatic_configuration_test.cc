@@ -927,7 +927,7 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithHistogramAggregationViews)
     {
       found_explicit_histogram = true;
     }
-    else if (nostd::holds_alternative<metrics_sdk::SumPointData>(point_data))
+    else if (nostd::holds_alternative<metrics_sdk::LongSumPointData>(point_data))
     {
       found_default_counter = true;
     }

@@ -201,19 +201,18 @@ void OStreamMetricExporter::printInstrumentationInfoMetricData(
 
 void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::PointType &point_data)
 {
-  if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data))
+  if (auto *long_sum_point_data = nostd::get_if<sdk::metrics::LongSumPointData>(&point_data))
   {
-    auto sum_point_data = nostd::get<sdk::metrics::SumPointData>(point_data);
-    sout_ << "\n  type\t\t: SumPointData";
+    sout_ << "\n  type\t\t: LongSumPointData";
     sout_ << "\n  value\t\t: ";
-    if (nostd::holds_alternative<double>(sum_point_data.value_))
-    {
-      sout_ << nostd::get<double>(sum_point_data.value_);
-    }
-    else if (nostd::holds_alternative<int64_t>(sum_point_data.value_))
-    {
-      sout_ << nostd::get<int64_t>(sum_point_data.value_);
-    }
+    sout_ << long_sum_point_data->value_;
+  }
+  else if (auto *double_sum_point_data =
+               nostd::get_if<sdk::metrics::DoubleSumPointData>(&point_data))
+  {
+    sout_ << "\n  type\t\t: DoubleSumPointData";
+    sout_ << "\n  value\t\t: ";
+    sout_ << double_sum_point_data->value_;
   }
   else if (nostd::holds_alternative<sdk::metrics::HistogramPointData>(point_data))
   {

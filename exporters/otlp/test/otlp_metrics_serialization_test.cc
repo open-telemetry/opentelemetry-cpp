@@ -51,7 +51,7 @@ static metrics_sdk::MetricData CreateSumAggregationData()
   metrics_sdk::InstrumentDescriptor inst_desc = {"Counter", "desc", "unit",
                                                  metrics_sdk::InstrumentType::kCounter,
                                                  metrics_sdk::InstrumentValueType::kDouble};
-  metrics_sdk::SumPointData s_data_1, s_data_2;
+  metrics_sdk::DoubleSumPointData s_data_1, s_data_2;
   s_data_1.value_ = 10.2;
   s_data_2.value_ = 20.2;
 
@@ -78,7 +78,7 @@ static metrics_sdk::MetricData CreateUpDownCounterAggregationData()
   metrics_sdk::InstrumentDescriptor inst_desc = {"UpDownCounter", "Robot Pose Y", "Meter",
                                                  metrics_sdk::InstrumentType::kUpDownCounter,
                                                  metrics_sdk::InstrumentValueType::kDouble};
-  metrics_sdk::SumPointData s_data_1, s_data_2;
+  metrics_sdk::DoubleSumPointData s_data_1, s_data_2;
   s_data_1.value_ = 1.35;
   s_data_2.value_ = 1.37;
 
@@ -219,7 +219,7 @@ static metrics_sdk::MetricData CreateObservableCounterAggregationData()
   metrics_sdk::InstrumentDescriptor inst_desc = {
       "ObservableCounter", "test description", "test unit",
       metrics_sdk::InstrumentType::kObservableCounter, metrics_sdk::InstrumentValueType::kDouble};
-  metrics_sdk::SumPointData s_data_1, s_data_2;
+  metrics_sdk::DoubleSumPointData s_data_1, s_data_2;
   s_data_1.value_ = 1.23;
   s_data_2.value_ = 4.56;
 
@@ -247,7 +247,7 @@ static metrics_sdk::MetricData CreateObservableUpDownCounterAggregationData()
       "ObservableUpDownCounter", "test description", "test unit",
       metrics_sdk::InstrumentType::kObservableUpDownCounter,
       metrics_sdk::InstrumentValueType::kDouble};
-  metrics_sdk::SumPointData s_data_1, s_data_2, s_data_3;
+  metrics_sdk::DoubleSumPointData s_data_1, s_data_2, s_data_3;
   s_data_1.value_ = 1.23;
   s_data_2.value_ = 4.56;
   s_data_3.value_ = 2.34;
@@ -468,7 +468,7 @@ TEST(OtlpMetricSerializationTest, AttributeTypes)
                                   metrics_sdk::InstrumentType::kCounter,
                                   metrics_sdk::InstrumentValueType::kDouble};
 
-  metrics_sdk::SumPointData point;
+  metrics_sdk::DoubleSumPointData point;
   point.value_ = 1.0;
 
   const std::array<uint8_t, 4> byte_values                             = {0xDE, 0xAD, 0xBE, 0xEF};

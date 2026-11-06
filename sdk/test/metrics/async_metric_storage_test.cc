@@ -88,16 +88,16 @@ TEST_P(AsyncWritableMetricStorageTestFixture, TestAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<LongSumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count1);
+            EXPECT_EQ(data.value_, get_count1);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count1);
+            EXPECT_EQ(data.value_, put_count1);
           }
         }
         return true;
@@ -115,17 +115,17 @@ TEST_P(AsyncWritableMetricStorageTestFixture, TestAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<LongSumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
             if (temporality == AggregationTemporality::kCumulative)
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count2);
+              EXPECT_EQ(data.value_, get_count2);
             }
             else
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count2 - get_count1);
+              EXPECT_EQ(data.value_, get_count2 - get_count1);
             }
           }
           else if (opentelemetry::nostd::get<std::string>(
@@ -133,11 +133,11 @@ TEST_P(AsyncWritableMetricStorageTestFixture, TestAggregation)
           {
             if (temporality == AggregationTemporality::kCumulative)
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count2);
+              EXPECT_EQ(data.value_, put_count2);
             }
             else
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count2 - put_count1);
+              EXPECT_EQ(data.value_, put_count2 - put_count1);
             }
           }
         }
@@ -183,16 +183,16 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<LongSumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count1);
+            EXPECT_EQ(data.value_, get_count1);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count1);
+            EXPECT_EQ(data.value_, put_count1);
           }
         }
         return true;
@@ -212,17 +212,17 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<LongSumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
             if (temporality == AggregationTemporality::kCumulative)
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count2);
+              EXPECT_EQ(data.value_, get_count2);
             }
             else
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count2 - get_count1);
+              EXPECT_EQ(data.value_, get_count2 - get_count1);
             }
           }
           else if (opentelemetry::nostd::get<std::string>(
@@ -230,11 +230,11 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
           {
             if (temporality == AggregationTemporality::kCumulative)
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count2);
+              EXPECT_EQ(data.value_, put_count2);
             }
             else
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count2 - put_count1);
+              EXPECT_EQ(data.value_, put_count2 - put_count1);
             }
           }
         }
@@ -373,17 +373,17 @@ TEST_P(WritableMetricStorageTestFilteredAttributesFixture, TestAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<LongSumPointData>(data_attr.point_data);
           EXPECT_EQ(data_attr.attributes.end(), data_attr.attributes.find("version"));
           ++collected_points;
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count_v1 + get_count_v2);
+            EXPECT_EQ(data.value_, get_count_v1 + get_count_v2);
           }
           else
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count_v1);
+            EXPECT_EQ(data.value_, put_count_v1);
           }
         }
         return true;
@@ -405,19 +405,18 @@ TEST_P(WritableMetricStorageTestFilteredAttributesFixture, TestAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<LongSumPointData>(data_attr.point_data);
           EXPECT_EQ(data_attr.attributes.end(), data_attr.attributes.find("version"));
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
             if (temporality == AggregationTemporality::kCumulative)
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_),
-                        get_count_v1_2 + get_count_v2_2);
+              EXPECT_EQ(data.value_, get_count_v1_2 + get_count_v2_2);
             }
             else
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_),
+              EXPECT_EQ(data.value_,
                         (get_count_v1_2 + get_count_v2_2) - (get_count_v1 + get_count_v2));
             }
           }
@@ -425,12 +424,11 @@ TEST_P(WritableMetricStorageTestFilteredAttributesFixture, TestAggregation)
           {
             if (temporality == AggregationTemporality::kCumulative)
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count_v1_2);
+              EXPECT_EQ(data.value_, put_count_v1_2);
             }
             else
             {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_),
-                        put_count_v1_2 - put_count_v1);
+              EXPECT_EQ(data.value_, put_count_v1_2 - put_count_v1);
             }
           }
         }
@@ -478,10 +476,10 @@ TEST(WritableMetricStorageTestFilteredAttributes, TestUpDownCounterAllAttributes
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<DoubleSumPointData>(data_attr.point_data);
           ++collected_points;
           EXPECT_EQ(0, data_attr.attributes.size());
-          EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(data.value_), -1.0);
+          EXPECT_DOUBLE_EQ(data.value_, -1.0);
         }
         return true;
       });
@@ -491,7 +489,7 @@ TEST(WritableMetricStorageTestFilteredAttributes, TestUpDownCounterAllAttributes
 namespace
 {
 // Collects the emitted sum points, so assertions don't depend on iteration order.
-template <class T>
+template <class SumPointDataT, class T>
 std::vector<std::pair<PointAttributes, T>> CollectSumPoints(
     opentelemetry::sdk::metrics::AsyncMetricStorage &storage,
     const std::shared_ptr<CollectorHandle> &collector,
@@ -504,8 +502,8 @@ std::vector<std::pair<PointAttributes, T>> CollectSumPoints(
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
-          points.emplace_back(data_attr.attributes, opentelemetry::nostd::get<T>(data.value_));
+          const auto &data = opentelemetry::nostd::get<SumPointDataT>(data_attr.point_data);
+          points.emplace_back(data_attr.attributes, data.value_);
         }
         return true;
       });
@@ -553,7 +551,7 @@ TEST(WritableMetricStorageMultiCallback, MonotonicSumCombinesAcrossCallbacks)
   storage.RecordLong(from_second_callback,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
-  auto points = CollectSumPoints<int64_t>(storage, collector, collectors);
+  auto points = CollectSumPoints<LongSumPointData, uint64_t>(storage, collector, collectors);
   ASSERT_EQ(1, points.size());
   EXPECT_EQ(0, points[0].first.size());
   EXPECT_EQ(30, points[0].second);
@@ -582,7 +580,7 @@ TEST(WritableMetricStorageDisappearingSeries, MonotonicSumKeepsEarlierContributi
   storage.RecordLong(first_round,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
-  auto points = CollectSumPoints<int64_t>(storage, collector, collectors);
+  auto points = CollectSumPoints<LongSumPointData, int64_t>(storage, collector, collectors);
   ASSERT_EQ(1, points.size());
   EXPECT_EQ(30, points[0].second);
 
@@ -591,7 +589,7 @@ TEST(WritableMetricStorageDisappearingSeries, MonotonicSumKeepsEarlierContributi
   storage.RecordLong(second_round,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
-  points = CollectSumPoints<int64_t>(storage, collector, collectors);
+  points = CollectSumPoints<LongSumPointData, int64_t>(storage, collector, collectors);
   ASSERT_EQ(1, points.size());
   EXPECT_EQ(35, points[0].second);
 }
@@ -624,7 +622,7 @@ TEST(WritableMetricStorageDisappearingSeries, UpDownCounterFollowsTheTotal)
   storage.RecordLong(second_process,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
-  auto points = CollectSumPoints<int64_t>(storage, collector, collectors);
+  auto points = CollectSumPoints<LongSumPointData, int64_t>(storage, collector, collectors);
   ASSERT_EQ(1, points.size());
   EXPECT_EQ(1, points[0].first.size());
   EXPECT_EQ(150, points[0].second);
@@ -632,7 +630,7 @@ TEST(WritableMetricStorageDisappearingSeries, UpDownCounterFollowsTheTotal)
   storage.RecordLong(first_process,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
-  points = CollectSumPoints<int64_t>(storage, collector, collectors);
+  points = CollectSumPoints<LongSumPointData, int64_t>(storage, collector, collectors);
   ASSERT_EQ(1, points.size());
   EXPECT_EQ(100, points[0].second);
 }
@@ -669,7 +667,7 @@ TEST(WritableMetricStorageCardinalityLimit, OverflowCombinesContributions)
   storage.RecordLong(from_second_callback,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
-  auto points = CollectSumPoints<int64_t>(storage, collector, collectors);
+  auto points = CollectSumPoints<LongSumPointData, int64_t>(storage, collector, collectors);
 
   ASSERT_EQ(kCardinalityLimit + 1, points.size());
 
