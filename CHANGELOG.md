@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Remove a curl easy handle from the multi handle before freeing that
+  handle and the header list it points at, and keep both when libcurl will not
+  take the handle back
+  [#4391](https://github.com/open-telemetry/opentelemetry-cpp/issues/4391)
+
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
   Drop aggregation
