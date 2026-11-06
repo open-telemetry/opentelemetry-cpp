@@ -12,3 +12,7 @@ foreach(testname exporter_test collector_test exporter_utils_test)
     TEST_PREFIX exporter.
     TEST_LIST ${testname})
 endforeach()
+
+# prometheus exporter_test.cc: constructing an exporter starts a
+# prometheus-cpp Exposer on port 9464.
+set_tests_properties(${exporter_test} PROPERTIES RESOURCE_LOCK otelcpp_port_9464)
