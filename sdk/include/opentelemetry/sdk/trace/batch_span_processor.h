@@ -99,7 +99,8 @@ public:
    * all its ended spans and passes them to the exporter.
    *
    * @param timeout minimum amount of microseconds to wait for shutdown before giving up and
-   * returning failure.
+   * returning failure. If the timeout expires first, the worker thread keeps running until it has
+   * drained the queue, and a later Shutdown() or the destructor shuts down the exporter.
    * @return true if the shutdown succeeded, false otherwise
    */
   bool Shutdown(
@@ -154,6 +155,11 @@ protected:
     std::atomic<uint64_t> force_flush_pending_sequence{0};
     std::atomic<uint64_t> force_flush_notified_sequence{0};
     std::atomic<std::chrono::microseconds::rep> force_flush_timeout_us{0};
+
+    std::condition_variable worker_done_cv;
+    std::mutex worker_done_m;
+    bool is_worker_done{false};        // guarded by worker_done_m
+    bool is_exporter_shutdown{false};  // guarded by shutdown_m
 
     // Do not use SynchronizationData() = default; here, some versions of GCC&Clang have BUGs
     // and may not initialize the member correctly. See also
