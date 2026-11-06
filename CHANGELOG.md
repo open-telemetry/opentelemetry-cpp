@@ -47,6 +47,10 @@ Increment the:
   schedule delay.
   [#4741](https://github.com/open-telemetry/opentelemetry-cpp/pull/4741)
 
+* [EXPORTER] Prometheus exporter: export instrumentation scope schema URL and
+  attributes as labels
+  [#4735](https://github.com/open-telemetry/opentelemetry-cpp/pull/4735)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
