@@ -446,8 +446,7 @@ bool BatchSpanProcessor::InternalShutdown(std::chrono::microseconds timeout) noe
   }
 
   GetWaitAdjustedTime(timeout, start_time);
-  // Should only shutdown exporter ONCE: by the call that saw the worker thread finish, so that it
-  // never overlaps an Export().
+  // Should only shutdown exporter ONCE.
   const bool already_shutdown                 = synchronization_data_->is_exporter_shutdown;
   synchronization_data_->is_exporter_shutdown = true;
   if (!already_shutdown && exporter_ != nullptr)

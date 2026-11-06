@@ -99,8 +99,7 @@ public:
    * all its ended spans and passes them to the exporter.
    *
    * @param timeout minimum amount of microseconds to wait for shutdown before giving up and
-   * returning failure. If the timeout expires first, the worker thread keeps running until it has
-   * drained the queue, and a later Shutdown() or the destructor shuts down the exporter.
+   * returning failure.
    * @return true if the shutdown succeeded, false otherwise
    */
   bool Shutdown(
