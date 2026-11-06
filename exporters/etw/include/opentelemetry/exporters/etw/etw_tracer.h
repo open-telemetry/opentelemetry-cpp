@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 #include <fstream>
 #include <iomanip>
@@ -43,6 +44,7 @@
 #include "opentelemetry/exporters/etw/etw_provider.h"
 #include "opentelemetry/exporters/etw/etw_random_id_generator.h"
 #include "opentelemetry/exporters/etw/etw_tail_sampler.h"
+#include "opentelemetry/exporters/etw/span_end_properties.h"
 #include "opentelemetry/exporters/etw/utils.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -52,6 +54,62 @@ namespace etw
 {
 
 class Span;
+
+namespace detail
+{
+template <class SpanType, class TracerType>
+nostd::shared_ptr<opentelemetry::trace::Span> MakeSharedSpan(
+    TracerType *owner,
+    nostd::string_view name,
+    const opentelemetry::trace::StartSpanOptions &options,
+    std::unique_ptr<opentelemetry::trace::SpanContext> context,
+    SpanType *&raw)
+{
+  auto owned = std::make_shared<SpanType>(*owner, name, options, std::move(context));
+  raw        = owned.get();
+  return nostd::shared_ptr<opentelemetry::trace::Span>(std::move(owned));
+}
+
+template <typename Id, typename Fields>
+void SetSpanIdIfChanged(Fields &fields,
+                        const Properties &attributes,
+                        const std::string &key,
+                        const Id &id)
+{
+  // Generated fields can already override saved IDs, especially with custom key collisions.
+  char text[2 * Id::kSize];
+  id.ToLowerBase16(text);
+  const PropertyValue *effective = nullptr;
+  const auto generated           = fields.find(key);
+  if (generated != fields.end())
+  {
+    effective = &(*generated).second;
+  }
+  else
+  {
+    const auto saved = attributes.find(key);
+    if (saved != attributes.end())
+    {
+      effective = &saved->second;
+    }
+  }
+  if (effective != nullptr && nostd::holds_alternative<std::string>(*effective))
+  {
+    const auto &value = nostd::get<std::string>(*effective);
+    if (value.size() == sizeof(text) && std::memcmp(value.data(), text, sizeof(text)) == 0)
+    {
+      return;
+    }
+  }
+  fields[key] = std::string(text, sizeof(text));
+}
+
+template <typename T, typename Fields>
+void UpdateSpanStatus(T &span, Fields &fields)
+{
+  span.UpdateStatusFields(fields);
+}
+}  // namespace detail
 
 /**
  * @brief Template that allows to instantiate new Span object for header-only forward-declared
@@ -279,11 +337,104 @@ private:
     auto spanContext = spanBase.GetContext();
 
     // Populate Span with presaved attributes
-    Span &currentSpan = const_cast<Span &>(span);
-    Properties evt    = GetSpanAttributes(currentSpan);
+    Span &currentSpan      = const_cast<Span &>(span);
+    const auto &attributes = GetSpanAttributes(currentSpan);
+    auto export_span       = [&](auto &evt) {
+      if (cfg.enableActivityTracking)
+      {
+        evt[ETW_FIELD_NAME] = GetName(span);
+      }
+
+      if (cfg.enableSpanId)
+      {
+        detail::SetSpanIdIfChanged(evt, attributes, ETW_FIELD_SPAN_ID, spanContext.span_id());
+      }
+
+      if (cfg.enableTraceId)
+      {
+        detail::SetSpanIdIfChanged(evt, attributes, ETW_FIELD_TRACE_ID, spanContext.trace_id());
+      }
+
+      // Populate ActivityId if enabled
+      GUID ActivityId;
+      LPGUID ActivityIdPtr = nullptr;
+      if (cfg.enableActivityId)
+      {
+        if (CopySpanIdToActivityId(spanBase.GetContext().span_id(), ActivityId))
+        {
+          ActivityIdPtr = &ActivityId;
+        }
+      }
+
+      // Populate RelatedActivityId if enabled
+      GUID RelatedActivityId;
+      LPGUID RelatedActivityIdPtr = nullptr;
+      if (cfg.enableRelatedActivityId)
+      {
+        if (parentSpan != nullptr)
+        {
+          if (CopySpanIdToActivityId(parentSpan->GetContext().span_id(), RelatedActivityId))
+          {
+            RelatedActivityIdPtr = &RelatedActivityId;
+          }
+        }
+      }
+
+      auto write_event = [&](uint8_t opcode) {
+        WriteSpanEvent(evt, attributes, ActivityIdPtr, RelatedActivityIdPtr, opcode);
+      };
+
+      if (cfg.enableActivityTracking)
+      {
+        // TODO: check what EndSpanOptions should be supported for this exporter.
+        // The only option available currently (end_steady_time) does not apply.
+        //
+        // This event on Span Stop enables generation of "non-transactional"
+        // OpCode=Stop in alignment with TraceLogging Activity "EventSource"
+        // spec.
+        write_event(2);
+      }
+
+      {
+        // Now since the span has ended, we need to emit the "Span" event that
+        // contains the entire span information, attributes, time, etc. on it.
+        evt[ETW_FIELD_NAME]         = ETW_VALUE_SPAN;
+        evt[ETW_FIELD_PAYLOAD_NAME] = GetName(span);
+
+        // Add timing details in ISO8601 format, which adequately represents
+        // the actual time, taking Timezone into consideration. This is NOT
+        // local time, but rather UTC time (Z=0).
+        std::chrono::system_clock::time_point startTime = GetStartTime(currentSpan);
+        std::chrono::system_clock::time_point endTime   = GetEndTime(currentSpan);
+        int64_t startTimeNs =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(startTime.time_since_epoch())
+                .count();
+        int64_t endTimeNs =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(endTime.time_since_epoch())
+                .count();
+
+        // It may be more optimal to enable passing timestamps as UTC nanoseconds
+        // since Unix epoch instead of string, but that implies additional tooling
+        // is needed to convert it, rendering it NOT human-readable.
+        evt[ETW_FIELD_STARTTIME] = utils::formatUtcTimestampNsAsISO8601(startTimeNs);
+#ifdef ETW_FIELD_ENDTTIME
+        // ETW has its own precise timestamp at envelope layer for every event.
+        // However, in some scenarios it is easier to deal with ISO8601 strings.
+        // In that case we convert the app-created timestamp and place it into
+        // Payload[$ETW_FIELD_TIME] field. The option configurable at compile-time.
+        evt[ETW_FIELD_ENDTTIME] = utils::formatUtcTimestampNsAsISO8601(endTimeNs);
+#endif
+        // Duration of Span in nanoseconds
+        evt[ETW_FIELD_DURATION] = endTimeNs - startTimeNs;
+        // Presently we assume that all spans are server spans
+        evt[ETW_FIELD_SPAN_KIND] = uint32_t(opentelemetry::trace::SpanKind::kServer);
+        detail::UpdateSpanStatus(currentSpan, evt);
+        write_event(0);
+      }
+    };
 
 #if defined(ENABLE_ENV_PROPERTIES)
-
+    Properties evt                = attributes;
     Properties env_properties_env = {};
     if (evt.size() > 0)
     {
@@ -292,8 +443,6 @@ private:
       for (auto &kv : evt)
       {
         nostd::string_view key = kv.first.data();
-
-        // don't serialize fields propagated from span data.
         if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID ||
             key == ETW_FIELD_SPAN_PARENTID)
         {
@@ -311,92 +460,45 @@ private:
         evt                                          = std::move(env_properties_env);
       }
     }
-
-#endif  // defined(ENABLE_ENV_PROPERTIES)
-
-    evt[ETW_FIELD_NAME] = GetName(span);
-
-    if (cfg.enableSpanId)
+    export_span(evt);
+#else
+    if (encoding == ETWProvider::ETW_MANIFEST)
     {
-      evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
+      detail::SpanEndProperties fields;
+      export_span(fields);
     }
-
-    if (cfg.enableTraceId)
+    else
     {
-      evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
+      // Serializer mutations must survive the Stop and final Span writes.
+      Properties evt = attributes;
+      export_span(evt);
     }
-
-    // Populate ActivityId if enabled
-    GUID ActivityId;
-    LPGUID ActivityIdPtr = nullptr;
-    if (cfg.enableActivityId)
-    {
-      if (CopySpanIdToActivityId(spanBase.GetContext().span_id(), ActivityId))
-      {
-        ActivityIdPtr = &ActivityId;
-      }
-    }
-
-    // Populate RelatedActivityId if enabled
-    GUID RelatedActivityId;
-    LPGUID RelatedActivityIdPtr = nullptr;
-    if (cfg.enableRelatedActivityId)
-    {
-      if (parentSpan != nullptr)
-      {
-        if (CopySpanIdToActivityId(parentSpan->GetContext().span_id(), RelatedActivityId))
-        {
-          RelatedActivityIdPtr = &RelatedActivityId;
-        }
-      }
-    }
-
-    if (cfg.enableActivityTracking)
-    {
-      // TODO: check what EndSpanOptions should be supported for this exporter.
-      // The only option available currently (end_steady_time) does not apply.
-      //
-      // This event on Span Stop enables generation of "non-transactional"
-      // OpCode=Stop in alignment with TraceLogging Activity "EventSource"
-      // spec.
-      etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 2, encoding);
-    }
-
-    {
-      // Now since the span has ended, we need to emit the "Span" event that
-      // contains the entire span information, attributes, time, etc. on it.
-      evt[ETW_FIELD_NAME]         = ETW_VALUE_SPAN;
-      evt[ETW_FIELD_PAYLOAD_NAME] = GetName(span);
-
-      // Add timing details in ISO8601 format, which adequately represents
-      // the actual time, taking Timezone into consideration. This is NOT
-      // local time, but rather UTC time (Z=0).
-      std::chrono::system_clock::time_point startTime = GetStartTime(currentSpan);
-      std::chrono::system_clock::time_point endTime   = GetEndTime(currentSpan);
-      int64_t startTimeNs =
-          std::chrono::duration_cast<std::chrono::nanoseconds>(startTime.time_since_epoch())
-              .count();
-      int64_t endTimeNs =
-          std::chrono::duration_cast<std::chrono::nanoseconds>(endTime.time_since_epoch()).count();
-
-      // It may be more optimal to enable passing timestamps as UTC nanoseconds
-      // since Unix epoch instead of string, but that implies additional tooling
-      // is needed to convert it, rendering it NOT human-readable.
-      evt[ETW_FIELD_STARTTIME] = utils::formatUtcTimestampNsAsISO8601(startTimeNs);
-#ifdef ETW_FIELD_ENDTTIME
-      // ETW has its own precise timestamp at envelope layer for every event.
-      // However, in some scenarios it is easier to deal with ISO8601 strings.
-      // In that case we convert the app-created timestamp and place it into
-      // Payload[$ETW_FIELD_TIME] field. The option configurable at compile-time.
-      evt[ETW_FIELD_ENDTTIME] = utils::formatUtcTimestampNsAsISO8601(endTimeNs);
 #endif
-      // Duration of Span in nanoseconds
-      evt[ETW_FIELD_DURATION] = endTimeNs - startTimeNs;
-      // Presently we assume that all spans are server spans
-      evt[ETW_FIELD_SPAN_KIND] = uint32_t(opentelemetry::trace::SpanKind::kServer);
-      UpdateStatus(currentSpan, evt);
-      etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 0, encoding);
-    }
+  }
+
+private:
+  void WriteSpanEvent(Properties &evt,
+                      const Properties &attributes,
+                      LPCGUID activityId,
+                      LPCGUID relatedActivityId,
+                      uint8_t opcode)
+  {
+#if defined(ENABLE_ENV_PROPERTIES)
+    (void)attributes;
+    etwProvider().write(provHandle, evt, activityId, relatedActivityId, opcode, encoding);
+#else
+    etwProvider().write(provHandle, evt, activityId, relatedActivityId, opcode, encoding,
+                        attributes);
+#endif
+  }
+
+  void WriteSpanEvent(detail::SpanEndProperties &fields,
+                      const Properties &attributes,
+                      LPCGUID activityId,
+                      LPCGUID relatedActivityId,
+                      uint8_t opcode)
+  {
+    etwProvider().writeSpan(provHandle, fields, attributes, activityId, relatedActivityId, opcode);
   }
 
   const opentelemetry::trace::TraceId &trace_id() { return traceId_; }
@@ -475,19 +577,29 @@ public:
     // Parent Context:
     // - either use current span
     // - or attach to parent SpanContext specified in options
-    opentelemetry::trace::SpanContext parentContext = GetCurrentSpan()->GetContext();
-    if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(options.parent))
-    {
-      auto spanContext = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
-      if (spanContext.IsValid())
+    auto parentContext = [&]() {
+      if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(options.parent))
       {
-        parentContext = spanContext;
+        const auto &explicitParent = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
+        if (explicitParent.IsValid())
+        {
+          return explicitParent;
+        }
       }
-    }
+      // Avoid constructing a DefaultSpan when there is no active span.
+      auto current = opentelemetry::context::RuntimeContext::GetCurrent();
+      auto value   = current.GetValue(opentelemetry::trace::kSpanKey);
+      if (const auto *active = nostd::get_if<nostd::shared_ptr<opentelemetry::trace::Span>>(&value))
+      {
+        return (*active)->GetContext();
+      }
+      return opentelemetry::trace::SpanContext::GetInvalid();
+    }();
     auto traceId = parentContext.IsValid() ? parentContext.trace_id() : traceId_;
 
     // Sampling based on attributes is not supported for now, so passing empty below.
-    std::map<std::string, int> emptyAttributes = {{}};
+    // Keep the existing sampler input, but do not allocate it for every span.
+    static const std::map<std::string, int> emptyAttributes = {{}};
     opentelemetry::sdk::trace::SamplingResult sampling_result =
         GetSampler(tracerProvider_)
             .ShouldSample(parentContext, traceId, name, options.kind,
@@ -530,8 +642,9 @@ public:
 
     // This template pattern allows us to forward-declare the etw::Span,
     // create an instance of it, then assign it to tracer::Span result.
-    auto currentSpan = new_span<Span, Tracer>(this, name, options, std::move(spanContext));
-    nostd::shared_ptr<opentelemetry::trace::Span> result = to_span_ptr<Span>(currentSpan);
+    Span *currentSpan = nullptr;
+    auto result = detail::MakeSharedSpan<Span, Tracer>(this, name, options, std::move(spanContext),
+                                                       currentSpan);
 
     // Decorate with additional standard fields
     std::string eventName = name.data();
@@ -813,12 +926,12 @@ protected:
 
   std::unique_ptr<opentelemetry::trace::SpanContext> context_;
 
-public:
-  /**
-   * @brief Update Properties object with current Span status
-   * @param evt
-   */
-  void UpdateStatus(Properties &evt)
+private:
+  template <typename T, typename Fields>
+  friend void detail::UpdateSpanStatus(T &span, Fields &fields);
+
+  template <typename Fields>
+  void UpdateStatusFields(Fields &evt)
   {
     /* Should we avoid populating this extra field if status is unset? */
     if ((status_code_ == opentelemetry::trace::StatusCode::kUnset) ||
@@ -835,6 +948,13 @@ public:
       evt[ETW_FIELD_STATUSMESSAGE] = status_description_;
     }
   }
+
+public:
+  /**
+   * @brief Update Properties object with current Span status
+   * @param evt
+   */
+  void UpdateStatus(Properties &evt) { UpdateStatusFields(evt); }
 
   /**
    * @brief Get start time of this Span.
@@ -965,7 +1085,7 @@ public:
 
   opentelemetry::trace::StatusCode GetStatus() { return status_code_; }
 
-  void SetAttributes(Properties attributes) { attributes_ = attributes; }
+  void SetAttributes(const Properties &attributes) { attributes_ = attributes; }
 
   /**
    * @brief Obtain span attributes specified at Span start.

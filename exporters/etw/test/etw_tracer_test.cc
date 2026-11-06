@@ -9,8 +9,11 @@
 #  include <string>
 #  include "opentelemetry//sdk/trace/sampler.h"
 #  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
+#  include "opentelemetry/exporters/etw/span_end_properties.h"
 #  include "opentelemetry/sdk/trace/samplers/always_off.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
+#  include "opentelemetry/trace/default_span.h"
+#  include "opentelemetry/trace/scope.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
@@ -90,6 +93,210 @@ public:
     return {opentelemetry::sdk::trace::Decision::DROP};
   }
 };
+
+TEST(ETWTracer, SetAttributesRetainsOwnershipAndSupportsSelfAssignment)
+{
+  exporter::etw::TracerProvider provider;
+  auto tracer    = provider.GetTracer("SetAttributesOwnership");
+  auto span      = tracer->StartSpan("span");
+  auto *etw_span = static_cast<exporter::etw::Span *>(span.get());
+  Properties attributes{{"key", std::string(128, 'x')}};
+  etw_span->SetAttributes(attributes);
+  attributes["key"] = "changed";
+  etw_span->SetAttributes(etw_span->GetAttributes());
+  EXPECT_EQ(nostd::get<std::string>(etw_span->GetAttributes().at("key")), std::string(128, 'x'));
+  span->End();
+  EXPECT_EQ(nostd::get<std::string>(etw_span->GetAttributes().at("key")), std::string(128, 'x'));
+}
+
+TEST(ETWTracer, EndSpanIdsReuseMatchingAttributes)
+{
+  MockIdGenerator generator;
+  const auto span_id  = generator.GenerateSpanId();
+  const auto trace_id = generator.GenerateTraceId();
+  Properties source{{ETW_FIELD_SPAN_ID, ToLowerBase16(span_id)},
+                    {ETW_FIELD_TRACE_ID, ToLowerBase16(trace_id)}};
+  Properties overrides;
+  exporter::etw::detail::SpanPropertiesView view(source, overrides);
+  exporter::etw::detail::SetSpanIdIfChanged(overrides, source, ETW_FIELD_SPAN_ID, span_id);
+  exporter::etw::detail::SetSpanIdIfChanged(overrides, source, ETW_FIELD_TRACE_ID, trace_id);
+  EXPECT_TRUE(overrides.empty());
+  EXPECT_EQ(view.size(), 2u);
+  EXPECT_EQ(view.Find(ETW_FIELD_SPAN_ID), &source.at(ETW_FIELD_SPAN_ID));
+  EXPECT_EQ(view.Find(ETW_FIELD_TRACE_ID), &source.at(ETW_FIELD_TRACE_ID));
+}
+
+TEST(ETWTracer, EndSpanIdsRepairMissingOrModifiedAttributes)
+{
+  MockIdGenerator generator;
+  const auto id                 = generator.GenerateTraceId();
+  const auto expected           = ToLowerBase16(id);
+  const PropertyValue invalid[] = {42, "wrong", std::string(expected.size(), 'x'),
+                                   std::string(expected.size(), '\0')};
+  Properties source;
+  Properties overrides;
+  exporter::etw::detail::SpanPropertiesView missing(source, overrides);
+  exporter::etw::detail::SetSpanIdIfChanged(overrides, source, ETW_FIELD_TRACE_ID, id);
+  ASSERT_NE(missing.Find(ETW_FIELD_TRACE_ID), nullptr);
+  EXPECT_EQ(nostd::get<std::string>(*missing.Find(ETW_FIELD_TRACE_ID)), expected);
+  EXPECT_TRUE(source.empty());
+  for (const auto &value : invalid)
+  {
+    source[ETW_FIELD_TRACE_ID] = value;
+    overrides.clear();
+    exporter::etw::detail::SpanPropertiesView view(source, overrides);
+    exporter::etw::detail::SetSpanIdIfChanged(overrides, source, ETW_FIELD_TRACE_ID, id);
+    ASSERT_NE(view.Find(ETW_FIELD_TRACE_ID), nullptr);
+    EXPECT_EQ(nostd::get<std::string>(*view.Find(ETW_FIELD_TRACE_ID)), expected);
+    EXPECT_EQ(source.at(ETW_FIELD_TRACE_ID).index(), value.index());
+    if (nostd::holds_alternative<std::string>(value))
+    {
+      EXPECT_EQ(nostd::get<std::string>(source.at(ETW_FIELD_TRACE_ID)),
+                nostd::get<std::string>(value));
+    }
+
+    Properties owned = source;
+    exporter::etw::detail::SetSpanIdIfChanged(owned, source, ETW_FIELD_TRACE_ID, id);
+    EXPECT_EQ(nostd::get<std::string>(owned.at(ETW_FIELD_TRACE_ID)), expected);
+  }
+}
+
+TEST(ETWTracer, ExplicitParentSkipsActiveSpanLookupAndInvalidParentFallsBack)
+{
+  class CountingSpan : public trace::DefaultSpan
+  {
+  public:
+    CountingSpan(const trace::SpanContext &context, size_t &calls)
+        : trace::DefaultSpan(context), calls_(calls)
+    {}
+    trace::SpanContext GetContext() const noexcept override
+    {
+      ++calls_;
+      return trace::DefaultSpan::GetContext();
+    }
+
+  private:
+    size_t &calls_;
+  };
+  const uint8_t explicit_trace[16] = {1, 2, 3};
+  const uint8_t explicit_span[8]   = {4, 5, 6};
+  const uint8_t active_trace[16]   = {7, 8, 9};
+  const uint8_t active_span[8]     = {10, 11, 12};
+  const trace::SpanContext explicit_parent(
+      trace::TraceId(explicit_trace), trace::SpanId(explicit_span), trace::TraceFlags(1), false);
+  const trace::SpanContext active_parent(trace::TraceId(active_trace), trace::SpanId(active_span),
+                                         trace::TraceFlags(1), false);
+  exporter::etw::TracerProvider provider({{"enableTraceId", true}, {"enableSpanId", true}});
+  auto tracer  = provider.GetTracer("ExplicitParentLookup");
+  size_t calls = 0;
+  nostd::shared_ptr<trace::Span> active(new CountingSpan(active_parent, calls));
+  trace::Scope scope(active);
+  trace::StartSpanOptions options;
+  options.parent = explicit_parent;
+  auto child     = tracer->StartSpan("explicit", options);
+  EXPECT_EQ(calls, 0u);
+  EXPECT_EQ(child->GetContext().trace_id(), explicit_parent.trace_id());
+  EXPECT_EQ(nostd::get<std::string>(static_cast<exporter::etw::Span *>(child.get())
+                                        ->GetAttributes()
+                                        .at(ETW_FIELD_SPAN_PARENTID)),
+            ToLowerBase16(explicit_parent.span_id()));
+  child->End();
+
+  options.parent = trace::SpanContext::GetInvalid();
+  auto fallback  = tracer->StartSpan("fallback", options);
+  EXPECT_EQ(calls, 1u);
+  EXPECT_EQ(fallback->GetContext().trace_id(), active_parent.trace_id());
+  EXPECT_EQ(nostd::get<std::string>(static_cast<exporter::etw::Span *>(fallback.get())
+                                        ->GetAttributes()
+                                        .at(ETW_FIELD_SPAN_PARENTID)),
+            ToLowerBase16(active_parent.span_id()));
+  fallback->End();
+}
+
+TEST(ETWTracer, InlineEndFieldsOwnKeysAndValuesAndMergeInOrder)
+{
+  exporter::etw::detail::SpanEndProperties fields;
+  std::string key = "temporary-custom-field-name";
+  std::string value(4096, 'x');
+  fields[key] = value;
+  key.assign("changed");
+  value.clear();
+  fields["z"]              = 1;
+  fields[std::string("z")] = 2;
+  fields["a"]              = 3;
+  fields.Sort();
+  Properties attributes{{"a", 9}, {"b", 4}};
+  exporter::etw::detail::SpanPropertiesViewImpl<exporter::etw::detail::SpanEndProperties> view(
+      attributes, fields);
+  std::vector<std::string> keys;
+  for (const auto &entry : view)
+  {
+    keys.push_back(entry.first);
+  }
+  EXPECT_EQ(keys, (std::vector<std::string>{"a", "b", "temporary-custom-field-name", "z"}));
+  EXPECT_EQ(nostd::get<int32_t>(*view.Find("a")), 3);
+  EXPECT_EQ(nostd::get<int32_t>(*view.Find("z")), 2);
+  EXPECT_EQ(nostd::get<std::string>(*view.Find("temporary-custom-field-name")),
+            std::string(4096, 'x'));
+  EXPECT_EQ(nostd::get<int32_t>(attributes.at("a")), 9);
+}
+
+TEST(ETWTracer, InlineEndFieldsOverflowPreservesEntriesAndSubsequentUpserts)
+{
+  exporter::etw::detail::SpanEndProperties fields;
+  Properties expected;
+  for (size_t i = 0; i < exporter::etw::detail::SpanEndProperties::kCapacity + 4; ++i)
+  {
+    const auto key = "field-" + std::to_string(i);
+    fields[key]    = static_cast<int32_t>(i);
+    expected[key]  = static_cast<int32_t>(i);
+  }
+  fields["field-0"] = expected["field-0"] = int32_t{42};
+  fields["field-13"] = expected["field-13"] = int32_t{43};
+  fields.Sort();
+  ASSERT_EQ(fields.size(), expected.size());
+  auto reference = expected.begin();
+  for (const auto &entry : fields)
+  {
+    ASSERT_NE(reference, expected.end());
+    EXPECT_EQ(entry.first, reference->first);
+    EXPECT_EQ(nostd::get<int32_t>(entry.second), nostd::get<int32_t>(reference->second));
+    ++reference;
+  }
+  EXPECT_EQ(reference, expected.end());
+  Properties attributes{{"field-0", int32_t{-1}}, {"source-only", int32_t{-2}}};
+  exporter::etw::detail::SpanPropertiesViewImpl<exporter::etw::detail::SpanEndProperties> view(
+      attributes, fields);
+  EXPECT_EQ(view.size(), expected.size() + 1);
+  EXPECT_EQ(nostd::get<int32_t>(*view.Find("field-0")), 42);
+  EXPECT_EQ(nostd::get<int32_t>(*view.Find("source-only")), -2);
+}
+
+TEST(ETWTracer, EndSpanIdReuseChecksGeneratedOverridesBeforeSavedAttributes)
+{
+  const uint8_t bytes[8] = {1, 2, 3};
+  const trace::SpanId id(bytes);
+  const auto text               = ToLowerBase16(id);
+  const uint8_t trace_bytes[16] = {4, 5, 6};
+  const trace::TraceId trace_id(trace_bytes);
+  const auto trace_text = ToLowerBase16(trace_id);
+  Properties saved{{"shared-name-and-id", text}};
+  auto check = [&](auto &fields) {
+    fields["shared-name-and-id"] = "operation";
+    exporter::etw::detail::SetSpanIdIfChanged(fields, saved, "shared-name-and-id", id);
+    const auto found = fields.find("shared-name-and-id");
+    ASSERT_TRUE(found != fields.end());
+    EXPECT_EQ(nostd::get<std::string>((*found).second), text);
+    saved["shared-name-and-id"] = trace_text;
+    exporter::etw::detail::SetSpanIdIfChanged(fields, saved, "shared-name-and-id", trace_id);
+    EXPECT_EQ(nostd::get<std::string>((*fields.find("shared-name-and-id")).second), trace_text);
+    saved["shared-name-and-id"] = text;
+  };
+  Properties owned;
+  check(owned);
+  exporter::etw::detail::SpanEndProperties inlined;
+  check(inlined);
+}
 
 /* clang-format off */
 TEST(ETWTracer, TracerCheck)

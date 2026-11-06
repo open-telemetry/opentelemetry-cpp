@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Reduce ETW span export allocations and timestamp formatting overhead
+  while preserving event payloads and timestamp representation.
+  [#4761](https://github.com/open-telemetry/opentelemetry-cpp/pull/4761)
+
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
   Drop aggregation

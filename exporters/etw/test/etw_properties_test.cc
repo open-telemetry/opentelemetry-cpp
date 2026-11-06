@@ -88,3 +88,60 @@ TEST(ETWProperties, PropertiesMapPreservesSpanStringAttribute)
   EXPECT_EQ(owned[0], "one");
   EXPECT_EQ(owned[1], "two");
 }
+
+TEST(ETWProperties, SpanViewBorrowsAttributesAndOverridesInSortedOrder)
+{
+  Properties source{{"b", std::string(1024, 'x')}, {"d", 4}, {"f", 6}};
+  Properties overrides{{"a", 1}, {"d", 40}, {"e", 5}, {"g", 7}};
+  exporter::etw::detail::SpanPropertiesView view(source, overrides);
+
+  std::vector<std::string> keys;
+  for (const auto &entry : view)
+  {
+    keys.push_back(entry.first);
+    if (entry.first == "b")
+    {
+      EXPECT_EQ(&entry.second, &source.at("b"));
+    }
+  }
+  EXPECT_EQ(keys, (std::vector<std::string>{"a", "b", "d", "e", "f", "g"}));
+  EXPECT_EQ(view.size(), 6u);
+  EXPECT_FALSE(view.empty());
+  ASSERT_NE(view.Find("d"), nullptr);
+  EXPECT_EQ(nostd::get<int32_t>(*view.Find("d")), 40);
+  EXPECT_EQ(nostd::get<int32_t>(source.at("d")), 4);
+  EXPECT_EQ(source.size(), 3u);
+  EXPECT_EQ(view.Find("b"), &source.at("b"));
+  EXPECT_EQ(view.Find("missing"), nullptr);
+
+  const common::KeyValueIterable &iterable = view;
+  size_t visited                           = 0;
+  EXPECT_FALSE(iterable.ForEachKeyValue(
+      [&](nostd::string_view, common::AttributeValue) { return ++visited < 2; }));
+  EXPECT_EQ(visited, 2u);
+}
+
+TEST(ETWProperties, SpanViewHandlesEmptyInputsAndCompleteOverlap)
+{
+  Properties source;
+  Properties overrides;
+  exporter::etw::detail::SpanPropertiesView view(source, overrides);
+  EXPECT_EQ(view.size(), 0u);
+  EXPECT_TRUE(view.empty());
+  source["key"] = 1;
+  EXPECT_EQ(view.size(), 1u);
+  EXPECT_FALSE(view.empty());
+  EXPECT_EQ(view.Find("key"), &source.at("key"));
+  overrides["key"] = 2;
+  EXPECT_EQ(view.size(), 1u);
+  EXPECT_EQ(view.Find("key"), &overrides.at("key"));
+
+  size_t visited = 0;
+  EXPECT_TRUE(view.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) {
+    ++visited;
+    EXPECT_EQ(key, "key");
+    EXPECT_EQ(nostd::get<int32_t>(value), 2);
+    return true;
+  }));
+  EXPECT_EQ(visited, 1u);
+}
