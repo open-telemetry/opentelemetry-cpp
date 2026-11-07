@@ -22,6 +22,7 @@
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/version.h"
+#include "src/metrics/collection_cancellation.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -61,6 +62,11 @@ MetricProducer::Result MetricCollector::Produce() noexcept
   }
   ResourceMetrics resource_metrics;
   meter_context_->ForEachMeter([&](const std::shared_ptr<Meter> &meter) noexcept {
+    // Stop before the next meter once the reader has stopped waiting for this collection.
+    if (CollectionCancellation::IsRequested())
+    {
+      return false;
+    }
     auto collection_ts = std::chrono::system_clock::now();
     auto metric_data   = meter->Collect(this, collection_ts);
     if (metric_data.empty())
@@ -122,7 +128,10 @@ MetricProducer::Result MetricCollector::Produce() noexcept
     return true;
   });
   resource_metrics.resource_ = &meter_context_->GetResource();
-  return {resource_metrics, MetricProducer::Status::kSuccess};
+  // Report a cancelled collection as kTimeout, with whatever was collected before it stopped.
+  const auto status = CollectionCancellation::IsRequested() ? MetricProducer::Status::kTimeout
+                                                            : MetricProducer::Status::kSuccess;
+  return {resource_metrics, status};
 }
 
 bool MetricCollector::ForceFlush(std::chrono::microseconds timeout) noexcept

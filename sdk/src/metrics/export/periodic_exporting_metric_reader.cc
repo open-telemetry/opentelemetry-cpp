@@ -20,6 +20,7 @@
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_runtime_options.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/version.h"
+#include "src/metrics/collection_cancellation.h"
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
 #  include "opentelemetry/sdk/common/thread_instrumentation.h"
@@ -161,6 +162,9 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
 bool PeriodicExportingMetricReader::CollectAndExportOnce()
 {
   std::uint64_t notify_force_flush = force_flush_pending_sequence_.load(std::memory_order_acquire);
+  // Lets MetricCollector and ObservableRegistry stop between meters and callbacks once
+  // OnShutDown() has spent its budget and set is_stop_requested_.
+  const CollectionCancellation::Scope cancellation_scope(is_stop_requested_);
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
@@ -168,6 +172,14 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
     auto start = std::chrono::steady_clock::now();
     this->Collect([this, &start](ResourceMetrics &metric_data) {
       auto end = std::chrono::steady_clock::now();
+      if (this->is_stop_requested_.load(std::memory_order_acquire))
+      {
+        // OnShutDown() has given up waiting for this cycle, so do not spend more time exporting.
+        OTEL_INTERNAL_LOG_WARN(
+            "[Periodic Exporting Metric Reader] Shutdown timed out during collection, metrics "
+            "from this collection are not exported");
+        return false;
+      }
       if ((end - start) > this->export_timeout_millis_)
       {
         OTEL_INTERNAL_LOG_ERROR(
