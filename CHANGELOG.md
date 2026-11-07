@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Skip completely empty span links (invalid span context, no attributes
+  and no trace state), so they no longer count against `link_count_limit`
+  [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)
+
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
   Drop aggregation
