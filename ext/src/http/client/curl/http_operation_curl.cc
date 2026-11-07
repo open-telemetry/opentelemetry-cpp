@@ -500,8 +500,13 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
   if (!curl_resource_.easy_handle)
   {
     last_curl_result_ = CURLE_FAILED_INIT;
-    DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
-                  curl_easy_strerror(last_curl_result_));
+    // Recorded, not dispatched. Send() and SendAsync() refuse on it at entry, so the caller
+    // reports the refusal once; dispatching from here as well is the second terminal event
+    // #4360 is about.
+    header_setup_result_ = CURLE_FAILED_INIT;
+    // Terminal already, so Cleanup() does not later announce a cancel for an operation that
+    // never started. Left at its Created default, Cleanup() reads it as still in flight.
+    session_state_ = opentelemetry::ext::http::client::SessionState::CreateFailed;
     return;
   }
 
@@ -1476,6 +1481,15 @@ CURLcode HttpOperation::Setup()
 
 CURLcode HttpOperation::Send()
 {
+  // No handle to work with, either because construction failed or because Cleanup() released
+  // it. Setup() answers the same way, so the result matches; returning before it is what keeps
+  // a refused request to one terminal event, reported by the caller. last_curl_result_ is left
+  // alone, since for a released handle it still holds the outcome of the attempt that used it.
+  if (nullptr == curl_resource_.easy_handle)
+  {
+    return CURLE_FAILED_INIT;
+  }
+
   // If it is async sending, just return error
   if (async_data_ && async_data_->is_promise_running.load(std::memory_order_acquire))
   {
@@ -1506,6 +1520,15 @@ CURLcode HttpOperation::Send()
 
 CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOperation &)> callback)
 {
+  // No handle to work with, either because construction failed or because Cleanup() released
+  // it. Setup() answers the same way, so the result matches; returning before it is what keeps
+  // a refused request to one terminal event, reported by the caller. last_curl_result_ is left
+  // alone, since for a released handle it still holds the outcome of the attempt that used it.
+  if (nullptr == curl_resource_.easy_handle)
+  {
+    return CURLE_FAILED_INIT;
+  }
+
   if (nullptr == session)
   {
     return CURLE_FAILED_INIT;
