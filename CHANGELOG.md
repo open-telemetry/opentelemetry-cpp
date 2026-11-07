@@ -17,7 +17,7 @@ Increment the:
 
 * [SDK] Clamp `BatchLogRecordProcessor` max_export_batch_size to non-zero
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
-  [#4750](https://github.com/open-telemetry/opentelemetry-cpp/issues/4750)
+  [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
