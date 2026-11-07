@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] `Baggage::ToHeader` now percent-encodes spaces as `%20` instead of
+  `+`, as required by the W3C Baggage specification. Decoding is unchanged.
+  [#4745](https://github.com/open-telemetry/opentelemetry-cpp/issues/4745)
+
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
   Drop aggregation

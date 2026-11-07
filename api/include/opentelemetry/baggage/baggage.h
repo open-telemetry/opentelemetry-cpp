@@ -320,10 +320,6 @@ private:
       {
         ret.push_back(c);
       }
-      else if (c == ' ')
-      {
-        ret.push_back('+');
-      }
       else
       {
         ret.push_back('%');
