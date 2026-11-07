@@ -15,6 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Stop exporting stale async attribute sets with cumulative
+  temporality. Preserve reader-scoped callback behavior and overflow
+  contributions, and bound per-reader monotonic counter baseline storage by
+  the configured cardinality limit.
+  [#4484](https://github.com/open-telemetry/opentelemetry-cpp/pull/4484)
+
+* [SDK] Preserve the default unlimited timeout when batch span and log record
+  processors shut down their exporters.
+  [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
+
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
   Drop aggregation
