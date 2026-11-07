@@ -15,6 +15,13 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Elasticsearch: report an asynchronous export's outcome exactly once
+  [#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502)
+
+* [BUG] Stop the Elasticsearch async ForceFlush reporting success without
+  waiting for the sessions it was asked about
+  [#4337](https://github.com/open-telemetry/opentelemetry-cpp/pull/4337)
+
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
   Drop aggregation
