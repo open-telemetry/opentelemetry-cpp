@@ -155,6 +155,11 @@ protected:
     std::atomic<uint64_t> force_flush_notified_sequence{0};
     std::atomic<std::chrono::microseconds::rep> force_flush_timeout_us{0};
 
+    std::condition_variable worker_done_cv;
+    std::mutex worker_done_m;
+    bool is_worker_done{false};        // guarded by worker_done_m
+    bool is_exporter_shutdown{false};  // guarded by shutdown_m
+
     // Do not use SynchronizationData() = default; here, some versions of GCC&Clang have BUGs
     // and may not initialize the member correctly. See also
     // https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be

@@ -10,6 +10,7 @@
 #include <memory>
 #include <mutex>
 #include <ostream>
+#include <ratio>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -264,6 +265,12 @@ void BatchSpanProcessor::DoBackgroundWork()
     worker_thread_instrumentation_->OnEnd();
   }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
+  {
+    std::lock_guard<std::mutex> lock(synchronization_data_->worker_done_m);
+    synchronization_data_->is_worker_done = true;
+  }
+  synchronization_data_->worker_done_cv.notify_all();
 }
 
 void BatchSpanProcessor::Export()
@@ -399,17 +406,14 @@ bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 
 BatchSpanProcessor::~BatchSpanProcessor()
 {
-  if (synchronization_data_->is_shutdown.load() == false)
-  {
-    InternalShutdown();
-  }
+  InternalShutdown();
 }
 
 bool BatchSpanProcessor::InternalShutdown(std::chrono::microseconds timeout) noexcept
 {
   auto start_time = std::chrono::system_clock::now();
   std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};
-  bool already_shutdown = synchronization_data_->is_shutdown.exchange(true);
+  synchronization_data_->is_shutdown.store(true);
 
   if (worker_thread_.joinable())
   {
@@ -419,11 +423,32 @@ bool BatchSpanProcessor::InternalShutdown(std::chrono::microseconds timeout) noe
                                                                      std::memory_order_release);
       synchronization_data_->cv.notify_all();
     }
+
+    {
+      // As in ForceFlush(), a non-positive timeout or microseconds::max() means no limit.
+      const auto wait_timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
+          timeout, std::chrono::microseconds::zero());
+      const auto is_worker_done = [this] { return synchronization_data_->is_worker_done; };
+
+      std::unique_lock<std::mutex> lock(synchronization_data_->worker_done_m);
+      if (wait_timeout <= std::chrono::microseconds::zero())
+      {
+        synchronization_data_->worker_done_cv.wait(lock, is_worker_done);
+      }
+      else if (!synchronization_data_->worker_done_cv.wait_for(lock, wait_timeout, is_worker_done))
+      {
+        // The worker thread keeps using this object until the destructor joins it.
+        return false;
+      }
+    }
+
     worker_thread_.join();
   }
 
   GetWaitAdjustedTime(timeout, start_time);
   // Should only shutdown exporter ONCE.
+  const bool already_shutdown                 = synchronization_data_->is_exporter_shutdown;
+  synchronization_data_->is_exporter_shutdown = true;
   if (!already_shutdown && exporter_ != nullptr)
   {
     return exporter_->Shutdown(timeout);

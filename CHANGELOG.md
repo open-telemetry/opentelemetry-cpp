@@ -47,6 +47,12 @@ Increment the:
   schedule delay.
   [#4741](https://github.com/open-telemetry/opentelemetry-cpp/pull/4741)
 
+* [SDK] `BatchSpanProcessor::Shutdown(timeout)` now returns `false` when the
+  timeout expires while the worker thread is still exporting, instead of
+  waiting for the export to finish. The worker thread keeps exporting, and a
+  later `Shutdown()` or the destructor shuts down the exporter.
+  [#4767](https://github.com/open-telemetry/opentelemetry-cpp/pull/4767)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
