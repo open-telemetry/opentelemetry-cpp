@@ -6,8 +6,5 @@ foreach(testname composite_propagator_test environment_carrier_test
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
-  gtest_add_tests(
-    TARGET ${testname}
-    TEST_PREFIX trace.
-    TEST_LIST ${testname})
+  gtest_discover_tests(${testname} TEST_PREFIX trace.)
 endforeach()

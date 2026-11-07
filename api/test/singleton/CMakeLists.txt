@@ -49,7 +49,4 @@ target_link_libraries(
   ${CMAKE_DL_LIBS}
   opentelemetry_api)
 
-gtest_add_tests(
-  TARGET singleton_test
-  TEST_PREFIX singleton.
-  TEST_LIST singleton_test)
+gtest_discover_tests(singleton_test TEST_PREFIX singleton.)

@@ -28,14 +28,16 @@ foreach(
     opentelemetry_trace
     opentelemetry_resources
     opentelemetry_exporter_in_memory)
-  if(testname STREQUAL "tracer_provider_test" OR testname STREQUAL
-                                                 "batch_span_processor_test")
+  if(testname STREQUAL "tracer_provider_test" OR
+     testname STREQUAL "batch_span_processor_test")
     target_link_libraries(${testname} opentelemetry_test_common)
   endif()
-  gtest_add_tests(
-    TARGET ${testname}
-    TEST_PREFIX trace.
-    TEST_LIST ${testname})
+
+  if(testname STREQUAL "tracer_provider_test")
+    gtest_discover_tests(${testname} TEST_PREFIX trace. PROPERTIES TIMEOUT 10)
+  else()
+    gtest_discover_tests(${testname} TEST_PREFIX trace.)
+  endif()
 endforeach()
 
 set_tests_properties(
