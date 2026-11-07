@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] End the Elasticsearch exporter's wait on a read or write error
+  [#4331](https://github.com/open-telemetry/opentelemetry-cpp/pull/4331)
+
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
   Drop aggregation
