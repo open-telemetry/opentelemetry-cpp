@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Decide Elasticsearch bulk export success from the HTTP status, the
+  errors flag, and one acknowledgement per record that names its target index
+  and says the operation applied
+  [#4297](https://github.com/open-telemetry/opentelemetry-cpp/pull/4297)
+
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
   Drop aggregation
