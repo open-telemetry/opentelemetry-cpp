@@ -15,3 +15,16 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "entity_test",
+    srcs = [
+        "entity_test.cc",
+    ],
+    tags = ["test"],
+    deps = [
+        "//api",
+        "//sdk/src/resource",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
