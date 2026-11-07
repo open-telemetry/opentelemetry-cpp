@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Parse the `event_to_span_event_bridge/development` log
+  record processor configuration in declarative configuration. The SDK
+  implementation of this processor is not yet available; `SdkBuilder` logs a
+  warning and skips it when configured.
+  [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
+
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
   Drop aggregation
