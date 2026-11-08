@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
@@ -242,6 +243,30 @@ static void BM_EnabledOnSeverityAndEventIdReturnFalse(benchmark::State &state)
   }
 }
 BENCHMARK(BM_EnabledOnSeverityAndEventIdReturnFalse);
+
+// Isolates the per-call cost of opentelemetry::context::RuntimeContext::GetCurrent(), to
+// quantify the overhead of the second call EmitToProcessor() now makes on the ABI v1 path, right
+// after Logger::CreateLogRecord() already made one of its own to stamp the recordable's trace
+// fields. Compared against BM_RuntimeContextGetCurrentTwice below, which repeats the call back
+// to back the way the two call sites do in practice.
+static void BM_RuntimeContextGetCurrentOnce(benchmark::State &state)
+{
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(opentelemetry::context::RuntimeContext::GetCurrent());
+  }
+}
+BENCHMARK(BM_RuntimeContextGetCurrentOnce);
+
+static void BM_RuntimeContextGetCurrentTwice(benchmark::State &state)
+{
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(opentelemetry::context::RuntimeContext::GetCurrent());
+    benchmark::DoNotOptimize(opentelemetry::context::RuntimeContext::GetCurrent());
+  }
+}
+BENCHMARK(BM_RuntimeContextGetCurrentTwice);
 
 }  // namespace
 

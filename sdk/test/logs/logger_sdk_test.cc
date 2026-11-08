@@ -758,7 +758,7 @@ class ContextCapturingProcessor final : public LogRecordProcessor
 public:
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<Recordable>(new MockLogRecordable());
+    return std::make_unique<MockLogRecordable>();
   }
 
   void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override
