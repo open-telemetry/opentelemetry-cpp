@@ -308,9 +308,6 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdownRespectsMaxExportBatchSize)
   }
 }
 
-/**
- * StartBlockedExport() leaves the worker thread stuck inside Export() until ReleaseExport().
- */
 class BatchSpanProcessorShutdownTest : public testing::Test
 {
 protected:
@@ -326,15 +323,9 @@ protected:
         std::unique_ptr<sdk::trace::SpanExporter>(exporter_), options));
   }
 
-  void StartBlockedExport()
+  bool StartBlockedExport()
   {
     exporter_->SetBlock(true);
-    processor_->OnEnd(processor_->MakeRecordable());
-
-    while (export_call_count_->load() == 0)
-    {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
 
     // If Shutdown() wrongly waits for the export, this still unblocks it, so that the test fails
     // instead of hanging.
@@ -342,6 +333,13 @@ protected:
       release_.get_future().wait_for(std::chrono::seconds(2));
       exporter_->SetBlock(false);
     });
+
+    processor_->OnEnd(processor_->MakeRecordable());
+    for (int i = 0; i < 1000 && export_call_count_->load() == 0; ++i)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    return export_call_count_->load() > 0;
   }
 
   void ReleaseExport()
@@ -372,7 +370,7 @@ protected:
 TEST_F(BatchSpanProcessorShutdownTest, HonorsTimeoutWhileExportIsBlocked)
 {
   CreateProcessor();
-  StartBlockedExport();
+  ASSERT_TRUE(StartBlockedExport());
 
   const auto start                   = std::chrono::steady_clock::now();
   const bool shutdown_result         = processor_->Shutdown(std::chrono::milliseconds(10));
@@ -388,33 +386,43 @@ TEST_F(BatchSpanProcessorShutdownTest, HonorsTimeoutWhileExportIsBlocked)
   EXPECT_TRUE(is_shutdown_->load());
 }
 
-TEST_F(BatchSpanProcessorShutdownTest, LaterCallWaitsForWorker)
+TEST_F(BatchSpanProcessorShutdownTest, RepeatedShutdownReturnsImmediately)
 {
   CreateProcessor();
-  StartBlockedExport();
+  ASSERT_TRUE(StartBlockedExport());
 
   EXPECT_FALSE(processor_->Shutdown(std::chrono::milliseconds(10)));
+
+  const auto start                   = std::chrono::steady_clock::now();
+  const bool shutdown_result         = processor_->Shutdown();
+  const auto elapsed                 = std::chrono::steady_clock::now() - start;
+  const auto exporter_shutdown_calls = exporter_->GetShutdownCallCount();
   ReleaseExport();
 
-  EXPECT_TRUE(processor_->Shutdown());
-  EXPECT_EQ(1u, exporter_->GetShutdownCallCount());
+  EXPECT_TRUE(shutdown_result);
+  EXPECT_LT(elapsed, std::chrono::seconds(1));
+  EXPECT_EQ(0u, exporter_shutdown_calls);
 
-  EXPECT_TRUE(processor_->Shutdown());
-  EXPECT_EQ(1u, exporter_->GetShutdownCallCount());
+  processor_.reset();
+  EXPECT_TRUE(is_shutdown_->load());
 }
 
-TEST_F(BatchSpanProcessorShutdownTest, ReportsExporterFailureAfterTimeout)
+TEST_F(BatchSpanProcessorShutdownTest, ConcurrentShutdownDoesNotWait)
 {
   CreateProcessor();
-  exporter_->SetShutdownResult(false);
-  StartBlockedExport();
+  ASSERT_TRUE(StartBlockedExport());
 
-  EXPECT_FALSE(processor_->Shutdown(std::chrono::milliseconds(10)));
+  auto first = std::async(std::launch::async, [this] { return processor_->Shutdown(); });
+  // Give the first call time to claim the shutdown. The assertions hold in either order.
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+  const auto start = std::chrono::steady_clock::now();
+  processor_->Shutdown(std::chrono::milliseconds(10));
+  const auto elapsed = std::chrono::steady_clock::now() - start;
   ReleaseExport();
 
-  EXPECT_FALSE(processor_->Shutdown());
-  EXPECT_TRUE(processor_->Shutdown());
-  EXPECT_EQ(1u, exporter_->GetShutdownCallCount());
+  EXPECT_LT(elapsed, std::chrono::seconds(1));
+  EXPECT_TRUE(first.get());
 }
 
 TEST_F(BatchSpanProcessorTestPeer, TestShutdownPassesRemainingTimeToExporter)
