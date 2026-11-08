@@ -129,12 +129,15 @@ public:
           std::shared_ptr<std::atomic<std::size_t>>(new std::atomic<std::size_t>(0)),
       std::shared_ptr<std::atomic<std::size_t>> export_call_count =
           std::shared_ptr<std::atomic<std::size_t>>(new std::atomic<std::size_t>(0)),
-      std::chrono::milliseconds export_delay = std::chrono::milliseconds(0)) noexcept
+      std::chrono::milliseconds export_delay = std::chrono::milliseconds(0),
+      std::shared_ptr<std::atomic<std::size_t>> shutdown_call_count =
+          std::make_shared<std::atomic<std::size_t>>(0)) noexcept
       : batch_sizes_(std::move(batch_sizes)),
         spans_received_count_(std::move(spans_received_count)),
         is_shutdown_(std::move(is_shutdown)),
         force_flush_counter_(std::move(force_flush_counter)),
         export_call_count_(std::move(export_call_count)),
+        shutdown_call_count_(std::move(shutdown_call_count)),
         export_delay_(export_delay)
   {}
 
@@ -178,14 +181,10 @@ public:
 
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
   {
-    ++shutdown_call_count_;
+    ++(*shutdown_call_count_);
     *is_shutdown_ = true;
-    return shutdown_result_.load();
+    return true;
   }
-
-  std::size_t GetShutdownCallCount() const noexcept { return shutdown_call_count_.load(); }
-
-  void SetShutdownResult(bool result) noexcept { shutdown_result_.store(result); }
 
   void SetBlock(bool block)
   {
@@ -205,13 +204,12 @@ private:
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<std::size_t>> force_flush_counter_;
   std::shared_ptr<std::atomic<std::size_t>> export_call_count_;
+  std::shared_ptr<std::atomic<std::size_t>> shutdown_call_count_;
 
   mutable std::mutex mutex_;
   std::condition_variable cv_;
   std::atomic<bool> block_export_{false};
   std::chrono::milliseconds export_delay_;
-  std::atomic<std::size_t> shutdown_call_count_{0};
-  std::atomic<bool> shutdown_result_{true};
 };
 
 /**
@@ -314,7 +312,8 @@ protected:
   void CreateProcessor()
   {
     exporter_ = new BlockingMockSpanExporter(batch_sizes_, spans_received_count_, is_shutdown_,
-                                             force_flush_counter_, export_call_count_);
+                                             force_flush_counter_, export_call_count_,
+                                             std::chrono::milliseconds(0), shutdown_call_count_);
 
     sdk::trace::BatchSpanProcessorOptions options{};
     options.schedule_delay_millis = std::chrono::milliseconds(1);
@@ -361,6 +360,7 @@ protected:
   std::shared_ptr<std::atomic<bool>> is_shutdown_{new std::atomic<bool>(false)};
   std::shared_ptr<std::atomic<std::size_t>> force_flush_counter_{new std::atomic<std::size_t>(0)};
   std::shared_ptr<std::atomic<std::size_t>> export_call_count_{new std::atomic<std::size_t>(0)};
+  std::shared_ptr<std::atomic<std::size_t>> shutdown_call_count_{new std::atomic<std::size_t>(0)};
   BlockingMockSpanExporter *exporter_{nullptr};  // owned by processor_
   std::shared_ptr<sdk::trace::BatchSpanProcessor> processor_;
   std::promise<void> release_;
@@ -375,7 +375,7 @@ TEST_F(BatchSpanProcessorShutdownTest, HonorsTimeoutWhileExportIsBlocked)
   const auto start                   = std::chrono::steady_clock::now();
   const bool shutdown_result         = processor_->Shutdown(std::chrono::milliseconds(10));
   const auto elapsed                 = std::chrono::steady_clock::now() - start;
-  const auto exporter_shutdown_calls = exporter_->GetShutdownCallCount();
+  const auto exporter_shutdown_calls = shutdown_call_count_->load();
   ReleaseExport();
 
   EXPECT_FALSE(shutdown_result);
@@ -383,7 +383,7 @@ TEST_F(BatchSpanProcessorShutdownTest, HonorsTimeoutWhileExportIsBlocked)
   EXPECT_EQ(0u, exporter_shutdown_calls);
 
   processor_.reset();
-  EXPECT_TRUE(is_shutdown_->load());
+  EXPECT_EQ(1u, shutdown_call_count_->load());
 }
 
 TEST_F(BatchSpanProcessorShutdownTest, RepeatedShutdownReturnsImmediately)
@@ -396,7 +396,7 @@ TEST_F(BatchSpanProcessorShutdownTest, RepeatedShutdownReturnsImmediately)
   const auto start                   = std::chrono::steady_clock::now();
   const bool shutdown_result         = processor_->Shutdown();
   const auto elapsed                 = std::chrono::steady_clock::now() - start;
-  const auto exporter_shutdown_calls = exporter_->GetShutdownCallCount();
+  const auto exporter_shutdown_calls = shutdown_call_count_->load();
   ReleaseExport();
 
   EXPECT_TRUE(shutdown_result);
@@ -404,7 +404,7 @@ TEST_F(BatchSpanProcessorShutdownTest, RepeatedShutdownReturnsImmediately)
   EXPECT_EQ(0u, exporter_shutdown_calls);
 
   processor_.reset();
-  EXPECT_TRUE(is_shutdown_->load());
+  EXPECT_EQ(1u, shutdown_call_count_->load());
 }
 
 TEST_F(BatchSpanProcessorShutdownTest, ConcurrentShutdownDoesNotWait)
@@ -423,6 +423,9 @@ TEST_F(BatchSpanProcessorShutdownTest, ConcurrentShutdownDoesNotWait)
 
   EXPECT_LT(elapsed, std::chrono::seconds(1));
   EXPECT_TRUE(first.get());
+
+  processor_.reset();
+  EXPECT_EQ(1u, shutdown_call_count_->load());
 }
 
 TEST_F(BatchSpanProcessorTestPeer, TestShutdownPassesRemainingTimeToExporter)
