@@ -77,6 +77,10 @@ public:
               opentelemetry::common::SystemTimestamp /* observation_time */) noexcept
   {
     std::lock_guard<std::mutex> guard(hashmap_lock_);
+    if (storage_failed_)
+    {
+      return;
+    }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     const bool offer_exemplars =
         ExemplarFilterEnabled(exemplar_filter_type_, opentelemetry::context::Context{});
@@ -134,17 +138,35 @@ public:
     std::shared_ptr<AttributesHashMap> delta_metrics = nullptr;
     {
       std::lock_guard<std::mutex> guard(hashmap_lock_);
-      if (is_monotonic_sum_)
+      if (storage_failed_)
       {
-        BuildMonotonicDeltaFromRound(collector);
+        return false;
       }
-      else
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+      try
       {
-        BuildDeltaFromRound(collector);
+#endif
+        if (is_monotonic_sum_)
+        {
+          BuildMonotonicDeltaFromRound(collector);
+        }
+        else
+        {
+          BuildDeltaFromRound(collector);
+        }
+        delta_metrics = std::move(delta_hash_map_);
+        delta_hash_map_ =
+            std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
       }
-      delta_metrics = std::move(delta_hash_map_);
-      delta_hash_map_ =
-          std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
+      catch (...)
+      {
+        monotonic_round_observations_.clear();
+        monotonic_round_attribute_order_.clear();
+        storage_failed_ = true;
+        return false;
+      }
+#endif
     }
 
     auto status =
@@ -190,7 +212,7 @@ private:
    * monotonic sums. An attribute set missing from this round keeps its baseline and contributes
    * no delta; suppressing the stale output is the temporal storage's job.
    */
-  void BuildMonotonicDeltaFromRound(CollectorHandle *collector) noexcept
+  void BuildMonotonicDeltaFromRound(CollectorHandle *collector)
   {
     auto &last_observed = last_observed_monotonic_hash_maps_[collector];
     for (const auto &attributes : monotonic_round_attribute_order_)
@@ -201,34 +223,29 @@ private:
         continue;
       }
 
-      std::unique_ptr<Aggregation> delta;
       auto previous = last_observed.find(attributes);
       if (previous != last_observed.end())
       {
-        delta            = previous->second->Diff(*observed->second);
-        previous->second = DefaultAggregation::CloneAggregation(
-            aggregation_type_, instrument_descriptor_, *observed->second);
+        auto delta = previous->second->Diff(*observed->second);
+        AccumulateDelta(FilterAttributes(attributes), *delta);
+        previous->second = std::move(observed->second);
       }
       else
       {
-        delta = DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_,
-                                                     *observed->second);
+        AccumulateDelta(FilterAttributes(attributes), *observed->second);
         // Keep only first-observed baselines up to this reader's cardinality limit.
         if (last_observed.size() < aggregation_config_->cardinality_limit_)
         {
-          last_observed.emplace(attributes,
-                                DefaultAggregation::CloneAggregation(
-                                    aggregation_type_, instrument_descriptor_, *observed->second));
+          last_observed.emplace(attributes, std::move(observed->second));
         }
       }
-      AccumulateDelta(FilterAttributes(attributes), *delta);
     }
 
     monotonic_round_observations_.clear();
     monotonic_round_attribute_order_.clear();
   }
 
-  void BuildDeltaFromRound(CollectorHandle *collector) noexcept
+  void BuildDeltaFromRound(CollectorHandle *collector)
   {
     auto &last_observed = last_observed_hash_maps_[collector];
     if (!last_observed)
@@ -316,18 +333,19 @@ private:
   const AggregationConfig *aggregation_config_;
   std::shared_ptr<const AttributesProcessor> attributes_processor_;
   bool is_monotonic_sum_;
+  bool storage_failed_ = false;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
 
   std::unordered_map<CollectorHandle *, std::unique_ptr<AttributesHashMap>>
       last_observed_hash_maps_;
   // Source baselines are reader-specific and must remain distinct beyond the output cardinality
   // limit to calculate future per-attribute deltas.
-  std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, AttributeHashGenerator>
+  std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, MetricAttributesHash>
       monotonic_round_observations_;
   std::vector<MetricAttributes> monotonic_round_attribute_order_;
   std::unordered_map<
       CollectorHandle *,
-      std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, AttributeHashGenerator>>
+      std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, MetricAttributesHash>>
       last_observed_monotonic_hash_maps_;
 #ifdef UNIT_TESTING
   friend class AsyncMetricStorageTestPeer;

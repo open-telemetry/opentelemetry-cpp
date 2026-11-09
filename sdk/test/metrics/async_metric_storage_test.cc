@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -84,6 +85,43 @@ class WritableMetricStorageTestObservableGaugeFixture
 class AsyncMetricStorageStaleAttributeFixture
     : public ::testing::TestWithParam<AggregationTemporality>
 {};
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+TEST(AsyncMetricStorageException, CallbackFailureDisablesTemporalStorage)
+{
+  InstrumentDescriptor instrument = {"counter", "", "", InstrumentType::kObservableCounter,
+                                     InstrumentValueType::kLong};
+  const auto start_ts             = std::chrono::system_clock::now();
+  auto collector = std::make_shared<MockCollectorHandle>(AggregationTemporality::kDelta);
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  AsyncMetricStorage storage(
+      instrument, AggregationType::kSum, std::make_shared<DefaultAttributesProcessor>(),
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      nullptr);
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements = {
+      {{{"request", "get"}}, 10}};
+  storage.RecordLong(measurements, SystemTimestamp(start_ts));
+
+  size_t callback_count = 0;
+  EXPECT_FALSE(storage.Collect(collector.get(), collectors, start_ts,
+                               start_ts + std::chrono::seconds(1),
+                               [&callback_count](const MetricData &) -> bool {
+                                 ++callback_count;
+                                 throw std::runtime_error("injected export failure");
+                               }));
+
+  storage.RecordLong(measurements, SystemTimestamp(start_ts + std::chrono::seconds(1)));
+  EXPECT_FALSE(storage.Collect(collector.get(), collectors, start_ts,
+                               start_ts + std::chrono::seconds(2),
+                               [&callback_count](const MetricData &) {
+                                 ++callback_count;
+                                 return true;
+                               }));
+  EXPECT_EQ(callback_count, 1U);
+}
+#endif
 
 TEST_P(AsyncWritableMetricStorageTestFixture, TestAggregation)
 {

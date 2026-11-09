@@ -46,6 +46,34 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
                                          nostd::function_ref<bool(MetricData)> callback) noexcept
 {
   std::lock_guard<std::mutex> guard(lock_);
+  if (failed_)
+  {
+    return false;
+  }
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    return buildMetricsLocked(collector, collectors, sdk_start_ts, collection_ts, delta_metrics,
+                              callback);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (...)
+  {
+    failed_ = true;
+    return false;
+  }
+#endif
+}
+
+bool TemporalMetricStorage::buildMetricsLocked(
+    CollectorHandle *collector,
+    nostd::span<std::shared_ptr<CollectorHandle>> collectors,
+    opentelemetry::common::SystemTimestamp sdk_start_ts,
+    opentelemetry::common::SystemTimestamp collection_ts,
+    const std::shared_ptr<AttributesHashMap> &delta_metrics,
+    nostd::function_ref<bool(MetricData)> callback)
+{
   AggregationTemporality aggregation_temporarily =
       collector->GetAggregationTemporality(instrument_descriptor_.type_);
   const bool is_async =
