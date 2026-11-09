@@ -6,7 +6,6 @@
 #include <utility>
 
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_status.h"
