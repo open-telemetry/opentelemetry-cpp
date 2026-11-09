@@ -428,6 +428,26 @@ TEST_F(BatchSpanProcessorShutdownTest, ConcurrentShutdownDoesNotWait)
   EXPECT_EQ(1u, shutdown_call_count_->load());
 }
 
+TEST_F(BatchSpanProcessorShutdownTest, DestructorWaitsForConcurrentShutdown)
+{
+  CreateProcessor();
+  ASSERT_TRUE(StartBlockedExport());
+
+  auto *processor = processor_.get();
+  auto first      = std::async(std::launch::async, [processor] { return processor->Shutdown(); });
+  // Give the first call time to claim the shutdown. The assertions hold in either order.
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  processor_->Shutdown(std::chrono::milliseconds(10));
+
+  std::thread destroy([this] { processor_.reset(); });
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  ReleaseExport();
+  destroy.join();
+
+  EXPECT_TRUE(first.get());
+  EXPECT_EQ(1u, shutdown_call_count_->load());
+}
+
 TEST_F(BatchSpanProcessorTestPeer, TestShutdownPassesRemainingTimeToExporter)
 {
   std::shared_ptr<std::atomic<std::size_t>> shut_down_counter(new std::atomic<std::size_t>(0));

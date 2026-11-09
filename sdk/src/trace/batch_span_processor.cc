@@ -410,7 +410,9 @@ BatchSpanProcessor::~BatchSpanProcessor()
   {
     InternalShutdown();
   }
-  // A Shutdown() that timed out left the worker running and the exporter up.
+  // Waits for a Shutdown() still running on another thread. A Shutdown() that timed out left the
+  // worker running and the exporter up.
+  std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};
   if (worker_thread_.joinable())
   {
     worker_thread_.join();
@@ -428,6 +430,7 @@ bool BatchSpanProcessor::InternalShutdown(std::chrono::microseconds timeout) noe
   {
     return true;
   }
+  std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};
 
   if (worker_thread_.joinable())
   {
