@@ -51,6 +51,10 @@ Increment the:
   schedule delay.
   [#4741](https://github.com/open-telemetry/opentelemetry-cpp/pull/4741)
 
+* [SDK] Clamp `BatchLogRecordProcessor` max_export_batch_size to non-zero
+  max_queue_size, with a warning, matching `BatchSpanProcessor`.
+  [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
