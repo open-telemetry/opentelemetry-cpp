@@ -22,6 +22,10 @@ Increment the:
   supplied context on its way to the processor.
   [#4421](https://github.com/open-telemetry/opentelemetry-cpp/pull/4421)
 
+* [SDK] Skip completely empty span links (invalid span context, no attributes
+  and no trace state), so they no longer count against `link_count_limit`
+  [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)
+
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
   Drop aggregation
@@ -53,6 +57,10 @@ Increment the:
   fills the queue, which could stall the export and drop spans until the
   schedule delay.
   [#4741](https://github.com/open-telemetry/opentelemetry-cpp/pull/4741)
+
+* [SDK] Clamp `BatchLogRecordProcessor` max_export_batch_size to non-zero
+  max_queue_size, with a warning, matching `BatchSpanProcessor`.
+  [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
 Breaking changes:
 
