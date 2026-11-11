@@ -15,7 +15,6 @@
 #include "opentracing/util.h"
 
 #include "opentelemetry/baggage/baggage.h"
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/opentracingshim/propagation.h"
@@ -23,7 +22,6 @@
 #include "shim_mocks.h"
 
 namespace baggage = opentelemetry::baggage;
-namespace common  = opentelemetry::common;
 namespace nostd   = opentelemetry::nostd;
 namespace shim    = opentelemetry::opentracingshim;
 

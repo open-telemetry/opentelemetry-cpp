@@ -47,6 +47,21 @@ public:
 
 static BaggagePropagator format;
 
+TEST(BaggagePropagatorTest, DoesNotPropagateHeaderInjection)
+{
+  for (const auto *payload : {"bad=value;a\r\nX-Injected: 1",
+                              "bad=value;a\r\n\r\nGET /smuggled HTTP/1.1\r\nHost: localhost"})
+  {
+    BaggageCarrierTest inbound;
+    inbound.Set("baggage", std::string(payload) + ",good=ok;flag");
+    context::Context base;
+    auto extracted = format.Extract(inbound, base);
+    BaggageCarrierTest outbound;
+    format.Inject(outbound, extracted);
+    EXPECT_EQ(outbound.Get("baggage"), "good=ok;flag");
+  }
+}
+
 TEST(BaggagePropagatorTest, ExtractNoBaggageHeader)
 {
   BaggageCarrierTest carrier;

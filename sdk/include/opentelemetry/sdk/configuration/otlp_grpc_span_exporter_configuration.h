@@ -25,6 +25,8 @@ class OtlpGrpcSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
   static constexpr std::size_t kDefaultTimeoutMs = 10000;
+  static constexpr std::size_t kMaxRequestSize   = 64 * 1024 * 1024;  // 64 MiB
+  static constexpr std::size_t kMaxResponseSize  = 4 * 1024 * 1024;   // 4 MiB
 
   void Accept(SpanExporterConfigurationVisitor *visitor) const override
   {
@@ -36,6 +38,8 @@ public:
   std::unique_ptr<HeadersConfiguration> headers;
   std::string headers_list;
   std::string compression;
+  std::size_t max_request_size{kMaxRequestSize};
+  std::size_t max_response_size{kMaxResponseSize};
   std::size_t timeout{kDefaultTimeoutMs};
 };
 

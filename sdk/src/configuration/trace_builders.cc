@@ -16,6 +16,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/always_record_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
@@ -107,6 +108,20 @@ public:
       const AlwaysOffSamplerConfiguration * /* model */) const override
   {
     return opentelemetry::sdk::trace::AlwaysOffSamplerFactory::Create();
+  }
+};
+
+class DefaultAlwaysRecordSamplerBuilder : public AlwaysRecordSamplerBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
+      const AlwaysRecordSamplerConfiguration * /* model */) const override
+  {
+    static const std::string die("AlwaysRecordSampler not supported");
+    throw UnsupportedException(die);
+
+    // FIXME: Implement AlwaysRecordSampler in SDK
+    // return opentelemetry::sdk::trace::AlwaysRecordSamplerFactory::Create();
   }
 };
 
@@ -438,6 +453,7 @@ private:
 
     opentelemetry::sdk::trace::SpanLimits span_limits;
     OptionalValue<std::size_t> model_attribute_value_length_limit;
+    OptionalValue<std::size_t> model_attribute_value_depth_limit;
     OptionalValue<std::uint32_t> model_attribute_count_limit;
     OptionalValue<std::uint32_t> model_event_count_limit;
     OptionalValue<std::uint32_t> model_link_count_limit;
@@ -446,6 +462,7 @@ private:
     if (model->limits)
     {
       model_attribute_value_length_limit = model->limits->attribute_value_length_limit;
+      model_attribute_value_depth_limit  = model->limits->attribute_value_depth_limit;
       model_attribute_count_limit        = model->limits->attribute_count_limit;
       model_event_count_limit            = model->limits->event_count_limit;
       model_link_count_limit             = model->limits->link_count_limit;
@@ -454,16 +471,21 @@ private:
     }
 
     OptionalValue<std::size_t> general_attribute_value_length_limit;
+    OptionalValue<std::size_t> general_attribute_value_depth_limit;
     OptionalValue<std::size_t> general_attribute_count_limit;
     if (context.attribute_limits)
     {
       general_attribute_value_length_limit = context.attribute_limits->attribute_value_length_limit;
+      general_attribute_value_depth_limit  = context.attribute_limits->attribute_value_depth_limit;
       general_attribute_count_limit        = context.attribute_limits->attribute_count_limit;
     }
 
     using SpanLimitDefaults = SpanLimitsConfiguration;
     span_limits.attribute_value_length_limit =
         ResolveLimit(model_attribute_value_length_limit, general_attribute_value_length_limit,
+                     SpanLimitDefaults::kDefaultAttributeValueLengthLimit);
+    span_limits.attribute_value_depth_limit =
+        ResolveLimit(model_attribute_value_depth_limit, general_attribute_value_depth_limit,
                      SpanLimitDefaults::kDefaultAttributeValueLengthLimit);
     span_limits.attribute_count_limit =
         ResolveLimit(model_attribute_count_limit, ToOptionalUint32(general_attribute_count_limit),
@@ -527,6 +549,7 @@ void RegisterDefaultTraceBuilders(Registry *registry)
 {
   registry->SetAlwaysOnSamplerBuilder(std::make_unique<DefaultAlwaysOnSamplerBuilder>());
   registry->SetAlwaysOffSamplerBuilder(std::make_unique<DefaultAlwaysOffSamplerBuilder>());
+  registry->SetAlwaysRecordSamplerBuilder(std::make_unique<DefaultAlwaysRecordSamplerBuilder>());
   registry->SetTraceIdRatioBasedSamplerBuilder(
       std::make_unique<DefaultTraceIdRatioBasedSamplerBuilder>());
   registry->SetProbabilitySamplerBuilder(std::make_unique<DefaultProbabilitySamplerBuilder>());

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/version.h"
 
 #include <cstddef>
@@ -280,80 +281,77 @@ struct UUID
   /// <returns>This UUID object in a string.</returns>
   std::string to_string() const
   {
-    static char inttoHex[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
-                                '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
     const unsigned buffSize = 36 + 1;  // 36 + null-terminator
     char buf[buffSize]      = {0};
 
     int test = (Data1 >> 28 & 0x0000000F);
-    buf[0]   = inttoHex[test];
+    buf[0]   = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data1 >> 24 & 0x0000000F);
-    buf[1]   = inttoHex[test];
+    buf[1]   = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data1 >> 20 & 0x0000000F);
-    buf[2]   = inttoHex[test];
+    buf[2]   = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data1 >> 16 & 0x0000000F);
-    buf[3]   = inttoHex[test];
+    buf[3]   = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data1 >> 12 & 0x0000000F);
-    buf[4]   = inttoHex[test];
+    buf[4]   = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data1 >> 8 & 0x0000000F);
-    buf[5]   = inttoHex[test];
+    buf[5]   = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data1 >> 4 & 0x0000000F);
-    buf[6]   = inttoHex[test];
+    buf[6]   = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data1 & 0x0000000F);
-    buf[7]   = inttoHex[test];
+    buf[7]   = opentelemetry::common::detail::UpperHexDigit(test);
     buf[8]   = '-';
     test     = (int)(Data2 >> 12 & 0x000F);
-    buf[9]   = inttoHex[test];
+    buf[9]   = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data2 >> 8 & 0x000F);
-    buf[10]  = inttoHex[test];
+    buf[10]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data2 >> 4 & 0x000F);
-    buf[11]  = inttoHex[test];
+    buf[11]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data2 & 0x000F);
-    buf[12]  = inttoHex[test];
+    buf[12]  = opentelemetry::common::detail::UpperHexDigit(test);
     buf[13]  = '-';
     test     = (int)(Data3 >> 12 & 0x000F);
-    buf[14]  = inttoHex[test];
+    buf[14]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data3 >> 8 & 0x000F);
-    buf[15]  = inttoHex[test];
+    buf[15]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data3 >> 4 & 0x000F);
-    buf[16]  = inttoHex[test];
+    buf[16]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data3 & 0x000F);
-    buf[17]  = inttoHex[test];
+    buf[17]  = opentelemetry::common::detail::UpperHexDigit(test);
     buf[18]  = '-';
     test     = (int)(Data4[0] >> 4 & 0x0F);
-    buf[19]  = inttoHex[test];
+    buf[19]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[0] & 0x0F);
-    buf[20]  = inttoHex[test];
+    buf[20]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[1] >> 4 & 0x0F);
-    buf[21]  = inttoHex[test];
+    buf[21]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[1] & 0x0F);
-    buf[22]  = inttoHex[test];
+    buf[22]  = opentelemetry::common::detail::UpperHexDigit(test);
     buf[23]  = '-';
     test     = (int)(Data4[2] >> 4 & 0x0F);
-    buf[24]  = inttoHex[test];
+    buf[24]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[2] & 0x0F);
-    buf[25]  = inttoHex[test];
+    buf[25]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[3] >> 4 & 0x0F);
-    buf[26]  = inttoHex[test];
+    buf[26]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[3] & 0x0F);
-    buf[27]  = inttoHex[test];
+    buf[27]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[4] >> 4 & 0x0F);
-    buf[28]  = inttoHex[test];
+    buf[28]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[4] & 0x0F);
-    buf[29]  = inttoHex[test];
+    buf[29]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[5] >> 4 & 0x0F);
-    buf[30]  = inttoHex[test];
+    buf[30]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[5] & 0x0F);
-    buf[31]  = inttoHex[test];
+    buf[31]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[6] >> 4 & 0x0F);
-    buf[32]  = inttoHex[test];
+    buf[32]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[6] & 0x0F);
-    buf[33]  = inttoHex[test];
+    buf[33]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[7] >> 4 & 0x0F);
-    buf[34]  = inttoHex[test];
+    buf[34]  = opentelemetry::common::detail::UpperHexDigit(test);
     test     = (int)(Data4[7] & 0x0F);
-    buf[35]  = inttoHex[test];
+    buf[35]  = opentelemetry::common::detail::UpperHexDigit(test);
     buf[36]  = 0;
 
     return std::string(buf);

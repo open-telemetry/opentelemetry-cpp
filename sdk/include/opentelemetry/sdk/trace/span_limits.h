@@ -28,12 +28,16 @@ struct SpanLimits
   static constexpr std::uint32_t kDefaultLinkAttributeCountLimit  = 128;
   static constexpr std::size_t kDefaultAttributeValueLengthLimit =
       (std::numeric_limits<std::size_t>::max)();
+  static constexpr std::size_t kDefaultAttributeValueDepthLimit = 64;
 
   /// Maximum number of attributes per span.
   std::uint32_t attribute_count_limit{kDefaultAttributeCountLimit};
 
   /// Maximum allowed attribute value length (applies to string values and byte arrays)
   std::size_t attribute_value_length_limit{kDefaultAttributeValueLengthLimit};
+
+  /// Maximum allowed attribute depth length
+  std::size_t attribute_value_depth_limit{kDefaultAttributeValueDepthLimit};
 
   /// Maximum number of events per span.
   std::uint32_t event_count_limit{kDefaultEventCountLimit};
@@ -55,6 +59,7 @@ struct SpanLimits
     SpanLimits limits;
     limits.attribute_count_limit        = (std::numeric_limits<std::uint32_t>::max)();
     limits.attribute_value_length_limit = (std::numeric_limits<std::size_t>::max)();
+    limits.attribute_value_depth_limit  = (std::numeric_limits<std::size_t>::max)();
     limits.event_count_limit            = (std::numeric_limits<std::uint32_t>::max)();
     limits.link_count_limit             = (std::numeric_limits<std::uint32_t>::max)();
     limits.event_attribute_count_limit  = (std::numeric_limits<std::uint32_t>::max)();
