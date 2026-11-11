@@ -30,7 +30,7 @@
 #include "nlohmann/json.hpp"
 
 #ifndef _WIN32
-#  include <sys/resource.h>
+#  include <sys/resource.h>  // IWYU pragma: keep
 #endif
 
 namespace
