@@ -418,7 +418,7 @@ TEST(ElasticsearchLogsExporterTests, ShutdownDoesNotSpinWhenResponseTimeoutIsZer
   parked.reset();
 }
 
-#ifndef _WIN32
+#  ifndef _WIN32
 // Regression test: the fix above only covers a finite caller timeout. Shutdown()/ForceFlush()
 // default to microseconds::max(), so timeout_steady is itself steady_clock::duration::max()
 // when the caller doesn't pass one; with response_timeout_ <= 0, configured used to fall back
@@ -447,13 +447,11 @@ TEST(ElasticsearchLogsExporterTests, ShutdownDoesNotSpinWhenResponseTimeoutIsZer
   std::thread shutdown_thread([&exporter]() { exporter->Shutdown(); });
 
   struct rusage before
-  {
-  };
+  {};
   getrusage(RUSAGE_SELF, &before);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   struct rusage after
-  {
-  };
+  {};
   getrusage(RUSAGE_SELF, &after);
 
   auto cpu_used_us = [](const struct rusage &r) {
@@ -472,8 +470,8 @@ TEST(ElasticsearchLogsExporterTests, ShutdownDoesNotSpinWhenResponseTimeoutIsZer
   handler->OnResponse(response);
   shutdown_thread.join();
 }
-#endif  // !_WIN32
-#endif  // ENABLE_ASYNC_EXPORT
+#  endif  // !_WIN32
+#endif    // ENABLE_ASYNC_EXPORT
 
 // Regression test: once Shutdown() has been called, any later Export() must fail rather than
 // silently trying to register a session against an exporter that is already tearing down.
