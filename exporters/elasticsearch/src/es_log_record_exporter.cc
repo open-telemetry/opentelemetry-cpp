@@ -564,12 +564,16 @@ bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeou
     // longer than the timeout it was given whenever nothing ever notifies this condition
     // variable (e.g. an export that never completes). A non-positive response_timeout_ means
     // "no timeout" (see SetTimeoutMs()/CURLOPT_TIMEOUT_MS), not zero, so it must not be allowed
-    // to collapse the wait into a spin; fall back to whatever is left of the caller's deadline.
+    // to collapse the wait into a spin; fall back to a finite slice instead of timeout_steady,
+    // which is itself duration::max() when the caller's own timeout is unbounded too (the
+    // default for ForceFlush()/Shutdown()) -- wait_for() on that overflows the same way
+    // wait_until() did on a time_point::max() deadline, turning the wait back into a spin.
     const std::chrono::steady_clock::duration configured =
         options_.response_timeout_ > 0
             ? std::chrono::duration_cast<std::chrono::steady_clock::duration>(
                   std::chrono::seconds{options_.response_timeout_})
-            : timeout_steady;
+            : std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+                  std::chrono::seconds{1});
     const std::chrono::steady_clock::duration wait_interval =
         (std::min)(configured, timeout_steady);
 

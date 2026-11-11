@@ -29,6 +29,10 @@
 #include <vector>
 #include "nlohmann/json.hpp"
 
+#ifndef _WIN32
+#  include <sys/resource.h>
+#endif
+
 namespace
 {
 namespace http_client = opentelemetry::ext::http::client;
@@ -413,6 +417,62 @@ TEST(ElasticsearchLogsExporterTests, ShutdownDoesNotSpinWhenResponseTimeoutIsZer
   // Let the export finish now that the assertions are done.
   parked.reset();
 }
+
+#ifndef _WIN32
+// Regression test: the fix above only covers a finite caller timeout. Shutdown()/ForceFlush()
+// default to microseconds::max(), so timeout_steady is itself steady_clock::duration::max()
+// when the caller doesn't pass one; with response_timeout_ <= 0, configured used to fall back
+// to that same duration::max(), and wait_for() on it overflows the same way wait_until() did on
+// a time_point::max() deadline, turning the wait back into a spin. A finite fallback slice
+// fixes it. Elapsed wall-clock time can't tell a blocking wait from a spin here (both take the
+// same real time), so this measures CPU time via getrusage() instead, as suggested in review.
+TEST(ElasticsearchLogsExporterTests, ShutdownDoesNotSpinWhenResponseTimeoutIsZeroAndNoTimeoutGiven)
+{
+  // Declared first so it outlives the client and the session that point at it.
+  std::shared_ptr<http_client::EventHandler> parked;
+  logs_exporter::ElasticsearchExporterOptions options;
+  options.response_timeout_ = 0;
+  auto http_client          = std::make_shared<HoldingHttpClient>(&parked);
+  auto exporter             = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  auto record = exporter->MakeRecordable();
+  record->SetBody("this export never completes");
+  auto export_result =
+      exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+  ASSERT_EQ(export_result, opentelemetry::sdk::common::ExportResult::kSuccess);
+
+  // Shutdown() with no argument defaults to microseconds::max(), so this thread blocks until
+  // the parked session below is answered.
+  std::thread shutdown_thread([&exporter]() { exporter->Shutdown(); });
+
+  struct rusage before
+  {
+  };
+  getrusage(RUSAGE_SELF, &before);
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  struct rusage after
+  {
+  };
+  getrusage(RUSAGE_SELF, &after);
+
+  auto cpu_used_us = [](const struct rusage &r) {
+    return static_cast<int64_t>(r.ru_utime.tv_sec) * 1000000 + r.ru_utime.tv_usec +
+           static_cast<int64_t>(r.ru_stime.tv_sec) * 1000000 + r.ru_stime.tv_usec;
+  };
+  // A blocking wait uses a negligible slice of the 200ms window; a spin burns most of it.
+  EXPECT_LT(cpu_used_us(after) - cpu_used_us(before), 100000);
+
+  // Answer the parked session so Shutdown() returns and the thread can be joined before
+  // exporter is destroyed; a detached thread would otherwise keep running against a
+  // soon-to-be-dangling exporter.
+  FakeResponse response;
+  auto handler = parked;
+  parked.reset();
+  handler->OnResponse(response);
+  shutdown_thread.join();
+}
+#endif  // !_WIN32
 #endif  // ENABLE_ASYNC_EXPORT
 
 // Regression test: once Shutdown() has been called, any later Export() must fail rather than
