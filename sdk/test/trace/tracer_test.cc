@@ -1015,6 +1015,66 @@ TEST(Tracer, SpanSetLinks)
   }
 }
 
+TEST(Tracer, SpanSkipsEmptyLinks)
+{
+  SpanLimits limits;
+  limits.link_count_limit = 1;
+
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(
+      std::unique_ptr<SpanExporter>{exporter}, new AlwaysOnSampler(), new RandomIdGenerator,
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default()).Build(),
+      InstrumentationScope::Create(""), limits);
+
+  constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
+  constexpr uint8_t span_id_buf[]  = {1, 2, 3, 4, 5, 6, 7, 8};
+  const SpanContext valid_context{trace_api::TraceId{trace_id_buf}, trace_api::SpanId{span_id_buf},
+                                  trace_api::TraceFlags{}, false};
+
+  {
+    // An empty link does not use up the link limit.
+    tracer->StartSpan("span", {}, {{SpanContext(false, false), {}}, {valid_context, {}}})->End();
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &links = spans.at(0)->GetLinks();
+    ASSERT_EQ(1, links.size());
+    EXPECT_EQ(valid_context, links.at(0).GetSpanContext());
+    EXPECT_EQ(0, spans.at(0)->GetDroppedLinksCount());
+  }
+
+  {
+    // An invalid context with attributes or a trace state is still recorded.
+    const SpanContext trace_state_context{trace_api::TraceId{}, trace_api::SpanId{},
+                                          trace_api::TraceFlags{}, false,
+                                          trace_api::TraceState::FromHeader("k=v")};
+    tracer->StartSpan("span", {}, {{trace_state_context, {}}})->End();
+    tracer->StartSpan("span", {}, {{SpanContext(false, false), {{"attr", 1}}}})->End();
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(2, spans.size());
+    EXPECT_EQ(1, spans.at(0)->GetLinks().size());
+    EXPECT_EQ(1, spans.at(1)->GetLinks().size());
+  }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  {
+    auto span = tracer->StartSpan("span");
+    span->AddLink(SpanContext(false, false), {});
+    span->AddLinks({{SpanContext(false, false), {}}});
+    span->AddLink(valid_context, {});
+    span->End();
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &links = spans.at(0)->GetLinks();
+    ASSERT_EQ(1, links.size());
+    EXPECT_EQ(valid_context, links.at(0).GetSpanContext());
+    EXPECT_EQ(0, spans.at(0)->GetDroppedLinksCount());
+  }
+#endif
+}
+
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(Tracer, SpanAddLinkAbiv2)
 {
