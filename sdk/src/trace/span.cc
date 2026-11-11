@@ -12,6 +12,7 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
 #include "src/trace/span.h"
 
@@ -50,6 +51,16 @@ SteadyTimestamp NowOr(const SteadyTimestamp &steady)
     return steady;
   }
 }
+
+// A link without a valid context, attributes or trace state carries no information.
+// https://opentelemetry.io/docs/specs/otel/trace/api/#link
+bool IsEmptyLink(const opentelemetry::trace::SpanContext &span_context,
+                 const common::KeyValueIterable &attributes) noexcept
+{
+  const auto &trace_state = span_context.trace_state();
+  return !span_context.IsValid() && attributes.size() == 0 &&
+         (!trace_state || trace_state->Empty());
+}
 }  // namespace
 
 Span::Span(std::shared_ptr<Tracer> &&tracer,
@@ -85,7 +96,10 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
 
   links.ForEachKeyValue([&](const opentelemetry::trace::SpanContext &span_context,
                             const common::KeyValueIterable &attributes) {
-    recordable_->AddLink(span_context, attributes);
+    if (!IsEmptyLink(span_context, attributes))
+    {
+      recordable_->AddLink(span_context, attributes);
+    }
     return true;
   });
 
@@ -176,7 +190,10 @@ void Span::AddLink(const opentelemetry::trace::SpanContext &target,
     return;
   }
 
-  recordable_->AddLink(target, attrs);
+  if (!IsEmptyLink(target, attrs))
+  {
+    recordable_->AddLink(target, attrs);
+  }
 }
 
 void Span::AddLinks(const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept
@@ -189,7 +206,10 @@ void Span::AddLinks(const opentelemetry::trace::SpanContextKeyValueIterable &lin
 
   links.ForEachKeyValue([&](const opentelemetry::trace::SpanContext &span_context,
                             const common::KeyValueIterable &attributes) {
-    recordable_->AddLink(span_context, attributes);
+    if (!IsEmptyLink(span_context, attributes))
+    {
+      recordable_->AddLink(span_context, attributes);
+    }
     return true;
   });
 }
