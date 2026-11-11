@@ -514,9 +514,11 @@ above and below the transport produce symptoms of the same shape. None of the
 options here fixes any of them, and one of them decides whether the measurement
 below means anything.
 
-**Processor batching, #4449 for spans with #4466 open against it, and #4498 for
-logs.** The request geometry the transport sees is chosen upstream of it. #4498
-reports, at `max_queue_size = 8192`, `max_export_batch_size = 2048` and
+**Processor batching, closed since this was written.** #4449 and #4466 closed on
+17 October 2026 and #4498 closed on 30 October, so the request geometry the
+transport sees is no longer waiting on any of them, and a benchmark can be run
+against the batching `main` has today. #4498 reported, at
+`max_queue_size = 8192`, `max_export_batch_size = 2048` and
 `schedule_delay_millis = 5000`, that 50,000 log records produced 2,332 export
 calls, of which one held 2,048 records or more and 2,331 held fewer than 100. A
 transport cannot change the size of the batches it is handed, so a benchmark run
