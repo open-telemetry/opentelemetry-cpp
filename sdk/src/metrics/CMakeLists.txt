@@ -58,8 +58,11 @@ if(OTELCPP_INSTALL)
     list(APPEND _metrics_pc_extra_libs ${OPENTELEMETRY_ATOMIC_LIB})
   endif()
   opentelemetry_add_pkgconfig(
-    metrics "OpenTelemetry SDK - Metrics"
+    metrics
+    "OpenTelemetry SDK - Metrics"
     "Components for exporting metrics in the OpenTelemetry SDK."
-    "opentelemetry_resources" "opentelemetry_instrumentation_scope"
-    EXTRA_LIBS ${_metrics_pc_extra_libs})
+    "opentelemetry_resources"
+    "opentelemetry_instrumentation_scope"
+    EXTRA_LIBS
+    ${_metrics_pc_extra_libs})
 endif()

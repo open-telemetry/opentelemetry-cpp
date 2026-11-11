@@ -43,8 +43,11 @@ if(OTELCPP_INSTALL)
     list(APPEND _logs_pc_extra_libs ${OPENTELEMETRY_ATOMIC_LIB})
   endif()
   opentelemetry_add_pkgconfig(
-    logs "OpenTelemetry SDK - Logs"
+    logs
+    "OpenTelemetry SDK - Logs"
     "Components for exporting logs in the OpenTelemetry SDK."
-    "opentelemetry_resources" "opentelemetry_instrumentation_scope"
-    EXTRA_LIBS ${_logs_pc_extra_libs})
+    "opentelemetry_resources"
+    "opentelemetry_instrumentation_scope"
+    EXTRA_LIBS
+    ${_logs_pc_extra_libs})
 endif()

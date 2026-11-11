@@ -55,8 +55,11 @@ if(OTELCPP_INSTALL)
     list(APPEND _trace_pc_extra_libs ${OPENTELEMETRY_ATOMIC_LIB})
   endif()
   opentelemetry_add_pkgconfig(
-    trace "OpenTelemetry SDK - Trace"
+    trace
+    "OpenTelemetry SDK - Trace"
     "Components for exporting traces in the OpenTelemetry SDK."
-    "opentelemetry_resources" "opentelemetry_instrumentation_scope"
-    EXTRA_LIBS ${_trace_pc_extra_libs})
+    "opentelemetry_resources"
+    "opentelemetry_instrumentation_scope"
+    EXTRA_LIBS
+    ${_trace_pc_extra_libs})
 endif()

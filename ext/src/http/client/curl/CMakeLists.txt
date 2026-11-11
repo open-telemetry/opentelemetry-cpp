@@ -49,8 +49,10 @@ if(OTELCPP_INSTALL)
     list(APPEND _http_client_curl_pc_extra_libs ${OPENTELEMETRY_ATOMIC_LIB})
   endif()
   opentelemetry_add_pkgconfig(
-    http_client_curl "OpenTelemetry Extension - HTTP Client CURL"
+    http_client_curl
+    "OpenTelemetry Extension - HTTP Client CURL"
     "CURL-based HTTP client used by OTLP HTTP, Zipkin, and Elasticsearch."
     "${_http_client_curl_pc_requires}"
-    EXTRA_LIBS ${_http_client_curl_pc_extra_libs})
+    EXTRA_LIBS
+    ${_http_client_curl_pc_extra_libs})
 endif()
