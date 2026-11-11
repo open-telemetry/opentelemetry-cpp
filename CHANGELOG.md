@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Catch matcher exceptions during runtime meter, tracer, and logger
+  configurator updates. Preserve the affected instance's previous configuration
+  and continue updating other instances, logging failures after releasing provider
+  locks
+  [#4775](https://github.com/open-telemetry/opentelemetry-cpp/issues/4775)
+
 * [SDK] Skip completely empty span links (invalid span context, no attributes
   and no trace state), so they no longer count against `link_count_limit`
   [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)
