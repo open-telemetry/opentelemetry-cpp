@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <ostream>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -18,6 +19,7 @@
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h"
@@ -37,6 +39,24 @@ namespace sdk
 {
 namespace logs
 {
+namespace
+{
+
+size_t ClampMaxExportBatchSize(size_t max_export_batch_size, size_t max_queue_size)
+{
+  // Clamping to a queue of 0 would give a batch of 0, which makes the worker spin.
+  if (max_queue_size > 0 && max_export_batch_size > max_queue_size)
+  {
+    OTEL_INTERNAL_LOG_WARN("[BatchLogRecordProcessor] max_export_batch_size ("
+                           << max_export_batch_size << ") is larger than max_queue_size ("
+                           << max_queue_size << "), using " << max_queue_size << ".");
+    return max_queue_size;
+  }
+  return max_export_batch_size;
+}
+
+}  // namespace
+
 BatchLogRecordProcessor::BatchLogRecordProcessor(
     std::unique_ptr<LogRecordExporter> &&exporter,
     const size_t max_queue_size,
@@ -45,7 +65,7 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(
     : exporter_(std::move(exporter)),
       max_queue_size_(max_queue_size),
       scheduled_delay_millis_(scheduled_delay_millis),
-      max_export_batch_size_(max_export_batch_size),
+      max_export_batch_size_(ClampMaxExportBatchSize(max_export_batch_size, max_queue_size)),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_instrumentation_(nullptr),
@@ -60,7 +80,8 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExport
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
-      max_export_batch_size_(options.max_export_batch_size),
+      max_export_batch_size_(
+          ClampMaxExportBatchSize(options.max_export_batch_size, options.max_queue_size)),
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_instrumentation_(nullptr),
@@ -77,7 +98,8 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
-      max_export_batch_size_(options.max_export_batch_size),
+      max_export_batch_size_(
+          ClampMaxExportBatchSize(options.max_export_batch_size, options.max_queue_size)),
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_instrumentation_(runtime_options.thread_instrumentation),
