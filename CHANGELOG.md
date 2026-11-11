@@ -19,7 +19,7 @@ Increment the:
   configurator updates. Preserve the affected instance's previous configuration
   and continue updating other instances, logging failures after releasing provider
   locks
-  [#4775](https://github.com/open-telemetry/opentelemetry-cpp/issues/4775)
+  [#4777](https://github.com/open-telemetry/opentelemetry-cpp/pull/4777)
 
 * [SDK] Skip completely empty span links (invalid span context, no attributes
   and no trace state), so they no longer count against `link_count_limit`
