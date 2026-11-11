@@ -19,6 +19,11 @@ Increment the:
   (32-bit powerpc and mips with GCC), so the curl HTTP client, the OTLP gRPC
   client, and the trace, logs, and metrics libraries link successfully.
   [#4773](https://github.com/open-telemetry/opentelemetry-cpp/issues/4773)
+* [SDK] Catch matcher exceptions during runtime meter, tracer, and logger
+  configurator updates. Preserve the affected instance's previous configuration
+  and continue updating other instances, logging failures after releasing provider
+  locks
+  [#4775](https://github.com/open-telemetry/opentelemetry-cpp/issues/4775)
 
 * [SDK] Skip completely empty span links (invalid span context, no attributes
   and no trace state), so they no longer count against `link_count_limit`

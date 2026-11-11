@@ -749,6 +749,86 @@ TEST(TracerProvider, ConstructorsAreNotNoexcept)
 }
 
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
+TEST(TracerProvider, UpdateTracerConfiguratorPreservesConfigOnMatcherFailure)
+{
+  using opentelemetry::sdk::common::internal_log::LogLevel;
+  using opentelemetry::test_common::ScopedTestLogHandler;
+  for (int exception_type = 0; exception_type < 2; ++exception_type)
+  {
+    SCOPED_TRACE(exception_type);
+    for (int initial_state = 0; initial_state < 2; ++initial_state)
+    {
+      SCOPED_TRACE(initial_state);
+      const bool initially_enabled = initial_state != 0;
+      int match_attempts           = 0;
+      auto initial_configurator    = std::make_unique<ScopeConfigurator<TracerConfig>>(
+          ScopeConfigurator<TracerConfig>::Builder(initially_enabled ? TracerConfig::Default()
+                                                                        : TracerConfig::Disabled())
+              .Build());
+      TracerProvider provider(
+          SimpleSpanProcessorFactory::Create(
+              std::make_unique<opentelemetry::exporter::memory::InMemorySpanExporter>()),
+          Resource::Create({}), std::make_unique<AlwaysOnSampler>(),
+          std::make_unique<RandomIdGenerator>(), std::move(initial_configurator));
+      auto before       = provider.GetTracer("scope.before");
+      auto throwing     = provider.GetTracer("scope.throwing");
+      auto after        = provider.GetTracer("scope.after");
+      auto new_config   = initially_enabled ? TracerConfig::Disabled() : TracerConfig::Default();
+      auto configurator = std::make_unique<ScopeConfigurator<TracerConfig>>(
+          ScopeConfigurator<TracerConfig>::Builder(new_config)
+              .AddCondition(
+                  [&](const InstrumentationScope &scope) {
+                    ++match_attempts;
+                    if (scope.GetName() == "scope.throwing")
+                    {
+                      if (exception_type == 0)
+                      {
+                        throw std::runtime_error("injected matcher failure");
+                      }
+                      throw 1;
+                    }
+                    return false;
+                  },
+                  new_config)
+              .Build());
+
+      int diagnostics = 0;
+      ScopedTestLogHandler handler(LogLevel::Error, [&](const ScopedTestLogHandler::Entry &entry) {
+        ++diagnostics;
+        EXPECT_EQ(entry.level, LogLevel::Error);
+        EXPECT_EQ(match_attempts, 3);
+        EXPECT_EQ(provider.GetTracer("scope.before"), before);
+        EXPECT_NE(provider.GetTracer("scope.new"), nullptr);
+      });
+
+      provider.UpdateTracerConfigurator(std::move(configurator));
+      EXPECT_EQ(diagnostics, 1);
+      EXPECT_EQ(match_attempts, 4);
+      auto entries = handler.Drain();
+      ASSERT_EQ(entries.size(), 1u);
+      EXPECT_NE(
+          entries[0].msg.find("[TracerProvider::UpdateTracerConfigurator] Failed to update 1"),
+          std::string::npos);
+      EXPECT_EQ(before->StartSpan("op")->IsRecording(), !initially_enabled);
+      EXPECT_EQ(throwing->StartSpan("op")->IsRecording(), initially_enabled);
+      EXPECT_EQ(after->StartSpan("op")->IsRecording(), !initially_enabled);
+
+      auto created = provider.GetTracer("scope.new");
+      EXPECT_EQ(match_attempts, 4);
+      EXPECT_EQ(created->StartSpan("op")->IsRecording(), !initially_enabled);
+
+      provider.UpdateTracerConfigurator(std::make_unique<ScopeConfigurator<TracerConfig>>(
+          ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default()).Build()));
+      EXPECT_TRUE(before->StartSpan("op")->IsRecording());
+      EXPECT_TRUE(throwing->StartSpan("op")->IsRecording());
+      EXPECT_TRUE(after->StartSpan("op")->IsRecording());
+      EXPECT_TRUE(created->StartSpan("op")->IsRecording());
+      EXPECT_EQ(diagnostics, 1);
+      EXPECT_TRUE(handler.Drain().empty());
+    }
+  }
+}
+
 TEST(TracerProvider, ConstructionFailureDiagnosticsAllowProviderReentry)
 {
   using opentelemetry::sdk::common::internal_log::LogLevel;

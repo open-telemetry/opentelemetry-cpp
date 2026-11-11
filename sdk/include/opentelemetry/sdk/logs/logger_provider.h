@@ -113,6 +113,9 @@ public:
    * Update the LoggerConfigurator for this provider. Updates the LoggerConfig for all existing
    * loggers.
    *
+   * If updating a logger's configuration fails, it keeps its previous configuration;
+   * the new configurator remains installed and updates continue for the other loggers.
+   *
    * @param logger_configurator The new configurator.
    *
    * @note Calling LoggerProvider::GetLogger from within the

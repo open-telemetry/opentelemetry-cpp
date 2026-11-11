@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <chrono>
+#include <cstddef>
 #include <exception>
 #include <mutex>
 #include <ostream>
@@ -187,22 +188,55 @@ void LoggerProvider::UpdateLoggerConfigurator(
     return;
   }
 
-  // Lock the provider mutex to ensure that calls to GetLogger are exclusive with respect to the
-  // LoggerConfigurator update and corresponding LoggerConfig updates. This ensures that a Logger
-  // will never be returned from GetLogger with a LoggerConfig that is out of date with respect to
-  // the provider-level LoggerConfigurator.
-  const std::lock_guard<std::mutex> guard(lock_);
-  context_->SetLoggerConfigurator(std::move(logger_configurator));
-
-  // The only way to set the LoggerConfig of a logger is on Logger construction in
-  // LoggerProvider::GetLogger or through Logger::UpdateLoggerConfig (which is private and only
-  // accessed by LoggerProvider).
-  for (auto &logger : loggers_)
+  std::size_t failure_count = 0;
   {
-    LoggerConfig new_config =
-        context_->GetLoggerConfigurator().ComputeConfig(logger->GetInstrumentationScope());
-    logger->UpdateLoggerConfig(new_config);
+    // Lock the provider mutex to ensure that calls to GetLogger are exclusive with respect to the
+    // LoggerConfigurator update and corresponding LoggerConfig updates. A failed match preserves
+    // that logger's previous config.
+    const std::lock_guard<std::mutex> guard(lock_);
+    context_->SetLoggerConfigurator(std::move(logger_configurator));
+
+    // The only way to set the LoggerConfig of a logger is on Logger construction in
+    // LoggerProvider::GetLogger or through Logger::UpdateLoggerConfig (which is private and only
+    // accessed by LoggerProvider).
+    for (auto &logger : loggers_)
+    {
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+      try
+      {
+#endif
+        LoggerConfig new_config =
+            context_->GetLoggerConfigurator().ComputeConfig(logger->GetInstrumentationScope());
+        logger->UpdateLoggerConfig(new_config);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+      }
+      catch (...)
+      {
+        // Keep the previous config for this instance and continue updating the others.
+        ++failure_count;
+      }
+#endif
+    }
   }
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  if (failure_count > 0)
+  {
+    try
+    {
+      OTEL_INTERNAL_LOG_ERROR("[LoggerProvider::UpdateLoggerConfigurator] Failed to update "
+                              << failure_count
+                              << " logger(s); keeping their previous configuration.");
+    }
+    catch (const std::exception &)  // NOLINT(bugprone-empty-catch)
+    {
+      // Logging can throw (typically std::bad_alloc from the string stream).
+      // Swallow it so the noexcept UpdateLoggerConfigurator path cannot throw.
+    }
+  }
+#else
+  (void)failure_count;
+#endif
 }
 
 const opentelemetry::sdk::resource::Resource &LoggerProvider::GetResource() const noexcept
