@@ -188,10 +188,8 @@ public:
 
   void SetBlock(bool block)
   {
-    {
-      std::lock_guard<std::mutex> lock(mutex_);
-      block_export_.store(block);
-    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    block_export_.store(block);
     if (!block)
     {
       cv_.notify_all();
