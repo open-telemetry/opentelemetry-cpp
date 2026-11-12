@@ -77,10 +77,6 @@ public:
               opentelemetry::common::SystemTimestamp /* observation_time */) noexcept
   {
     std::lock_guard<std::mutex> guard(hashmap_lock_);
-    if (storage_failed_)
-    {
-      return;
-    }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     const bool offer_exemplars =
         ExemplarFilterEnabled(exemplar_filter_type_, opentelemetry::context::Context{});
@@ -138,10 +134,6 @@ public:
     std::shared_ptr<AttributesHashMap> delta_metrics = nullptr;
     {
       std::lock_guard<std::mutex> guard(hashmap_lock_);
-      if (storage_failed_)
-      {
-        return false;
-      }
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
       try
       {
@@ -163,7 +155,6 @@ public:
       {
         monotonic_round_observations_.clear();
         monotonic_round_attribute_order_.clear();
-        storage_failed_ = true;
         return false;
       }
 #endif
@@ -333,7 +324,6 @@ private:
   const AggregationConfig *aggregation_config_;
   std::shared_ptr<const AttributesProcessor> attributes_processor_;
   bool is_monotonic_sum_;
-  bool storage_failed_ = false;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
 
   std::unordered_map<CollectorHandle *, std::unique_ptr<AttributesHashMap>>

@@ -54,7 +54,6 @@ public:
   AttributesHashMapWithCustomHash(size_t attributes_limit = kAggregationCardinalityLimit)
       : attributes_limit_(attributes_limit)
   {
-    (void)GetOverflowAttributes();
     if (attributes_limit_ > kAggregationCardinalityLimit)
     {
       hash_map_.reserve(attributes_limit_);

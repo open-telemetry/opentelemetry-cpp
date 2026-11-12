@@ -87,7 +87,7 @@ class AsyncMetricStorageStaleAttributeFixture
 {};
 
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
-TEST(AsyncMetricStorageException, CallbackFailureDisablesTemporalStorage)
+TEST(AsyncMetricStorageException, CallbackFailureDoesNotDisableTemporalStorage)
 {
   InstrumentDescriptor instrument = {"counter", "", "", InstrumentType::kObservableCounter,
                                      InstrumentValueType::kLong};
@@ -113,13 +113,14 @@ TEST(AsyncMetricStorageException, CallbackFailureDisablesTemporalStorage)
                                }));
 
   storage.RecordLong(measurements, SystemTimestamp(start_ts + std::chrono::seconds(1)));
-  EXPECT_FALSE(storage.Collect(collector.get(), collectors, start_ts,
-                               start_ts + std::chrono::seconds(2),
-                               [&callback_count](const MetricData &) {
-                                 ++callback_count;
-                                 return true;
-                               }));
-  EXPECT_EQ(callback_count, 1U);
+  EXPECT_TRUE(storage.Collect(collector.get(), collectors, start_ts,
+                              start_ts + std::chrono::seconds(2),
+                              [&callback_count](const MetricData &metric_data) {
+                                ++callback_count;
+                                EXPECT_FALSE(metric_data.point_data_attr_.empty());
+                                return true;
+                              }));
+  EXPECT_EQ(callback_count, 2U);
 }
 #endif
 

@@ -46,10 +46,6 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
                                          nostd::function_ref<bool(MetricData)> callback) noexcept
 {
   std::lock_guard<std::mutex> guard(lock_);
-  if (failed_)
-  {
-    return false;
-  }
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
@@ -60,7 +56,6 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   }
   catch (...)
   {
-    failed_ = true;
     return false;
   }
 #endif

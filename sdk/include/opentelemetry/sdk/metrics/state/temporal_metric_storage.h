@@ -59,8 +59,6 @@ private:
       unreported_metrics_;
   // last reported metrics stash for all the collectors.
   std::unordered_map<CollectorHandle *, LastReportedMetrics> last_reported_metrics_;
-  bool failed_ = false;
-
   // Lock while building metrics
   mutable std::mutex lock_;
   const AggregationConfig *aggregation_config_;
