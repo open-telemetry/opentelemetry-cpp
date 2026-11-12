@@ -706,11 +706,22 @@ void PrometheusExporterUtils::SetTarget(
   metric_sdk::PointAttributes empty_attributes;
   SetMetricBasic(metric, empty_attributes, scope, data.resource_);
 
+  const std::size_t resource_label_start = metric.label.size();
   for (auto &label : data.resource_->GetAttributes())
   {
     AddPrometheusLabel(SanitizeNames(label.first), AttributeValueToString(label.second),
                        &metric.label);
   }
+  std::sort(metric.label.begin() + static_cast<std::ptrdiff_t>(resource_label_start),
+            metric.label.end(),
+            [](const prometheus_client::ClientMetric::Label &a,
+               const prometheus_client::ClientMetric::Label &b) {
+              if (a.name != b.name)
+              {
+                return a.name < b.name;
+              }
+              return a.value < b.value;
+            });
 
   output->emplace_back(std::move(metric_family));
 }

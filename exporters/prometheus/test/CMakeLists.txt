@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+file(COPY testdata DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 foreach(testname exporter_test collector_test exporter_utils_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
