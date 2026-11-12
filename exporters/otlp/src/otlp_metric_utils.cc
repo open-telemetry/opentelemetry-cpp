@@ -55,7 +55,10 @@ metric_sdk::AggregationType OtlpMetricUtils::GetAggregationType(
     return metric_sdk::AggregationType::kDrop;
   }
   auto point_data_with_attributes = metric_data.point_data_attr_[0];
-  if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_with_attributes.point_data))
+  if (nostd::holds_alternative<sdk::metrics::LongSumPointData>(
+          point_data_with_attributes.point_data) ||
+      nostd::holds_alternative<sdk::metrics::DoubleSumPointData>(
+          point_data_with_attributes.point_data))
   {
     return metric_sdk::AggregationType::kSum;
   }
@@ -92,17 +95,23 @@ void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data
     proto::metrics::v1::NumberDataPoint *proto_sum_point_data = sum->add_data_points();
     proto_sum_point_data->set_start_time_unix_nano(start_ts);
     proto_sum_point_data->set_time_unix_nano(ts);
-    const auto &sum_data =
-        nostd::get<sdk::metrics::SumPointData>(point_data_with_attributes.point_data);
 
-    if ((nostd::holds_alternative<int64_t>(sum_data.value_)))
+    const auto *long_sum_data =
+        nostd::get_if<sdk::metrics::LongSumPointData>(&point_data_with_attributes.point_data);
+
+    if (long_sum_data != nullptr)
     {
-      proto_sum_point_data->set_as_int(nostd::get<int64_t>(sum_data.value_));
+      proto_sum_point_data->set_as_int(long_sum_data->value_);
     }
-    else
+
+    const auto *double_sum_data =
+        nostd::get_if<sdk::metrics::DoubleSumPointData>(&point_data_with_attributes.point_data);
+
+    if (double_sum_data != nullptr)
     {
-      proto_sum_point_data->set_as_double(nostd::get<double>(sum_data.value_));
+      proto_sum_point_data->set_as_double(double_sum_data->value_);
     }
+
     // set attributes
     for (auto &kv_attr : point_data_with_attributes.attributes)
     {

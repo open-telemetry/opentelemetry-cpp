@@ -140,28 +140,26 @@ TEST(Aggregation, LongSumAggregation)
 {
   LongSumAggregation aggr(true);
   auto data = aggr.ToPoint();
-  ASSERT_TRUE(nostd::holds_alternative<SumPointData>(data));
-  auto sum_data = nostd::get<SumPointData>(data);
-  ASSERT_TRUE(nostd::holds_alternative<int64_t>(sum_data.value_));
-  EXPECT_EQ(nostd::get<int64_t>(sum_data.value_), 0);
+  ASSERT_TRUE(nostd::holds_alternative<LongSumPointData>(data));
+  auto sum_data = nostd::get<LongSumPointData>(data);
+  EXPECT_EQ(sum_data.value_, 0);
   aggr.Aggregate(static_cast<int64_t>(12), {});
   aggr.Aggregate(static_cast<int64_t>(0), {});
-  sum_data = nostd::get<SumPointData>(aggr.ToPoint());
-  EXPECT_EQ(nostd::get<int64_t>(sum_data.value_), 12);
+  sum_data = nostd::get<LongSumPointData>(aggr.ToPoint());
+  EXPECT_EQ(sum_data.value_, 12);
 }
 
 TEST(Aggregation, DoubleSumAggregation)
 {
   DoubleSumAggregation aggr(true);
   auto data = aggr.ToPoint();
-  ASSERT_TRUE(nostd::holds_alternative<SumPointData>(data));
-  auto sum_data = nostd::get<SumPointData>(data);
-  ASSERT_TRUE(nostd::holds_alternative<double>(sum_data.value_));
-  EXPECT_EQ(nostd::get<double>(sum_data.value_), 0);
+  ASSERT_TRUE(nostd::holds_alternative<DoubleSumPointData>(data));
+  auto sum_data = nostd::get<DoubleSumPointData>(data);
+  EXPECT_EQ(sum_data.value_, 0);
   aggr.Aggregate(12.0, {});
   aggr.Aggregate(1.0, {});
-  sum_data = nostd::get<SumPointData>(aggr.ToPoint());
-  EXPECT_EQ(nostd::get<double>(sum_data.value_), 13.0);
+  sum_data = nostd::get<DoubleSumPointData>(aggr.ToPoint());
+  EXPECT_EQ(sum_data.value_, 13.0);
 }
 
 TEST(Aggregation, LongLastValueAggregation)

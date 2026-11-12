@@ -87,9 +87,9 @@ public:
 
     auto exporter = OtlpFileMetricExporterFactory::Create(opts);
 
-    opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+    opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data{};
     sum_point_data.value_ = 10.0;
-    opentelemetry::sdk::metrics::SumPointData sum_point_data2{};
+    opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data2{};
     sum_point_data2.value_ = 20.0;
     opentelemetry::sdk::metrics::ResourceMetrics data;
 

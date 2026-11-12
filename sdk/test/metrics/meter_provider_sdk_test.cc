@@ -615,10 +615,10 @@ int64_t CollectCounterSum(MetricReader *reader,
         }
         for (const auto &pd : md.point_data_attr_)
         {
-          const auto *sum_point = opentelemetry::nostd::get_if<SumPointData>(&pd.point_data);
+          const auto *sum_point = opentelemetry::nostd::get_if<LongSumPointData>(&pd.point_data);
           if (sum_point != nullptr)
           {
-            const auto *value = opentelemetry::nostd::get_if<int64_t>(&sum_point->value_);
+            const auto *value = (&sum_point->value_);
             if (value != nullptr)
             {
               sum = (sum == -1) ? *value : sum + *value;
@@ -648,10 +648,10 @@ std::map<std::string, int64_t> CollectCounterSums(MetricReader *reader,
       {
         for (const auto &pd : md.point_data_attr_)
         {
-          const auto *sum_point = opentelemetry::nostd::get_if<SumPointData>(&pd.point_data);
+          const auto *sum_point = opentelemetry::nostd::get_if<LongSumPointData>(&pd.point_data);
           if (sum_point != nullptr)
           {
-            const auto *value = opentelemetry::nostd::get_if<int64_t>(&sum_point->value_);
+            const auto *value = (&sum_point->value_);
             if (value != nullptr)
             {
               sums[md.instrument_descriptor.name_] += *value;
