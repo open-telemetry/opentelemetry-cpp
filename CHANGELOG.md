@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] `CircularBuffer::Add`, the queue of the batch span and log record
+  processors, now claims a slot with fetch-and-add instead of retrying a
+  compare-and-swap
+  [#4795](https://github.com/open-telemetry/opentelemetry-cpp/pull/4795)
+
 * [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
   measurements, so they no longer reach the histogram aggregations
 
