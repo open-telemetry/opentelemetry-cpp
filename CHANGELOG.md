@@ -16,8 +16,8 @@ Increment the:
 ## [Unreleased]
 
 * [BUILD] Link `libatomic` on platforms that need it for 64-bit `std::atomic`
-  (32-bit powerpc and mips with GCC), so the curl HTTP client and the trace,
-  logs, and metrics libraries link successfully.
+  (32-bit powerpc and mips with GCC), so the curl HTTP client, the OTLP gRPC
+  client, and the trace, logs, and metrics libraries link successfully.
   [#4773](https://github.com/open-telemetry/opentelemetry-cpp/issues/4773)
 
 * [SDK] Skip completely empty span links (invalid span context, no attributes
