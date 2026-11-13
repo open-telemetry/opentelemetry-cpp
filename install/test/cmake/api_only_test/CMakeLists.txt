@@ -112,7 +112,4 @@ target_link_libraries(api_only_test PRIVATE opentelemetry-cpp::api GTest::gtest
 include(CTest)
 include(GoogleTest)
 
-gtest_add_tests(
-  TARGET api_only_test
-  TEST_PREFIX api_only.
-  TEST_LIST api_only_test)
+gtest_discover_tests(api_only_test TEST_PREFIX api_only.)

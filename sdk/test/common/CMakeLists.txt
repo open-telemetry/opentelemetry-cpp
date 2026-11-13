@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include(GoogleTest)
+
 foreach(
   testname
   wildcard_match_test
@@ -21,18 +23,12 @@ foreach(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_common opentelemetry_trace)
 
-  gtest_add_tests(
-    TARGET ${testname}
-    TEST_PREFIX trace.
-    TEST_LIST ${testname})
+  gtest_discover_tests(${testname} TEST_PREFIX trace.)
 endforeach()
 
 add_executable(base64_test base64_test.cc)
 target_link_libraries(base64_test ${GTEST_BOTH_LIBRARIES} opentelemetry_common)
-gtest_add_tests(
-  TARGET base64_test
-  TEST_PREFIX common.
-  TEST_LIST base64_test)
+gtest_discover_tests(base64_test TEST_PREFIX common.)
 
 add_executable(random_fork_test random_fork_test.cc)
 target_link_libraries(random_fork_test opentelemetry_common)
@@ -62,5 +58,5 @@ if(NOT (WIN32 AND BUILD_SHARED_LIBS))
   target_link_libraries(
     provider_initialization_test ${GTEST_BOTH_LIBRARIES} opentelemetry_trace
     opentelemetry_logs opentelemetry_metrics)
-  gtest_add_tests(TARGET provider_initialization_test TEST_PREFIX common.)
+  gtest_discover_tests(provider_initialization_test TEST_PREFIX common.)
 endif()

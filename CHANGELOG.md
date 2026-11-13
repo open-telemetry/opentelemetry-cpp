@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [TEST] Replace `gtest_add_tests()` with `gtest_discover_tests()` to prevent
+  false-positive test passes for tests compiled out by preprocessor conditionals.
+  [#4341](https://github.com/open-telemetry/opentelemetry-cpp/issues/4341)
 * [SDK] Skip completely empty span links (invalid span context, no attributes
   and no trace state), so they no longer count against `link_count_limit`
   [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)

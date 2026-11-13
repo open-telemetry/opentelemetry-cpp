@@ -61,10 +61,7 @@ if(OTELCPP_BUILD_TESTING)
     zipkin_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_exporter_zipkin_trace opentelemetry_resources)
 
-  gtest_add_tests(
-    TARGET zipkin_recordable_test
-    TEST_PREFIX exporter.
-    TEST_LIST zipkin_recordable_test)
+  gtest_discover_tests(zipkin_recordable_test TEST_PREFIX exporter.)
 
   if(OTELCPP_WITH_HTTP_CLIENT_CURL)
     add_executable(zipkin_exporter_test test/zipkin_exporter_test.cc)
@@ -82,9 +79,6 @@ if(OTELCPP_BUILD_TESTING)
       target_link_libraries(zipkin_exporter_test ws2_32)
     endif()
 
-    gtest_add_tests(
-      TARGET zipkin_exporter_test
-      TEST_PREFIX exporter.
-      TEST_LIST zipkin_exporter_test)
+    gtest_discover_tests(zipkin_exporter_test TEST_PREFIX exporter.)
   endif()
 endif() # OTELCPP_BUILD_TESTING
