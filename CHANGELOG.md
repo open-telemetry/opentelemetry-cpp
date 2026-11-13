@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Parse the `event_to_span_event_bridge/development` log
+  record processor configuration in declarative configuration. The SDK
+  implementation of this processor is not yet available; `SdkBuilder` logs a
+  warning and skips it when configured.
+  [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
+
 * [SDK] Skip completely empty span links (invalid span context, no attributes
   and no trace state), so they no longer count against `link_count_limit`
   [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)
