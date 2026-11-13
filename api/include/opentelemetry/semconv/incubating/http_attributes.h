@@ -63,6 +63,36 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpHost = "http.host";
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpMethod = "http.method";
 
 /**
+  The content of the HTTP request body, with any content coding indicated by <a
+  href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-encoding">Content-Encoding</a>
+  removed, captured as a string when the request content is textual or as byte array otherwise. <p>
+  Captured value MAY be limited in size and thus value is expected to be truncated in many cases.
+  When an instrumentation applies a byte-based limit while capturing the body as a string, it SHOULD
+  truncate on a character boundary so that the recorded value remains valid text. <p>
+  Instrumentations MUST NOT capture this attribute by default and MAY provide an option to enable
+  it. <blockquote>
+  [!WARNING]
+  This attribute may contain sensitive information.</blockquote>
+  <p>
+  When instrumentations record body, they SHOULD capture the body as string whenever possible as it
+  makes it easier to use in human-readable form, also it allows to implement sanitization if needed.
+  <p>
+  Textual content is typically detected based on the <a
+  href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-type">Content-Type</a> header
+  using heuristics such as checking if the type/subtype (compared case-insensitively, ignoring any
+  parameters) starts with @code text/ @endcode, ends with @code /json @endcode, @code +json
+  @endcode, @code /xml @endcode, @code +xml @endcode, @code /yaml @endcode or @code +yaml @endcode,
+  is @code application/x-www-form-urlencoded @endcode, or if the header declares a @code charset
+  @endcode parameter. <p> Instrumentations that implement request body recording MUST NOT
+  intentionally introduce side effects such as changing stream position or closing body stream
+  independently from the application. <p> When body is recorded, the instrumentation SHOULD record
+  part of the body that was sent or received at the time HTTP call has ended. The value MUST be
+  either a string or a byte array. Instrumentations MUST NOT record a parsed or otherwise structured
+  representation of the body, and MUST NOT base64-encode binary content into a string value.
+ */
+static constexpr const char *kHttpRequestBodyContent = "http.request.body.content";
+
+/**
   The size of the request payload body in bytes. This is the number of bytes transferred excluding
   headers and is often, but not always, present as the <a
   href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a> header.
@@ -162,6 +192,39 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpRequestContentLength 
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpRequestContentLengthUncompressed =
     "http.request_content_length_uncompressed";
+
+/**
+  The content of the HTTP response body, with any content coding indicated by <a
+  href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-encoding">Content-Encoding</a>
+  removed, captured as a string when the response content is textual or as byte array otherwise. <p>
+  Captured value MAY be limited in size and thus value is expected to be truncated in many cases.
+  When an instrumentation applies a byte-based limit while capturing the body as a string, it SHOULD
+  truncate on a character boundary so that the recorded value remains valid text. <p>
+  Instrumentations MUST NOT capture this attribute by default and MAY provide an option to enable
+  it. <blockquote>
+  [!WARNING]
+  This attribute may contain sensitive information.</blockquote>
+  <p>
+  When instrumentations record body, they SHOULD capture the body as string whenever possible as it
+  makes it easier to use in human-readable form, also it allows to implement sanitization if needed.
+  <p>
+  Textual content is typically detected based on the <a
+  href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-type">Content-Type</a> header
+  using heuristics such as checking if the type/subtype (compared case-insensitively, ignoring any
+  parameters) starts with @code text/ @endcode, ends with @code /json @endcode, @code +json
+  @endcode, @code /xml @endcode, @code +xml @endcode, @code /yaml @endcode or @code +yaml @endcode,
+  is @code application/x-www-form-urlencoded @endcode, or if the header declares a @code charset
+  @endcode parameter. <p> Instrumentations that implement response body recording MUST NOT
+  intentionally introduce side effects such as changing stream position or closing body stream
+  independently from the application. <p> When body is recorded, the instrumentation SHOULD record
+  part of the body that was sent or received at the time HTTP call has ended. Note that HTTP client
+  spans <a href="/docs/http/http-spans.md#http-client-span-duration">SHOULD end sometime after the
+  response headers are fully read</a>, which may or may not include reading the response body, so on
+  client spans this attribute is often absent or holds only part of the body. <p> The value MUST be
+  either a string or a byte array. Instrumentations MUST NOT record a parsed or otherwise structured
+  representation of the body, and MUST NOT base64-encode binary content into a string value.
+ */
+static constexpr const char *kHttpResponseBodyContent = "http.response.body.content";
 
 /**
   The size of the response payload body in bytes. This is the number of bytes transferred excluding

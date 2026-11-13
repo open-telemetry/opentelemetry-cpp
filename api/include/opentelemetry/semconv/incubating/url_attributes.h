@@ -67,11 +67,19 @@ static constexpr const char *kUrlFragment = "url.fragment";
   X-Amz-Credential @endcode</a></li> <li><a
   href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html">@code
   X-Amz-Security-Token @endcode</a></li> <li><a
+  href="https://docs.aws.amazon.com/AmazonS3/latest/developerguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth">@code
+  AWSAccessKeyId @endcode</a></li> <li><a
+  href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-creating-signed-url-canned-policy.html">@code
+  Signature @endcode</a></li> <li><a
   href="https://learn.microsoft.com/azure/storage/common/storage-sas-overview#sas-token">@code sig
   @endcode</a></li> <li><a
   href="https://cloud.google.com/storage/docs/access-control/signed-urls">@code X-Goog-Signature
   @endcode</a></li>
   </ul>
+  <p>
+  Several of these keys are used by more than one service or signing scheme. Each link
+  points to one representative usage rather than an exhaustive list, and does not narrow
+  the scope of the key to the linked service or signing scheme.
   <p>
   This list is subject to change over time.
   <p>
@@ -129,11 +137,19 @@ static constexpr const char *kUrlPort = "url.port";
   X-Amz-Credential @endcode</a></li> <li><a
   href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html">@code
   X-Amz-Security-Token @endcode</a></li> <li><a
+  href="https://docs.aws.amazon.com/AmazonS3/latest/developerguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth">@code
+  AWSAccessKeyId @endcode</a></li> <li><a
+  href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-creating-signed-url-canned-policy.html">@code
+  Signature @endcode</a></li> <li><a
   href="https://learn.microsoft.com/azure/storage/common/storage-sas-overview#sas-token">@code sig
   @endcode</a></li> <li><a
   href="https://cloud.google.com/storage/docs/access-control/signed-urls">@code X-Goog-Signature
   @endcode</a></li>
   </ul>
+  <p>
+  Several of these keys are used by more than one service or signing scheme. Each link
+  points to one representative usage rather than an exhaustive list, and does not narrow
+  the scope of the key to the linked service or signing scheme.
   <p>
   This list is subject to change over time.
   <p>

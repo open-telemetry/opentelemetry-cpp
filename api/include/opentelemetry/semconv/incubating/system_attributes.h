@@ -38,9 +38,18 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemCpuLogicalNumber =
 OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemCpuState = "system.cpu.state";
 
 /**
-  The device identifier
+  Deprecated, use @code system.device.name @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code system.device.name @endcode.", "reason": "renamed", "renamed_to":
+  "system.device.name"}
  */
-static constexpr const char *kSystemDevice = "system.device";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemDevice = "system.device";
+
+/**
+  The OS level identifier for a device, such as disk, partition or network interface.
+ */
+static constexpr const char *kSystemDeviceName = "system.device.name";
 
 /**
   The filesystem mode
@@ -203,7 +212,18 @@ namespace SystemMemoryStateValues
  */
 static constexpr const char *kUsed = "used";
 
-static constexpr const char *kFree = "free";
+/**
+  An estimate of how much memory is available for starting new applications, without causing
+  swapping.
+ */
+static constexpr const char *kAvailable = "available";
+
+/**
+  @deprecated
+  {"note": "Removed, report memory usage with the @code used @endcode and @code available @endcode
+  states instead.", "reason": "obsoleted"}
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kFree = "free";
 
 /**
   @deprecated
@@ -212,9 +232,19 @@ static constexpr const char *kFree = "free";
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kShared = "shared";
 
-static constexpr const char *kBuffers = "buffers";
+/**
+  @deprecated
+  {"note": "Removed, report memory usage with the @code used @endcode and @code available @endcode
+  states instead.", "reason": "obsoleted"}
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kBuffers = "buffers";
 
-static constexpr const char *kCached = "cached";
+/**
+  @deprecated
+  {"note": "Removed, report memory usage with the @code used @endcode and @code available @endcode
+  states instead.", "reason": "obsoleted"}
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kCached = "cached";
 
 }  // namespace SystemMemoryStateValues
 

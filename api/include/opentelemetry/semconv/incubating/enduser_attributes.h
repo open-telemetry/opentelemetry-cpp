@@ -21,20 +21,31 @@ namespace enduser
 
 /**
   Unique identifier of an end user in the system. It maybe a username, email address, or other
-  identifier. <p> Unique identifier of an end user in the system. <blockquote>
+  identifier.
+
+  @deprecated
+  {"note": "Moved to the <a
+  href="https://github.com/open-telemetry/semantic-conventions-client-side">OpenTelemetry
+  Client-Side semantic conventions repository</a>.\n", "reason": "uncategorized"} <p> Unique
+  identifier of an end user in the system. <blockquote>
   [!Warning]
   This field contains sensitive (PII) information.</blockquote>
  */
-static constexpr const char *kEnduserId = "enduser.id";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kEnduserId = "enduser.id";
 
 /**
   Pseudonymous identifier of an end user. This identifier should be a random value that is not
-  directly linked or associated with the end user's actual identity. <p> Pseudonymous identifier of
-  an end user. <blockquote>
+  directly linked or associated with the end user's actual identity.
+
+  @deprecated
+  {"note": "Moved to the <a
+  href="https://github.com/open-telemetry/semantic-conventions-client-side">OpenTelemetry
+  Client-Side semantic conventions repository</a>.\n", "reason": "uncategorized"} <p> Pseudonymous
+  identifier of an end user. <blockquote>
   [!Warning]
   This field contains sensitive (linkable PII) information.</blockquote>
  */
-static constexpr const char *kEnduserPseudoId = "enduser.pseudo.id";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kEnduserPseudoId = "enduser.pseudo.id";
 
 /**
   Deprecated, use @code user.roles @endcode instead.

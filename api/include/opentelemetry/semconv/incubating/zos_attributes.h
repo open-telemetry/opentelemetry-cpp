@@ -20,15 +20,25 @@ namespace zos
 {
 
 /**
-  The System Management Facility (SMF) Identifier uniquely identified a z/OS system within a SYSPLEX
-  or mainframe environment and is used for system and performance analysis.
+  The System Management Facility (SMF) identifier that uniquely identifies a z/OS system within a
+  sysplex or mainframe environment and is used for system and performance analysis.
+
+  @deprecated
+  {"note": "Moved to the <a
+  href="https://github.com/open-telemetry/semantic-conventions-mainframe">OpenTelemetry Mainframe
+  semantic conventions repository</a>.\n", "reason": "uncategorized"}
  */
-static constexpr const char *kZosSmfId = "zos.smf.id";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kZosSmfId = "zos.smf.id";
 
 /**
-  The name of the SYSPLEX to which the z/OS system belongs too.
+  The name of the sysplex to which the z/OS system belongs.
+
+  @deprecated
+  {"note": "Moved to the <a
+  href="https://github.com/open-telemetry/semantic-conventions-mainframe">OpenTelemetry Mainframe
+  semantic conventions repository</a>.\n", "reason": "uncategorized"}
  */
-static constexpr const char *kZosSysplexName = "zos.sysplex.name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kZosSysplexName = "zos.sysplex.name";
 
 }  // namespace zos
 }  // namespace semconv
