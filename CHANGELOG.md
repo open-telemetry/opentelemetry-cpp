@@ -15,6 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Stop exporting stale async attribute sets with cumulative
+  temporality. Preserve reader-scoped callback behavior and overflow
+  contributions, and bound per-reader monotonic counter baseline storage by
+  the configured cardinality limit.
+  [#4484](https://github.com/open-telemetry/opentelemetry-cpp/pull/4484)
+
+* [SDK] Preserve the default unlimited timeout when batch span and log record
+  processors shut down their exporters.
+  [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
+
 * [SDK] Skip completely empty span links (invalid span context, no attributes
   and no trace state), so they no longer count against `link_count_limit`
   [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)

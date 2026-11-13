@@ -155,6 +155,24 @@ struct InstrumentDescriptorUtil
         return "Unknown";
     }
   }
+
+  static bool IsInstrumentTypeAsync(InstrumentType type) noexcept
+  {
+    switch (type)
+    {
+      case InstrumentType::kCounter:
+      case InstrumentType::kGauge:
+      case InstrumentType::kHistogram:
+      case InstrumentType::kUpDownCounter:
+        return false;
+      case InstrumentType::kObservableCounter:
+      case InstrumentType::kObservableGauge:
+      case InstrumentType::kObservableUpDownCounter:
+        return true;
+      default:
+        return false;
+    }
+  }
 };
 
 struct AggregationUtil
