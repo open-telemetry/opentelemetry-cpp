@@ -59,9 +59,63 @@ static constexpr const char *kHostCpuStepping = "host.cpu.stepping";
 static constexpr const char *kHostCpuVendorId = "host.cpu.vendor.id";
 
 /**
-  Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider. For
-  non-containerized systems, this should be the @code machine-id @endcode. See the table below for
-  the sources to use to determine the @code machine-id @endcode based on operating system.
+  Unique host ID, determined by the first matching source in the priority order.
+  <p>
+  SHOULD be determined using the first available source from the following priority tiers:
+  <ol>
+    <li>Known cloud vendors - cloud instance ID</li>
+    <li>Known VM vendors - provider VM ID</li>
+    <li>OS-dependent machine ID</li>
+    <li>User-provided value</li>
+  </ol>
+  <p>
+  The value SHOULD conform to the following properties:
+  <ul>
+    <li><strong>Unique</strong> within a given context;</li>
+    <li><strong><a
+  href="https://opentelemetry.io/docs/specs/otel/entities/data-model/#repeatable-identity">Repeatable</a></strong>
+  - multiple observers on the same host come up with the same value;</li>
+    <li><strong>Persistent</strong> - survives host restarts and software updates.</li>
+  </ul>
+  <p>
+  <strong>Collecting @code host.id @endcode From Known Environments:</strong> When @code host.id
+  @endcode is derived from a cloud vendor instance ID, the resource SHOULD also carry the
+  corresponding
+  @code cloud.provider @endcode and @code cloud.platform @endcode attributes so that the source of
+  the @code host.id @endcode value can be unambiguously determined. <p> The following cloud
+  environments are currently recognized: <p> | Environment | @code host.id @endcode source | @code
+  cloud.provider @endcode | @code cloud.platform @endcode | | --- | --- | --- | --- | | AWS EC2 |
+  EC2 instance ID | @code aws @endcode | @code aws_ec2 @endcode | | AWS EKS (node) | EC2 instance ID
+  | @code aws @endcode | @code aws_eks @endcode | | Azure VM | @code vmId @endcode | @code azure
+  @endcode | @code azure.vm @endcode | | GCP Compute Engine | GCE instance ID | @code gcp @endcode |
+  @code gcp_compute_engine @endcode | | GCP GKE (node) | GCE instance ID | @code gcp @endcode |
+  @code gcp_kubernetes_engine @endcode | <p> The listed @code cloud.provider @endcode/@code
+  cloud.platform @endcode values are for example only. Refer to the <a
+  href="/docs/registry/attributes/cloud.md">@code cloud @endcode</a> attribute definitions for the
+  relevant set of values. <p> <strong>Non-privileged Machine ID Lookup:</strong> When collecting
+  @code host.id @endcode for non-containerized systems, non-privileged lookups of the machine ID are
+  preferred. SDK detector implementations MUST use the sources listed below to obtain the machine
+  ID. <p> | OS | Primary | Fallback | | --- | --- | --- | | Linux | contents of @code
+  /etc/machine-id @endcode | contents of @code /var/lib/dbus/machine-id @endcode | | BSD | contents
+  of @code /etc/hostid @endcode | output of @code /bin/kenv -q smbios.system.uuid @endcode | | macOS
+  | @code IOPlatformUUID @endcode line from the output of @code /usr/sbin/ioreg -rd1 -c
+  "IOPlatformExpertDevice" @endcode | - | | Windows | @code MachineGuid @endcode from registry @code
+  HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography @endcode | - | <p> <strong>Privileged Machine
+  ID Lookup:</strong> The @code host.id @endcode can be looked up using privileged sources. For
+  example, Linux systems can use the output of @code dmidecode -t system @endcode,
+  @code dmidecode -t baseboard @endcode,
+  @code dmidecode -t chassis @endcode, or read the corresponding data from the filesystem
+  (e.g. @code cat /sys/devices/virtual/dmi/id/product_id @endcode,
+  @code cat /sys/devices/virtual/dmi/id/product_uuid @endcode, etc), however, SDK resource
+  detector implementations MUST NOT collect @code host.id @endcode from privileged sources. If
+  privileged lookup of @code host.id @endcode is required, the value SHOULD be injected via the
+  @code OTEL_RESOURCE_ATTRIBUTES @endcode environment variable.
+  <p>
+  <strong>Collecting @code host.id @endcode From User Configuration:</strong> If none of the above
+  sources yields a non-empty value, the implementation MAY be unable to determine @code host.id
+  @endcode automatically and SHOULD omit the attribute. In that case, the @code host.id @endcode can
+  only be provided through user configuration or other available manual options. Users SHOULD ensure
+  that the @code host.id @endcode value conforms to the properties stated above.
  */
 static constexpr const char *kHostId = "host.id";
 

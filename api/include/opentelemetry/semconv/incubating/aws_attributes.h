@@ -160,8 +160,8 @@ static constexpr const char *kAwsEcsClusterArn = "aws.ecs.cluster.arn";
 
 /**
   The Amazon Resource Name (ARN) of an <a
-  href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_instances.html">ECS
-  container instance</a>.
+  href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-metadata-endpoint-v4-response.html">ECS
+  container</a>.
  */
 static constexpr const char *kAwsEcsContainerArn = "aws.ecs.container.arn";
 

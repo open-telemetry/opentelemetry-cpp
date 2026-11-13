@@ -29,6 +29,23 @@ namespace service
 static constexpr const char *kServiceCriticality = "service.criticality";
 
 /**
+  Identifier of the cost center associated with the service instance.
+  <p>
+  The cost center identifier enables tracking and attribution of service resource costs to
+  organizational units, billing accounts, or teams. It is typically a string identifier such as a
+  billing account ID, cost allocation code, or internal accounting ID.
+ */
+static constexpr const char *kServiceInstanceCostCenterId = "service.instance.cost_center.id";
+
+/**
+  Name of the cost center associated with the service instance.
+  <p>
+  A human-readable name of the cost center, department, or organizational unit responsible for the
+  service instance costs.
+ */
+static constexpr const char *kServiceInstanceCostCenterName = "service.instance.cost_center.name";
+
+/**
   The string ID of the service instance.
   <p>
   MUST be unique for each instance of the same @code service.namespace,service.name @endcode pair
@@ -87,15 +104,24 @@ static constexpr const char *kServiceNamespace = "service.namespace";
   Logical name of the service on the other side of the connection. SHOULD be equal to the actual <a
   href="/docs/resource/README.md#service">@code service.name @endcode</a> resource attribute of the
   remote service if any.
+
+  @deprecated
+  {"note": "Use @code server.service.name @endcode on the client side or @code client.service.name
+  @endcode on the server side.", "reason": "uncategorized"}
  */
-static constexpr const char *kServicePeerName = "service.peer.name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kServicePeerName = "service.peer.name";
 
 /**
   Logical namespace of the service on the other side of the connection. SHOULD be equal to the
   actual <a href="/docs/resource/README.md#service">@code service.namespace @endcode</a> resource
   attribute of the remote service if any.
+
+  @deprecated
+  {"note": "Use @code server.service.namespace @endcode on the client side or @code
+  client.service.namespace @endcode on the server side.", "reason": "uncategorized"}
  */
-static constexpr const char *kServicePeerNamespace = "service.peer.namespace";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kServicePeerNamespace =
+    "service.peer.namespace";
 
 /**
   The version string of the service component. The format is not defined by these conventions.

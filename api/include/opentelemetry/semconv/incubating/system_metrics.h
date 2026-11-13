@@ -791,10 +791,10 @@ CreateAsyncDoubleMetricSystemMemoryLimit(metrics::Meter *meter)
 
 /**
   An estimate of how much memory is available for starting new applications, without causing
-  swapping. <p> This is an alternative to @code system.memory.usage @endcode metric with @code
-  state=free @endcode. Linux starting from 3.14 exports "available" memory. It takes "free" memory
-  as a baseline, and then factors in kernel-specific values. This is supposed to be more accurate
-  than just "free" memory. For reference, see the calculations <a
+  swapping. <p> This is equivalent to the @code system.memory.usage @endcode metric with @code
+  state=available @endcode. Linux starting from 3.14 exports "available" memory. It takes "free"
+  memory as a baseline, and then factors in kernel-specific values. This is supposed to be more
+  accurate than just "free" memory. For reference, see the calculations <a
   href="https://superuser.com/a/980821">here</a>. See also @code MemAvailable @endcode in <a
   href="https://man7.org/linux/man-pages/man5/proc.5.html">/proc/meminfo</a>. <p> updowncounter
  */
@@ -1247,12 +1247,13 @@ CreateAsyncDoubleMetricSystemMemoryShared(metrics::Meter *meter)
 }
 
 /**
-  Reports memory in use by state.
+  Reports memory by state.
   <p>
-  updowncounter
+  The sum of the @code used @endcode and @code available @endcode state values SHOULD be equal to
+  @code system.memory.limit @endcode. <p> updowncounter
  */
 static constexpr const char *kMetricSystemMemoryUsage     = "system.memory.usage";
-static constexpr const char *descrMetricSystemMemoryUsage = "Reports memory in use by state.";
+static constexpr const char *descrMetricSystemMemoryUsage = "Reports memory by state.";
 static constexpr const char *unitMetricSystemMemoryUsage  = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1284,13 +1285,15 @@ CreateAsyncDoubleMetricSystemMemoryUsage(metrics::Meter *meter)
 }
 
 /**
-  Percentage of memory bytes in use.
+  Fraction of memory bytes by state.
+  <p>
+  The sum of the @code used @endcode and @code available @endcode state values SHOULD be equal to 1.
   <p>
   gauge
  */
 static constexpr const char *kMetricSystemMemoryUtilization = "system.memory.utilization";
 static constexpr const char *descrMetricSystemMemoryUtilization =
-    "Percentage of memory bytes in use.";
+    "Fraction of memory bytes by state.";
 static constexpr const char *unitMetricSystemMemoryUtilization = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2

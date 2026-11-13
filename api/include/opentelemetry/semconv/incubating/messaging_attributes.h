@@ -119,43 +119,66 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingEventhubsConsume
     "messaging.eventhubs.consumer.group";
 
 /**
-  The UTC epoch seconds at which the message has been accepted and stored in the entity.
+  Deprecated, use @code azure.eventhubs.message.enqueued_time @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code azure.eventhubs.message.enqueued_time @endcode.", "reason": "renamed",
+  "renamed_to": "azure.eventhubs.message.enqueued_time"}
  */
-static constexpr const char *kMessagingEventhubsMessageEnqueuedTime =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingEventhubsMessageEnqueuedTime =
     "messaging.eventhubs.message.enqueued_time";
 
 /**
-  The ack deadline in seconds set for the modify ack deadline request.
+  Deprecated, use @code gcp.pubsub.message.ack_deadline @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code gcp.pubsub.message.ack_deadline @endcode.", "reason": "renamed",
+  "renamed_to": "gcp.pubsub.message.ack_deadline"}
  */
-static constexpr const char *kMessagingGcpPubsubMessageAckDeadline =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingGcpPubsubMessageAckDeadline =
     "messaging.gcp_pubsub.message.ack_deadline";
 
 /**
-  The ack ID for a given message.
+  Deprecated, use @code gcp.pubsub.message.ack_id @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code gcp.pubsub.message.ack_id @endcode.", "reason": "renamed",
+  "renamed_to": "gcp.pubsub.message.ack_id"}
  */
-static constexpr const char *kMessagingGcpPubsubMessageAckId =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingGcpPubsubMessageAckId =
     "messaging.gcp_pubsub.message.ack_id";
 
 /**
-  The delivery attempt for a given message.
+  Deprecated, use @code gcp.pubsub.message.delivery_attempt @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code gcp.pubsub.message.delivery_attempt @endcode.", "reason": "renamed",
+  "renamed_to": "gcp.pubsub.message.delivery_attempt"}
  */
-static constexpr const char *kMessagingGcpPubsubMessageDeliveryAttempt =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingGcpPubsubMessageDeliveryAttempt =
     "messaging.gcp_pubsub.message.delivery_attempt";
 
 /**
-  The ordering key for a given message. If the attribute is not present, the message does not have
-  an ordering key.
+  Deprecated, use @code gcp.pubsub.message.ordering_key @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code gcp.pubsub.message.ordering_key @endcode.", "reason": "renamed",
+  "renamed_to": "gcp.pubsub.message.ordering_key"}
  */
-static constexpr const char *kMessagingGcpPubsubMessageOrderingKey =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingGcpPubsubMessageOrderingKey =
     "messaging.gcp_pubsub.message.ordering_key";
 
 /**
-  The Kafka cluster ID, obtained from the broker metadata exposed through the Kafka client (or
-  AdminClient) API. <p> The cluster ID is a unique identifier reported by the Kafka broker. It
+  Deprecated, use @code kafka.cluster.id @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code kafka.cluster.id @endcode.", "reason": "renamed", "renamed_to":
+  "kafka.cluster.id"} <p> The cluster ID is a unique identifier reported by the Kafka broker. It
   identifies the cluster independently of the individual brokers the client is configured to connect
   to, and remains stable even if broker hostnames, IP addresses, or ports change.
  */
-static constexpr const char *kMessagingKafkaClusterId = "messaging.kafka.cluster.id";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaClusterId =
+    "messaging.kafka.cluster.id";
 
 /**
   Deprecated, use @code messaging.consumer.group.name @endcode instead.
@@ -178,33 +201,46 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaDestination
     "messaging.kafka.destination.partition";
 
 /**
-  Message keys in Kafka are used for grouping alike messages to ensure they're processed on the same
-  partition. They differ from @code messaging.message.id @endcode in that they're not unique. If the
-  key is @code null @endcode, the attribute MUST NOT be set. <p> If the key type is not string, it's
-  string representation has to be supplied for the attribute. If the key has no unambiguous,
-  canonical string form, don't include its value.
- */
-static constexpr const char *kMessagingKafkaMessageKey = "messaging.kafka.message.key";
-
-/**
-  Deprecated, use @code messaging.kafka.offset @endcode instead.
+  Deprecated, use @code kafka.message.key @endcode instead.
 
   @deprecated
-  {"note": "Replaced by @code messaging.kafka.offset @endcode.", "reason": "renamed", "renamed_to":
-  "messaging.kafka.offset"}
+  {"note": "Replaced by @code kafka.message.key @endcode.", "reason": "renamed", "renamed_to":
+  "kafka.message.key"} <p> If the key type is not string, it's string representation has to be
+  supplied for the attribute. If the key has no unambiguous, canonical string form, don't include
+  its value.
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaMessageKey =
+    "messaging.kafka.message.key";
+
+/**
+  Deprecated, use @code kafka.offset @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code kafka.offset @endcode.", "reason": "renamed", "renamed_to":
+  "kafka.offset"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaMessageOffset =
     "messaging.kafka.message.offset";
 
 /**
-  A boolean that is true if the message is a tombstone.
+  Deprecated, use @code kafka.message.tombstone @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code kafka.message.tombstone @endcode.", "reason": "renamed", "renamed_to":
+  "kafka.message.tombstone"}
  */
-static constexpr const char *kMessagingKafkaMessageTombstone = "messaging.kafka.message.tombstone";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaMessageTombstone =
+    "messaging.kafka.message.tombstone";
 
 /**
-  The offset of a record in the corresponding Kafka partition.
+  Deprecated, use @code kafka.offset @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code kafka.offset @endcode.", "reason": "renamed", "renamed_to":
+  "kafka.offset"}
  */
-static constexpr const char *kMessagingKafkaOffset = "messaging.kafka.offset";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaOffset =
+    "messaging.kafka.offset";
 
 /**
   The size of the message body in bytes.
@@ -255,15 +291,23 @@ static constexpr const char *kMessagingOperationName = "messaging.operation.name
 static constexpr const char *kMessagingOperationType = "messaging.operation.type";
 
 /**
-  RabbitMQ message routing key.
+  Deprecated, use @code rabbitmq.destination.routing_key @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rabbitmq.destination.routing_key @endcode.", "reason": "renamed",
+  "renamed_to": "rabbitmq.destination.routing_key"}
  */
-static constexpr const char *kMessagingRabbitmqDestinationRoutingKey =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRabbitmqDestinationRoutingKey =
     "messaging.rabbitmq.destination.routing_key";
 
 /**
-  RabbitMQ message delivery tag
+  Deprecated, use @code rabbitmq.message.delivery_tag @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rabbitmq.message.delivery_tag @endcode.", "reason": "renamed",
+  "renamed_to": "rabbitmq.message.delivery_tag"}
  */
-static constexpr const char *kMessagingRabbitmqMessageDeliveryTag =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRabbitmqMessageDeliveryTag =
     "messaging.rabbitmq.message.delivery_tag";
 
 /**
@@ -277,48 +321,84 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRocketmqClientGr
     "messaging.rocketmq.client_group";
 
 /**
-  Model of message consumption. This only applies to consumer spans.
+  Deprecated, use @code rocketmq.consumption_model @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rocketmq.consumption_model @endcode.", "reason": "renamed",
+  "renamed_to": "rocketmq.consumption_model"}
  */
-static constexpr const char *kMessagingRocketmqConsumptionModel =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRocketmqConsumptionModel =
     "messaging.rocketmq.consumption_model";
 
 /**
-  The delay time level for delay message, which determines the message delay time.
+  Deprecated, use @code rocketmq.message.delay_time_level @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rocketmq.message.delay_time_level @endcode.", "reason": "renamed",
+  "renamed_to": "rocketmq.message.delay_time_level"}
  */
-static constexpr const char *kMessagingRocketmqMessageDelayTimeLevel =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRocketmqMessageDelayTimeLevel =
     "messaging.rocketmq.message.delay_time_level";
 
 /**
-  The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
+  Deprecated, use @code rocketmq.message.delivery_timestamp @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rocketmq.message.delivery_timestamp @endcode.", "reason": "renamed",
+  "renamed_to": "rocketmq.message.delivery_timestamp"}
  */
-static constexpr const char *kMessagingRocketmqMessageDeliveryTimestamp =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRocketmqMessageDeliveryTimestamp =
     "messaging.rocketmq.message.delivery_timestamp";
 
 /**
-  It is essential for FIFO message. Messages that belong to the same message group are always
-  processed one by one within the same consumer group.
+  Deprecated, use @code rocketmq.message.group @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rocketmq.message.group @endcode.", "reason": "renamed", "renamed_to":
+  "rocketmq.message.group"}
  */
-static constexpr const char *kMessagingRocketmqMessageGroup = "messaging.rocketmq.message.group";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRocketmqMessageGroup =
+    "messaging.rocketmq.message.group";
 
 /**
-  Key(s) of message, another way to mark message besides message ID.
+  Deprecated, use @code rocketmq.message.keys @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rocketmq.message.keys @endcode.", "reason": "renamed", "renamed_to":
+  "rocketmq.message.keys"}
  */
-static constexpr const char *kMessagingRocketmqMessageKeys = "messaging.rocketmq.message.keys";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRocketmqMessageKeys =
+    "messaging.rocketmq.message.keys";
 
 /**
-  The secondary classifier of message besides topic.
+  Deprecated, use @code rocketmq.message.tag @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rocketmq.message.tag @endcode.", "reason": "renamed", "renamed_to":
+  "rocketmq.message.tag"}
  */
-static constexpr const char *kMessagingRocketmqMessageTag = "messaging.rocketmq.message.tag";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRocketmqMessageTag =
+    "messaging.rocketmq.message.tag";
 
 /**
-  Type of message.
+  Deprecated, use @code rocketmq.message.type @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rocketmq.message.type @endcode.", "reason": "renamed", "renamed_to":
+  "rocketmq.message.type"}
  */
-static constexpr const char *kMessagingRocketmqMessageType = "messaging.rocketmq.message.type";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRocketmqMessageType =
+    "messaging.rocketmq.message.type";
 
 /**
-  Namespace of RocketMQ resources, resources in different namespaces are individual.
+  Deprecated, use @code rocketmq.namespace @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rocketmq.namespace @endcode.", "reason": "renamed", "renamed_to":
+  "rocketmq.namespace"}
  */
-static constexpr const char *kMessagingRocketmqNamespace = "messaging.rocketmq.namespace";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRocketmqNamespace =
+    "messaging.rocketmq.namespace";
 
 /**
   Deprecated, use @code messaging.destination.subscription.name @endcode instead.
@@ -332,33 +412,62 @@ OPENTELEMETRY_DEPRECATED static constexpr const char
         "messaging.servicebus.destination.subscription_name";
 
 /**
-  Describes the <a
-  href="https://learn.microsoft.com/azure/service-bus-messaging/message-transfers-locks-settlement#peeklock">settlement
-  type</a>.
+  Deprecated, use @code azure.servicebus.disposition_status @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code azure.servicebus.disposition_status @endcode.", "reason": "renamed",
+  "renamed_to": "azure.servicebus.disposition_status"}
  */
-static constexpr const char *kMessagingServicebusDispositionStatus =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingServicebusDispositionStatus =
     "messaging.servicebus.disposition_status";
 
 /**
-  Number of deliveries that have been attempted for this message.
+  Deprecated, use @code azure.servicebus.message.delivery_count @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code azure.servicebus.message.delivery_count @endcode.", "reason":
+  "renamed", "renamed_to": "azure.servicebus.message.delivery_count"}
  */
-static constexpr const char *kMessagingServicebusMessageDeliveryCount =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingServicebusMessageDeliveryCount =
     "messaging.servicebus.message.delivery_count";
 
 /**
-  The UTC epoch seconds at which the message has been accepted and stored in the entity.
+  Deprecated, use @code azure.servicebus.message.enqueued_time @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code azure.servicebus.message.enqueued_time @endcode.", "reason":
+  "renamed", "renamed_to": "azure.servicebus.message.enqueued_time"}
  */
-static constexpr const char *kMessagingServicebusMessageEnqueuedTime =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingServicebusMessageEnqueuedTime =
     "messaging.servicebus.message.enqueued_time";
+
+/**
+  Deprecated, use @code messaging.system.name @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code messaging.system.name @endcode.", "reason": "renamed", "renamed_to":
+  "messaging.system.name"} <p> The actual messaging system may differ from the one known by the
+  client. For example, when using Kafka client libraries to communicate with Azure Event Hubs, the
+  @code messaging.system @endcode is set to @code kafka @endcode based on the instrumentation's best
+  knowledge. <p> When migrating to @code messaging.system.name @endcode, update the following
+  values: <ul> <li>@code aws_sqs @endcode to @code aws.sqs @endcode</li> <li>@code eventgrid
+  @endcode to @code azure.eventgrid @endcode</li> <li>@code eventhubs @endcode to @code
+  azure.eventhubs @endcode</li> <li>@code servicebus @endcode to @code azure.servicebus
+  @endcode</li> <li>@code gcp_pubsub @endcode to @code gcp.pubsub @endcode</li>
+  </ul>
+  <p>
+  All other values are unchanged.
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingSystem = "messaging.system";
 
 /**
   The messaging system as identified by the client instrumentation.
   <p>
   The actual messaging system may differ from the one known by the client. For example, when using
-  Kafka client libraries to communicate with Azure Event Hubs, the @code messaging.system @endcode
-  is set to @code kafka @endcode based on the instrumentation's best knowledge.
+  Kafka client libraries to communicate with Azure Event Hubs, the @code messaging.system.name
+  @endcode is set to @code kafka @endcode based on the instrumentation's best knowledge.
  */
-static constexpr const char *kMessagingSystem = "messaging.system";
+static constexpr const char *kMessagingSystemName = "messaging.system.name";
 
 namespace MessagingOperationTypeValues
 {
@@ -534,6 +643,70 @@ static constexpr const char *kRocketmq = "rocketmq";
 static constexpr const char *kPulsar = "pulsar";
 
 }  // namespace MessagingSystemValues
+
+namespace MessagingSystemNameValues
+{
+/**
+  Apache ActiveMQ
+ */
+static constexpr const char *kActivemq = "activemq";
+
+/**
+  Amazon Simple Notification Service (SNS)
+ */
+static constexpr const char *kAwsSns = "aws.sns";
+
+/**
+  Amazon Simple Queue Service (SQS)
+ */
+static constexpr const char *kAwsSqs = "aws.sqs";
+
+/**
+  Azure Event Grid
+ */
+static constexpr const char *kAzureEventgrid = "azure.eventgrid";
+
+/**
+  Azure Event Hubs
+ */
+static constexpr const char *kAzureEventhubs = "azure.eventhubs";
+
+/**
+  Azure Service Bus
+ */
+static constexpr const char *kAzureServicebus = "azure.servicebus";
+
+/**
+  Google Cloud Pub/Sub
+ */
+static constexpr const char *kGcpPubsub = "gcp.pubsub";
+
+/**
+  Java Message Service
+ */
+static constexpr const char *kJms = "jms";
+
+/**
+  Apache Kafka
+ */
+static constexpr const char *kKafka = "kafka";
+
+/**
+  RabbitMQ
+ */
+static constexpr const char *kRabbitmq = "rabbitmq";
+
+/**
+  Apache RocketMQ
+ */
+static constexpr const char *kRocketmq = "rocketmq";
+
+/**
+  Apache Pulsar
+ */
+static constexpr const char *kPulsar = "pulsar";
+
+}  // namespace MessagingSystemNameValues
 
 }  // namespace messaging
 }  // namespace semconv

@@ -21,10 +21,14 @@ namespace opentracing
 
 /**
   Parent-child Reference type
-  <p>
-  The causal relationship between a child Span and a parent Span.
+
+  @deprecated
+  {"note": "OpenTracing compatibility requirements are <a
+  href="https://opentelemetry.io/docs/specs/otel/compatibility/opentracing/">deprecated in
+  OpenTelemetry Specification</a>", "reason": "obsoleted"} <p> The causal relationship between a
+  child Span and a parent Span.
  */
-static constexpr const char *kOpentracingRefType = "opentracing.ref_type";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kOpentracingRefType = "opentracing.ref_type";
 
 namespace OpentracingRefTypeValues
 {
