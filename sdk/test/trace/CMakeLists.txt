@@ -40,6 +40,7 @@ endforeach()
 
 set_tests_properties(
   trace.TracerProvider.ConstructionFailureDiagnosticsAllowProviderReentry
+  trace.TracerProvider.UpdateTracerConfiguratorPreservesConfigOnMatcherFailure
   PROPERTIES TIMEOUT 10)
 
 if(OTELCPP_WITH_BENCHMARK)

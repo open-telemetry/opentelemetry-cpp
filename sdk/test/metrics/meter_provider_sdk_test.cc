@@ -1214,6 +1214,84 @@ TEST(MeterProvider, ConstructorsAreNotNoexcept)
 }
 
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
+TEST(MeterProvider, UpdateMeterConfiguratorPreservesConfigOnMatcherFailure)
+{
+  for (int exception_type = 0; exception_type < 2; ++exception_type)
+  {
+    SCOPED_TRACE(exception_type);
+    for (int initial_state = 0; initial_state < 2; ++initial_state)
+    {
+      SCOPED_TRACE(initial_state);
+      const bool initially_enabled = initial_state != 0;
+      int match_attempts           = 0;
+      MetricReader *reader{};
+      auto provider     = MakeProvider(reader, initially_enabled ? EnableAll() : DisableAll(),
+                                       AggregationTemporality::kDelta);
+      auto before       = provider->GetMeter("scope.before")->CreateUInt64Counter("counter");
+      auto throwing     = provider->GetMeter("scope.throwing")->CreateUInt64Counter("counter");
+      auto after        = provider->GetMeter("scope.after")->CreateUInt64Counter("counter");
+      auto new_config   = initially_enabled ? MeterConfig::Disabled() : MeterConfig::Default();
+      auto configurator = std::make_unique<scope_sdk::ScopeConfigurator<MeterConfig>>(
+          scope_sdk::ScopeConfigurator<MeterConfig>::Builder(new_config)
+              .AddCondition(
+                  [&](const scope_sdk::InstrumentationScope &scope) {
+                    ++match_attempts;
+                    if (scope.GetName() == "scope.throwing")
+                    {
+                      if (exception_type == 0)
+                      {
+                        throw std::runtime_error("injected matcher failure");
+                      }
+                      throw 1;
+                    }
+                    return false;
+                  },
+                  new_config)
+              .Build());
+
+      int diagnostics = 0;
+      ScopedTestLogHandler handler(LogLevel::Error, [&](const ScopedTestLogHandler::Entry &entry) {
+        ++diagnostics;
+        EXPECT_EQ(entry.level, LogLevel::Error);
+        EXPECT_EQ(match_attempts, 3);
+        // Creating a meter re-enters both the provider lock and meter_lock_.
+        EXPECT_NE(provider->GetMeter("scope.new"), nullptr);
+      });
+
+      provider->UpdateMeterConfigurator(std::move(configurator));
+      EXPECT_EQ(diagnostics, 1);
+      EXPECT_EQ(match_attempts, 4);
+      auto entries = handler.Drain();
+      ASSERT_EQ(entries.size(), 1u);
+      EXPECT_NE(entries[0].msg.find("[MeterProvider::UpdateMeterConfigurator] Failed to update 1"),
+                std::string::npos);
+
+      // A failed match must not prevent subsequent meters from being created or configured.
+      auto created = provider->GetMeter("scope.new")->CreateUInt64Counter("counter");
+      EXPECT_EQ(match_attempts, 4);
+      before->Add(1);
+      throwing->Add(1);
+      after->Add(1);
+      created->Add(1);
+      const std::set<std::string> expected_scopes =
+          initially_enabled ? std::set<std::string>{"scope.throwing"}
+                            : std::set<std::string>{"scope.before", "scope.after", "scope.new"};
+      EXPECT_EQ(CollectScopeNames(reader), expected_scopes);
+
+      // A later successful update still reaches the instance whose matcher previously threw.
+      provider->UpdateMeterConfigurator(EnableAll());
+      before->Add(1);
+      throwing->Add(1);
+      after->Add(1);
+      created->Add(1);
+      EXPECT_EQ(CollectScopeNames(reader), (std::set<std::string>{"scope.before", "scope.throwing",
+                                                                  "scope.after", "scope.new"}));
+      EXPECT_EQ(diagnostics, 1);
+      EXPECT_TRUE(handler.Drain().empty());
+    }
+  }
+}
+
 TEST(MeterProvider, ConstructionFailureDiagnosticsAllowProviderReentry)
 {
   using opentelemetry::sdk::instrumentationscope::InstrumentationScope;

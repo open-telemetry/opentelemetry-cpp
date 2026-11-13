@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstddef>
 #include <exception>
 #include <mutex>
 #include <ostream>
@@ -221,17 +222,51 @@ void MeterProvider::UpdateMeterConfigurator(
     return;
   }
 
-  // Shares the lock with GetMeter so a Meter is never returned while its MeterConfig is out of
-  // date with the provider configurator.
-  const std::lock_guard<std::mutex> guard(lock_);
-  context_->SetMeterConfigurator(std::move(meter_configurator));
+  std::size_t failure_count = 0;
+  {
+    // Shares the lock with GetMeter so meter creation is exclusive with configurator updates.
+    // A failed match preserves that meter's previous config.
+    const std::lock_guard<std::mutex> guard(lock_);
+    context_->SetMeterConfigurator(std::move(meter_configurator));
 
-  // Takes meter_lock_ after lock_, the same order as GetMeter and RemoveMeter.
-  const auto &configurator = context_->GetMeterConfigurator();
-  context_->ForEachMeter([&configurator](std::shared_ptr<Meter> &meter) {
-    meter->UpdateMeterConfig(configurator.ComputeConfig(*meter->GetInstrumentationScope()));
-    return true;
-  });
+    // Takes meter_lock_ after lock_, the same order as GetMeter and RemoveMeter.
+    const auto &configurator = context_->GetMeterConfigurator();
+    context_->ForEachMeter([&](std::shared_ptr<Meter> &meter) {
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+      try
+      {
+#endif
+        meter->UpdateMeterConfig(configurator.ComputeConfig(*meter->GetInstrumentationScope()));
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+      }
+      catch (...)
+      {
+        // Keep the previous config for this instance and continue updating the others.
+        ++failure_count;
+      }
+#endif
+      return true;
+    });
+  }
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  if (failure_count > 0)
+  {
+    try
+    {
+      OTEL_INTERNAL_LOG_ERROR("[MeterProvider::UpdateMeterConfigurator] Failed to update "
+                              << failure_count
+                              << " meter(s); keeping their previous configuration.");
+    }
+    catch (const std::exception &)  // NOLINT(bugprone-empty-catch)
+    {
+      // Logging can throw (typically std::bad_alloc from the string stream).
+      // Swallow it so the noexcept UpdateMeterConfigurator path cannot throw.
+    }
+  }
+#else
+  (void)failure_count;
+#endif
 }
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW

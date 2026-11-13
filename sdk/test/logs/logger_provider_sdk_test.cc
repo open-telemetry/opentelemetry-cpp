@@ -682,6 +682,84 @@ TEST(LoggerProviderSDK, ConstructorsAreNotNoexcept)
 }
 
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
+TEST(LoggerProviderSDK, UpdateLoggerConfiguratorPreservesConfigOnMatcherFailure)
+{
+  using opentelemetry::sdk::common::internal_log::LogLevel;
+  using opentelemetry::test_common::ScopedTestLogHandler;
+  for (int exception_type = 0; exception_type < 2; ++exception_type)
+  {
+    SCOPED_TRACE(exception_type);
+    for (int initial_state = 0; initial_state < 2; ++initial_state)
+    {
+      SCOPED_TRACE(initial_state);
+      const bool initially_enabled = initial_state != 0;
+      int match_attempts           = 0;
+      RecordingExporter *exporter{};
+      auto provider = MakeProvider(
+          exporter,
+          std::make_unique<scope_sdk::ScopeConfigurator<LoggerConfig>>(
+              scope_sdk::ScopeConfigurator<LoggerConfig>::Builder(
+                  LoggerConfig::Create(initially_enabled, logs_api::Severity::kWarn, false))
+                  .Build()));
+      auto before       = provider->GetLogger("before", "scope.before");
+      auto throwing     = provider->GetLogger("throwing", "scope.throwing");
+      auto after        = provider->GetLogger("after", "scope.after");
+      auto new_config   = LoggerConfig::Create(true, logs_api::Severity::kDebug, false);
+      auto configurator = std::make_unique<scope_sdk::ScopeConfigurator<LoggerConfig>>(
+          scope_sdk::ScopeConfigurator<LoggerConfig>::Builder(new_config)
+              .AddCondition(
+                  [&](const scope_sdk::InstrumentationScope &scope) {
+                    ++match_attempts;
+                    if (scope.GetName() == "scope.throwing")
+                    {
+                      if (exception_type == 0)
+                      {
+                        throw std::runtime_error("injected matcher failure");
+                      }
+                      throw 1;
+                    }
+                    return false;
+                  },
+                  new_config)
+              .Build());
+
+      int diagnostics = 0;
+      ScopedTestLogHandler handler(LogLevel::Error, [&](const ScopedTestLogHandler::Entry &entry) {
+        ++diagnostics;
+        EXPECT_EQ(entry.level, LogLevel::Error);
+        EXPECT_EQ(match_attempts, 3);
+        EXPECT_EQ(provider->GetLogger("before", "scope.before"), before);
+        EXPECT_NE(provider->GetLogger("new", "scope.new"), nullptr);
+      });
+
+      provider->UpdateLoggerConfigurator(std::move(configurator));
+      EXPECT_EQ(diagnostics, 1);
+      EXPECT_EQ(match_attempts, 4);
+      auto entries = handler.Drain();
+      ASSERT_EQ(entries.size(), 1u);
+      EXPECT_NE(
+          entries[0].msg.find("[LoggerProvider::UpdateLoggerConfigurator] Failed to update 1"),
+          std::string::npos);
+      EXPECT_TRUE(before->Enabled(logs_api::Severity::kDebug));
+      EXPECT_FALSE(throwing->Enabled(logs_api::Severity::kDebug));
+      EXPECT_EQ(throwing->Enabled(logs_api::Severity::kWarn), initially_enabled);
+      EXPECT_TRUE(after->Enabled(logs_api::Severity::kDebug));
+
+      auto created = provider->GetLogger("new", "scope.new");
+      EXPECT_EQ(match_attempts, 4);
+      EXPECT_TRUE(created->Enabled(logs_api::Severity::kDebug));
+
+      provider->UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kDebug));
+      EXPECT_TRUE(before->Enabled(logs_api::Severity::kDebug));
+      EXPECT_TRUE(throwing->Enabled(logs_api::Severity::kDebug));
+      EXPECT_TRUE(after->Enabled(logs_api::Severity::kDebug));
+      EXPECT_TRUE(created->Enabled(logs_api::Severity::kDebug));
+      EXPECT_EQ(diagnostics, 1);
+      EXPECT_TRUE(handler.Drain().empty());
+    }
+  }
+}
+
 TEST(LoggerProviderSDK, ConstructionFailureDiagnosticsAllowProviderReentry)
 {
   using opentelemetry::sdk::common::internal_log::LogLevel;
