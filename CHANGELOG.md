@@ -60,6 +60,10 @@ Increment the:
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
+* [API] `Baggage::ToHeader` now percent-encodes spaces as `%20` instead of
+  `+`, as required by the W3C Baggage specification. Decoding is unchanged.
+  [#4765](https://github.com/open-telemetry/opentelemetry-cpp/pull/4765)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
