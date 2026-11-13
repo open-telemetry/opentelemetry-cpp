@@ -1,0 +1,17 @@
+# HELP target Target metadata
+# TYPE target gauge
+target_info{otel_scope_name="library_name",otel_scope_version="1.2.0",custom_resource_attr="custom_resource_value",service_instance_id="localhost:8001",service_name="unknown_service"} 1
+# HELP library_name_unit description
+# TYPE library_name_unit histogram
+library_name_unit_count{a1="b1",otel_scope_name="library_name",otel_scope_version="1.2.0"} 3
+library_name_unit_sum{a1="b1",otel_scope_name="library_name",otel_scope_version="1.2.0"} 900.5
+library_name_unit_bucket{a1="b1",otel_scope_name="library_name",otel_scope_version="1.2.0",le="10.1"} 200
+library_name_unit_bucket{a1="b1",otel_scope_name="library_name",otel_scope_version="1.2.0",le="20.2"} 500
+library_name_unit_bucket{a1="b1",otel_scope_name="library_name",otel_scope_version="1.2.0",le="30.2"} 900
+library_name_unit_bucket{a1="b1",otel_scope_name="library_name",otel_scope_version="1.2.0",le="+Inf"} 1400
+library_name_unit_count{a2="b2",otel_scope_name="library_name",otel_scope_version="1.2.0"} 3
+library_name_unit_sum{a2="b2",otel_scope_name="library_name",otel_scope_version="1.2.0"} 900
+library_name_unit_bucket{a2="b2",otel_scope_name="library_name",otel_scope_version="1.2.0",le="10"} 200
+library_name_unit_bucket{a2="b2",otel_scope_name="library_name",otel_scope_version="1.2.0",le="20"} 500
+library_name_unit_bucket{a2="b2",otel_scope_name="library_name",otel_scope_version="1.2.0",le="30"} 900
+library_name_unit_bucket{a2="b2",otel_scope_name="library_name",otel_scope_version="1.2.0",le="+Inf"} 1400

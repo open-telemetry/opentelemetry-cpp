@@ -1,0 +1,4 @@
+# HELP library_name_unit_total description
+# TYPE library_name_unit_total counter
+library_name_unit_total{a1="b1",otel_scope_name="library_name",otel_scope_version="1.2.0"} 10
+library_name_unit_total{a2="b2",otel_scope_name="library_name",otel_scope_version="1.2.0"} 20

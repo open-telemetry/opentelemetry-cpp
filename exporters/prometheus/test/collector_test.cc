@@ -7,7 +7,6 @@
 #include <cstddef>
 #include <string>
 #include <thread>
-#include <vector>
 
 #include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -81,10 +80,19 @@ TEST(PrometheusCollector, BasicTests)
   MockMetricReader reader;
   MockMetricProducer producer;
   reader.SetMetricProducer(&producer);
-  PrometheusCollector collector(&reader, true, false, false, false);
-  auto data = collector.Collect();
 
-  // Collection size should be the same as the size
-  // of the records collection produced by MetricProducer.
-  ASSERT_EQ(data.size(), 2);
+  PrometheusCollector collector(&reader, true, false, false, false);
+  EXPECT_EQ(SerializeMetrics(collector.Collect()), ReadTestDataFile("counter.txt"));
+
+  PrometheusCollector collector_without_target(&reader, false, false, false, false);
+  EXPECT_EQ(SerializeMetrics(collector_without_target.Collect()),
+            ReadTestDataFile("without_target_info.txt"));
+
+  PrometheusCollector collector_without_scope(&reader, true, true, false, false);
+  EXPECT_EQ(SerializeMetrics(collector_without_scope.Collect()),
+            ReadTestDataFile("without_scope_info.txt"));
+
+  PrometheusCollector collector_without_units_and_suffix(&reader, true, false, true, true);
+  EXPECT_EQ(SerializeMetrics(collector_without_units_and_suffix.Collect()),
+            ReadTestDataFile("without_units_and_suffix.txt"));
 }

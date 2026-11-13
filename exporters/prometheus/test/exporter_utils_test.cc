@@ -2,12 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <prometheus/client_metric.h>
 #include <prometheus/metric_family.h>
 #include <prometheus/metric_type.h>
-#include <cstddef>
-#include <limits>
-#include <list>
 #include <string>
 #include <utility>
 #include <vector>
@@ -80,219 +76,92 @@ public:
 }  // namespace metrics
 }  // namespace exporter
 
-template <typename T>
-static void assert_basic(prometheus_client::MetricFamily &metric,
-                         const std::string &expected_name,
-                         const std::string &description,
-                         prometheus_client::MetricType type,
-                         size_t label_num,
-                         std::vector<T> vals)
-{
-  ASSERT_EQ(metric.name, expected_name);  // name sanitized
-  ASSERT_EQ(metric.help, description);    // description not changed
-  ASSERT_EQ(metric.type, type);           // type translated
-
-  // Prometheus metric data points should not have explicit timestamps
-  for (const prometheus::ClientMetric &cm : metric.metric)
-  {
-    ASSERT_EQ(cm.timestamp_ms, 0);
-  }
-
-  auto metric_data = metric.metric[0];
-  ASSERT_EQ(metric_data.label.size(), label_num);
-
-  switch (type)
-  {
-    case prometheus_client::MetricType::Counter: {
-      ASSERT_DOUBLE_EQ(static_cast<double>(metric_data.counter.value),
-                       static_cast<double>(vals[0]));
-      break;
-    }
-    case prometheus_client::MetricType::Histogram: {
-      ASSERT_DOUBLE_EQ(static_cast<double>(metric_data.histogram.sample_count),
-                       static_cast<double>(vals[0]));
-      ASSERT_DOUBLE_EQ(static_cast<double>(metric_data.histogram.sample_sum),
-                       static_cast<double>(vals[1]));
-      auto buckets = metric_data.histogram.bucket;
-      ASSERT_EQ(buckets.size(), vals[2]);
-      break;
-    }
-    case prometheus_client::MetricType::Gauge: {
-      ASSERT_DOUBLE_EQ(static_cast<double>(metric_data.gauge.value), static_cast<double>(vals[0]));
-      break;
-    }
-    break;
-    case prometheus_client::MetricType::Summary:
-      // Summary and Info type not supported
-      ASSERT_TRUE(false);
-      break;
-    case prometheus::MetricType::Untyped:
-    default:
-      break;
-  }
-}
-
-static void assert_histogram(prometheus_client::MetricFamily &metric,
-                             const std::list<double> &boundaries,
-                             std::vector<int> correct)
-{
-  int cumulative_count = 0;
-  auto buckets         = metric.metric[0].histogram.bucket;
-  auto boundary_it     = boundaries.cbegin();
-  for (size_t i = 0; i < buckets.size(); i++)
-  {
-    auto bucket = buckets[i];
-    if (i != buckets.size() - 1)
-    {
-      ASSERT_DOUBLE_EQ(*boundary_it++, bucket.upper_bound);
-    }
-    else
-    {
-      ASSERT_DOUBLE_EQ(std::numeric_limits<double>::infinity(), bucket.upper_bound);
-    }
-    cumulative_count += correct[i];
-    ASSERT_EQ(cumulative_count, bucket.cumulative_count);
-  }
-}
-
 TEST(PrometheusExporterUtils, TranslateToPrometheusEmptyInputReturnsEmptyCollection)
 {
   metric_sdk::ResourceMetrics metrics_data = {};
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
-  ASSERT_EQ(translated.size(), 0);
+  ASSERT_EQ(translated.size(), 0U);
+  EXPECT_EQ(SerializeMetrics(translated), "");
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 {
-
-  opentelemetry::sdk::resource::Resource resource = opentelemetry::sdk::resource::Resource::Create(
-      {{"service.name", "test_service"},
-       {"service.namespace", "test_namespace"},
-       {"service.instance.id", "localhost:8000"},
-       {"custom_resource_attr", "custom_resource_value"}});
   TestDataPoints dp;
   metric_sdk::ResourceMetrics metrics_data = dp.CreateSumPointData();
-  metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
-  ASSERT_EQ(translated.size(), 2);
-  auto metric1          = translated[1];
-  std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name_unit_total", "description",
-               prometheus_client::MetricType::Counter, 3, vals);
-  int checked_label_num = 0;
-  for (auto &label : translated[0].metric[0].label)
-  {
-    if (label.name == "service_namespace")
-    {
-      ASSERT_EQ(label.value, "test_namespace");
-      checked_label_num++;
-    }
-    else if (label.name == "service_name")
-    {
-      ASSERT_EQ(label.value, "test_service");
-      checked_label_num++;
-    }
-    else if (label.name == "service_instance_id")
-    {
-      ASSERT_EQ(label.value, "localhost:8000");
-      checked_label_num++;
-    }
-    else if (label.name == "custom_resource_attr")
-    {
-      ASSERT_EQ(label.value, "custom_resource_value");
-      checked_label_num++;
-    }
-  }
-  ASSERT_EQ(checked_label_num, 4);
+  EXPECT_EQ(SerializeMetrics(translated), ReadTestDataFile("counter.txt"));
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
 {
-  opentelemetry::sdk::resource::Resource resource = opentelemetry::sdk::resource::Resource::Create(
-      {{"service.name", "test_service"},
-       {"service.instance.id", "localhost:8000"},
-       {"custom_resource_attr", "custom_resource_value"}});
+  Resource resource{ResourceAttributes{{"service.name", "test_service"},
+                                       {"service.instance.id", "localhost:8000"},
+                                       {"custom_resource_attr", "custom_resource_value"}}};
   TestDataPoints dp;
   metric_sdk::ResourceMetrics metrics_data = dp.CreateLastValuePointData();
   metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
-  ASSERT_EQ(translated.size(), 2);
-
-  auto metric1          = translated[1];
-  std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name_unit", "description", prometheus_client::MetricType::Gauge, 3,
-               vals);
-
-  int checked_label_num = 0;
-  for (auto &label : translated[0].metric[0].label)
-  {
-    if (label.name == "service_name")
-    {
-      ASSERT_EQ(label.value, "test_service");
-      checked_label_num++;
-    }
-    else if (label.name == "service_instance_id")
-    {
-      ASSERT_EQ(label.value, "localhost:8000");
-      checked_label_num++;
-    }
-    else if (label.name == "custom_resource_attr")
-    {
-      ASSERT_EQ(label.value, "custom_resource_value");
-      checked_label_num++;
-    }
-  }
-  ASSERT_EQ(checked_label_num, 3);
+  EXPECT_EQ(SerializeMetrics(translated), ReadTestDataFile("gauge.txt"));
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 {
-  opentelemetry::sdk::resource::Resource resource = opentelemetry::sdk::resource::Resource::Create(
-      {{"service.instance.id", "localhost:8001"},
-       {"custom_resource_attr", "custom_resource_value"}});
+  Resource resource{ResourceAttributes{{"service.name", "unknown_service"},
+                                       {"service.instance.id", "localhost:8001"},
+                                       {"custom_resource_attr", "custom_resource_value"}}};
   TestDataPoints dp;
   metric_sdk::ResourceMetrics metrics_data = dp.CreateHistogramPointData();
   metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
-  ASSERT_EQ(translated.size(), 2);
+  EXPECT_EQ(SerializeMetrics(translated), ReadTestDataFile("histogram.txt"));
+}
 
-  auto metric              = translated[1];
-  std::vector<double> vals = {3, 900.5, 4};
-  assert_basic(metric, "library_name_unit", "description", prometheus_client::MetricType::Histogram,
-               3, vals);
-  assert_histogram(metric, std::list<double>{10.1, 20.2, 30.2}, {200, 300, 400, 500});
+TEST(PrometheusExporterUtils, TranslateToPrometheusUpDownCounter)
+{
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateUpDownCounterPointData();
 
-  int checked_label_num = 0;
-  for (auto &label : translated[0].metric[0].label)
-  {
-    if (label.name == "service_name")
-    {
-      // default service name is "unknown_service"
-      ASSERT_EQ(label.value, "unknown_service");
-      checked_label_num++;
-    }
-    else if (label.name == "service_instance_id")
-    {
-      ASSERT_EQ(label.value, "localhost:8001");
-      checked_label_num++;
-    }
-    else if (label.name == "custom_resource_attr")
-    {
-      ASSERT_EQ(label.value, "custom_resource_value");
-      checked_label_num++;
-    }
-  }
-  ASSERT_EQ(checked_label_num, 3);
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
+  EXPECT_EQ(SerializeMetrics(translated), ReadTestDataFile("up_down_counter.txt"));
+}
+
+TEST(PrometheusExporterUtils, TranslateToPrometheusWithoutTargetInfo)
+{
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateSumPointData();
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data, false);
+  EXPECT_EQ(SerializeMetrics(translated), ReadTestDataFile("without_target_info.txt"));
+}
+
+TEST(PrometheusExporterUtils, TranslateToPrometheusWithoutScopeInfo)
+{
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateSumPointData();
+
+  auto translated =
+      PrometheusExporterUtils::TranslateToPrometheus(metrics_data, true, true, false, false);
+  EXPECT_EQ(SerializeMetrics(translated), ReadTestDataFile("without_scope_info.txt"));
+}
+
+TEST(PrometheusExporterUtils, TranslateToPrometheusWithoutUnitsAndTypeSuffix)
+{
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateSumPointData();
+
+  auto translated =
+      PrometheusExporterUtils::TranslateToPrometheus(metrics_data, true, false, true, true);
+  EXPECT_EQ(SerializeMetrics(translated), ReadTestDataFile("without_units_and_suffix.txt"));
 }
 
 namespace
 {
 class SanitizeTest : public ::testing::Test
 {
-  Resource resource_ = Resource::Create({});
+  Resource resource_{ResourceAttributes{}};
   nostd::unique_ptr<InstrumentationScope> instrumentation_scope_ =
       InstrumentationScope::Create("library_name", "1.2.0");
 
@@ -309,7 +178,12 @@ protected:
               std::vector<metric_sdk::MetricData>{
                   {instrument_descriptor, {}, {}, {}, {{{{original, "value"}}, {}}}}}}}},
         false);
-    EXPECT_EQ(result.begin()->metric.begin()->label.begin()->name, sanitized);
+    const std::string expected =
+        "# HELP name_unit_total description\n"
+        "# TYPE name_unit_total counter\n"
+        "name_unit_total{" +
+        sanitized + "=\"value\",otel_scope_name=\"library_name\",otel_scope_version=\"1.2.0\"} 0\n";
+    EXPECT_EQ(SerializeMetrics(result), expected);
   }
 };
 }  // namespace
@@ -324,13 +198,11 @@ TEST_F(SanitizeTest, Label)
   CheckSanitizeLabel("name?__name:", "name_name_");
 }
 
-TEST_F(SanitizeTest, Name) {}
-
 namespace
 {
 class AttributeCollisionTest : public ::testing::Test
 {
-  Resource resource_ = Resource::Create(ResourceAttributes{});
+  Resource resource_{ResourceAttributes{}};
   nostd::unique_ptr<InstrumentationScope> instrumentation_scope_ =
       InstrumentationScope::Create("library_name", "1.2.0");
   metric_sdk::InstrumentDescriptor instrument_descriptor_{"library_name", "description", "unit",
@@ -339,7 +211,7 @@ class AttributeCollisionTest : public ::testing::Test
 
 protected:
   void CheckTranslation(const metric_sdk::PointAttributes &attrs,
-                        const std::vector<prometheus::ClientMetric::Label> &expected)
+                        const std::string &expected_metric_line)
   {
     std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
         {&resource_,
@@ -348,29 +220,20 @@ protected:
               std::vector<metric_sdk::MetricData>{
                   {instrument_descriptor_, {}, {}, {}, {{attrs, {}}}}}}}},
         false);
-    for (auto &expected_kv : expected)
-    {
-      bool found = false;
-      for (auto &found_kv : result.begin()->metric.begin()->label)
-      {
-        if (found_kv.name == expected_kv.name)
-        {
-          EXPECT_EQ(found_kv.value, expected_kv.value);
-          found = true;
-        }
-      }
-      EXPECT_TRUE(found);
-    }
+    const std::string expected =
+        "# HELP library_name_unit_total description\n"
+        "# TYPE library_name_unit_total counter\n" +
+        expected_metric_line + "\n";
+    EXPECT_EQ(SerializeMetrics(result), expected);
   }
 };
 }  // namespace
 
 TEST_F(AttributeCollisionTest, SeparatesDistinctKeys)
 {
-  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}}, {{"foo_a", "value1"},
-                                                                {"foo_b", "value2"},
-                                                                {"otel_scope_name", "library_name"},
-                                                                {"otel_scope_version", "1.2.0"}});
+  CheckTranslation(
+      {{"foo.a", "value1"}, {"foo.b", "value2"}},
+      R"(library_name_unit_total{foo_a="value1",foo_b="value2",otel_scope_name="library_name",otel_scope_version="1.2.0"} 0)");
 }
 
 TEST(PrometheusExporterUtils, PrometheusUnit)
@@ -535,18 +398,16 @@ TEST(PromentheusExporterUtils, PrometheusNameMapping)
 
 TEST_F(AttributeCollisionTest, JoinsCollidingKeys)
 {
-  CheckTranslation({{"foo.a", "value1"}, {"foo_a", "value2"}}, {{"foo_a", "value1;value2"},
-                                                                {"otel_scope_name", "library_name"},
-                                                                {"otel_scope_version", "1.2.0"}});
+  CheckTranslation(
+      {{"foo.a", "value1"}, {"foo_a", "value2"}},
+      R"(library_name_unit_total{foo_a="value1;value2",otel_scope_name="library_name",otel_scope_version="1.2.0"} 0)");
 }
 
 TEST_F(AttributeCollisionTest, DropsInvertedKeys)
 {
-  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}, {"foo__a", "value3"}},
-                   {{"foo_a", "value1"},
-                    {"foo_b", "value2"},
-                    {"otel_scope_name", "library_name"},
-                    {"otel_scope_version", "1.2.0"}});
+  CheckTranslation(
+      {{"foo.a", "value1"}, {"foo.b", "value2"}, {"foo__a", "value3"}},
+      R"(library_name_unit_total{foo_a="value1",foo_b="value2",otel_scope_name="library_name",otel_scope_version="1.2.0"} 0)");
 }
 
 TEST(PrometheusExporterUtils, EmptyPointDataAttributesAndNullResourceScopeLabels)
@@ -576,18 +437,7 @@ TEST(PrometheusExporterUtils, EmptyPointDataAttributesAndNullResourceScopeLabels
           {scope.get(), std::vector<metric_sdk::MetricData>{empty_metric_data, metric_data}}}};
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
-  ASSERT_EQ(translated.size(), 1U);
-  ASSERT_EQ(translated[0].metric.size(), 1U);
-
-  const auto &labels                                    = translated[0].metric[0].label;
-  std::vector<prometheus::ClientMetric::Label> expected = {{"otel_scope_name", "library_name"},
-                                                           {"otel_scope_version", "1.2.0"}};
-  ASSERT_EQ(labels.size(), expected.size());
-  for (std::size_t i = 0; i < expected.size(); ++i)
-  {
-    EXPECT_EQ(labels[i].name, expected[i].name);
-    EXPECT_EQ(labels[i].value, expected[i].value);
-  }
+  EXPECT_EQ(SerializeMetrics(translated), ReadTestDataFile("empty_point_and_null_resource.txt"));
 }
 
 TEST(PrometheusExporterUtils, CrossSourceScopeCollisionsAndArrayAttributes)
@@ -613,29 +463,13 @@ TEST(PrometheusExporterUtils, CrossSourceScopeCollisionsAndArrayAttributes)
       opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{{std::move(point_attrs), sum_point_data}}};
 
-  Resource resource = Resource::Create(ResourceAttributes{});
+  Resource resource{ResourceAttributes{}};
   metric_sdk::ResourceMetrics data{
       &resource, std::vector<metric_sdk::ScopeMetrics>{
                      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
-  ASSERT_EQ(translated.size(), 1U);
-  ASSERT_EQ(translated[0].metric.size(), 1U);
-
-  const auto &labels                                    = translated[0].metric[0].label;
-  std::vector<prometheus::ClientMetric::Label> expected = {
-      {"counts", "[1,2,3]"},
-      {"doubles", "[1e-09,2e-09,1.5]"},
-      {"flags", "[true,false]"},
-      {"otel_scope_name", "point_name;library_name"},
-      {"otel_scope_version", "0.9.0;1.2.0"},
-      {"tags_a", "[\"a\",\"b\\\"c\"];[\"d\"]"}};
-  ASSERT_EQ(labels.size(), expected.size());
-  for (std::size_t i = 0; i < expected.size(); ++i)
-  {
-    EXPECT_EQ(labels[i].name, expected[i].name);
-    EXPECT_EQ(labels[i].value, expected[i].value);
-  }
+  EXPECT_EQ(SerializeMetrics(translated), ReadTestDataFile("scope_collisions_and_arrays.txt"));
 }
 
 OPENTELEMETRY_END_NAMESPACE

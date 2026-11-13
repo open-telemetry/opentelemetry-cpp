@@ -1,0 +1,3 @@
+# HELP requests_total description
+# TYPE requests_total counter
+requests_total{counts="[1,2,3]",doubles="[1e-09,2e-09,1.5]",flags="[true,false]",otel_scope_name="point_name;library_name",otel_scope_version="0.9.0;1.2.0",tags_a="[\"a\",\"b\\\"c\"];[\"d\"]"} 5
