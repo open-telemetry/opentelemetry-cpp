@@ -15,9 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
-* [API] `Baggage::ToHeader` now percent-encodes spaces as `%20` instead of
-  `+`, as required by the W3C Baggage specification. Decoding is unchanged.
-  [#4765](https://github.com/open-telemetry/opentelemetry-cpp/pull/4765)
+* [BUILD] Link `libatomic` on platforms that need it for 64-bit `std::atomic`
+  (32-bit powerpc and mips with GCC), so the curl HTTP client, the OTLP gRPC
+  client, and the trace, logs, and metrics libraries link successfully.
+  [#4773](https://github.com/open-telemetry/opentelemetry-cpp/issues/4773)
+
 * [SDK] Skip completely empty span links (invalid span context, no attributes
   and no trace state), so they no longer count against `link_count_limit`
   [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)
@@ -57,6 +59,10 @@ Increment the:
 * [SDK] Clamp `BatchLogRecordProcessor` max_export_batch_size to non-zero
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
+
+* [API] `Baggage::ToHeader` now percent-encodes spaces as `%20` instead of
+  `+`, as required by the W3C Baggage specification. Decoding is unchanged.
+  [#4765](https://github.com/open-telemetry/opentelemetry-cpp/pull/4765)
 
 ## [1.30.0] 2026-10-22
 
