@@ -154,6 +154,7 @@ protected:
     std::atomic<uint64_t> force_flush_pending_sequence{0};
     std::atomic<uint64_t> force_flush_notified_sequence{0};
     std::atomic<std::chrono::microseconds::rep> force_flush_timeout_us{0};
+    bool is_worker_done{false};  // guarded by cv_m
 
     // Do not use SynchronizationData() = default; here, some versions of GCC&Clang have BUGs
     // and may not initialize the member correctly. See also

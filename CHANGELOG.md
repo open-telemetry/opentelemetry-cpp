@@ -55,6 +55,12 @@ Increment the:
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
+* [SDK] `BatchSpanProcessor::Shutdown(timeout)` now returns `false` when the
+  timeout expires while the worker thread is still exporting, instead of
+  waiting for the export to finish. The processor's destructor then waits for
+  the worker thread and shuts down the exporter.
+  [#4767](https://github.com/open-telemetry/opentelemetry-cpp/pull/4767)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
