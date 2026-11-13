@@ -55,6 +55,13 @@ Increment the:
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
+* [METRICS SDK] Fix preview exemplar reservoirs to serialize concurrent
+  measurement offers and collection, reset stored cells and sampling state
+  between collection intervals, remain usable after collection, and omit empty
+  cells from collected results. Correct the simple fixed-size reservoir's
+  sampling bounds so the current measurement can be discarded.
+  [#4429](https://github.com/open-telemetry/opentelemetry-cpp/pull/4429)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
