@@ -23,9 +23,11 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "src/common/random.h"
+#include "src/trace/samplers/ot_trace_state.h"
 
 using opentelemetry::sdk::common::Random;
 using opentelemetry::sdk::trace::Decision;
+using opentelemetry::sdk::trace::OtelTraceState;
 using opentelemetry::sdk::trace::ProbabilitySampler;
 namespace trace_api = opentelemetry::trace;
 namespace common    = opentelemetry::common;
@@ -307,6 +309,96 @@ TEST(ProbabilitySampler, DropDeletesOtWhenOnlyThreshold)
   ASSERT_EQ("bar", foo_value);
 }
 
+TEST(ProbabilitySampler, UnchangedThresholdKeepsParentTraceState)
+{
+  ProbabilitySampler s1(0.5);
+
+  uint8_t trace_id_buffer[trace_api::TraceId::kSize] = {1};
+  trace_api::TraceId trace_id{trace_id_buffer};
+  uint8_t span_id_buffer[trace_api::SpanId::kSize] = {1};
+  trace_api::SpanId span_id{span_id_buffer};
+
+  auto trace_state = trace_api::TraceState::FromHeader("ot=th:8");
+  trace_api::SpanContext context(trace_id, span_id, trace_api::TraceFlags{0}, false, trace_state);
+
+  auto sampling_result = SampleWithContext(s1, context, TraceIdWithRandomness(0xffffffffffffff));
+
+  ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
+  ASSERT_EQ(trace_state.get(), sampling_result.trace_state.get());
+}
+
+TEST(ProbabilitySampler, ParseFailureDeletesOt)
+{
+  auto trace_state = trace_api::TraceState::FromHeader("ot=th:8;vendor:keep,foo=bar");
+
+  OtelTraceState state;
+  state.parse_succeeded = false;
+  auto deleted          = state.GetTraceStateWithThreshold(trace_state, 0);
+  std::string ot_value;
+  EXPECT_FALSE(deleted->Get("ot", ot_value));
+
+  std::string foo_value;
+  ASSERT_TRUE(deleted->Get("foo", foo_value));
+  EXPECT_EQ("bar", foo_value);
+}
+
+TEST(ProbabilitySampler, EmptyParsedStateKeepsTraceState)
+{
+  auto trace_state = trace_api::TraceState::FromHeader("foo=bar");
+  auto state       = OtelTraceState::Parse("");
+
+  ASSERT_TRUE(state.parse_succeeded);
+  EXPECT_FALSE(state.has_threshold);
+  auto unchanged =
+      state.GetTraceStateWithThreshold(trace_state, opentelemetry::sdk::trace::kMaxThreshold);
+  EXPECT_EQ(trace_state.get(), unchanged.get());
+}
+
+TEST(ProbabilitySampler, UnchangedParsedThresholdKeepsOriginalEncoding)
+{
+  for (const auto *value : {"th:80000000000000", "vendor:keep;th:8;rv:ffffffffffffff"})
+  {
+    auto trace_state = trace_api::TraceState::FromHeader(std::string("ot=") + value);
+    auto state       = OtelTraceState::Parse(opentelemetry::sdk::trace::GetOtValue(trace_state));
+
+    ASSERT_TRUE(state.parse_succeeded);
+    ASSERT_TRUE(state.has_threshold);
+    auto unchanged = state.GetTraceStateWithThreshold(trace_state, state.threshold);
+    EXPECT_EQ(trace_state.get(), unchanged.get()) << value;
+  }
+}
+
+TEST(ProbabilitySampler, GetTraceStateWithThresholdPreservesParsedInput)
+{
+  auto trace_state =
+      trace_api::TraceState::FromHeader("ot=th:8;rv:ffffffffffffff;vendor:keep,foo=bar");
+  const auto state = OtelTraceState::Parse(opentelemetry::sdk::trace::GetOtValue(trace_state));
+  const auto original_threshold = state.threshold;
+  const auto original_value     = state.Serialize(original_threshold);
+
+  auto updated = state.GetTraceStateWithThreshold(trace_state, 0);
+  std::string ot_value;
+  ASSERT_TRUE(updated->Get("ot", ot_value));
+  EXPECT_EQ("th:0;rv:ffffffffffffff;vendor:keep", ot_value);
+  std::string foo_value;
+  ASSERT_TRUE(updated->Get("foo", foo_value));
+  EXPECT_EQ("bar", foo_value);
+
+  auto removed =
+      state.GetTraceStateWithThreshold(trace_state, opentelemetry::sdk::trace::kMaxThreshold);
+  ASSERT_TRUE(removed->Get("ot", ot_value));
+  EXPECT_EQ("rv:ffffffffffffff;vendor:keep", ot_value);
+
+  EXPECT_TRUE(state.has_threshold);
+  EXPECT_EQ(original_threshold, state.threshold);
+  EXPECT_FALSE(state.requires_serialization);
+  EXPECT_EQ(original_value, state.Serialize(original_threshold));
+  EXPECT_EQ(trace_state.get(),
+            state.GetTraceStateWithThreshold(trace_state, original_threshold).get());
+  ASSERT_TRUE(trace_state->Get("ot", ot_value));
+  EXPECT_EQ(original_value, ot_value);
+}
+
 TEST(ProbabilitySampler, MalformedSubKeysAreDropped)
 {
   ProbabilitySampler s1(0.5);
@@ -316,9 +408,11 @@ TEST(ProbabilitySampler, MalformedSubKeysAreDropped)
   uint8_t span_id_buffer[trace_api::SpanId::kSize] = {1};
   trace_api::SpanId span_id{span_id_buffer};
 
-  // Empty, key-only, and duplicate th sub-keys are dropped from the output.
+  // Empty, key-only, invalid, and duplicate th sub-keys are dropped from the output.
   for (auto p : {std::make_pair("ot=a:1;;rv:ffffffffffffff", "th:8;rv:ffffffffffffff;a:1"),
-                 std::make_pair("ot=foo", "th:8"), std::make_pair("ot=th:1;th:2", "th:8")})
+                 std::make_pair("ot=foo", "th:8"), std::make_pair("ot=th:1;th:2", "th:8"),
+                 std::make_pair("ot=th:0;th:8", "th:8"), std::make_pair("ot=th:;th:8", "th:8"),
+                 std::make_pair("ot=th:8;", "th:8")})
   {
     auto trace_state = trace_api::TraceState::FromHeader(p.first);
     trace_api::SpanContext context(trace_id, span_id, trace_api::TraceFlags{0}, false, trace_state);

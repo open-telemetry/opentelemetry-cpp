@@ -24,6 +24,9 @@ Increment the:
   Drop aggregation
   [#4721](https://github.com/open-telemetry/opentelemetry-cpp/pull/4721)
 
+* [SDK] Optimize composite and probability samplers
+  [#4582](https://github.com/open-telemetry/opentelemetry-cpp/pull/4582)
+
 * [SDK] `BatchLogRecordProcessor` now exports at most one batch on normal
   wakeups instead of continuously draining the buffer, matching
   `BatchSpanProcessor`
