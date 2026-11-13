@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Reduce ETW span export allocations and timestamp formatting overhead
+  while preserving event payloads and timestamp representation.
+  [#4761](https://github.com/open-telemetry/opentelemetry-cpp/pull/4761)
 * [SDK] Skip completely empty span links (invalid span context, no attributes
   and no trace state), so they no longer count against `link_count_limit`
   [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)

@@ -27,6 +27,7 @@
 #endif
 
 #include "opentelemetry/exporters/etw/etw_properties.h"
+#include "opentelemetry/exporters/etw/span_end_properties.h"
 #include "opentelemetry/exporters/etw/uuid.h"
 #include "opentelemetry/version.h"
 
@@ -446,6 +447,46 @@ public:
                          LPCGUID RelatedActivityId = nullptr,
                          uint8_t Opcode            = 0 /* Information */)
   {
+    return writeTldImpl(providerData, eventData, ActivityId, RelatedActivityId, Opcode);
+  }
+
+private:
+  friend class exporter_etw::Tracer;
+
+  unsigned long writeSpan(Handle &providerData,
+                          exporter_etw::detail::SpanEndProperties &fields,
+                          const exporter_etw::Properties &attributes,
+                          LPCGUID activityId,
+                          LPCGUID relatedActivityId,
+                          uint8_t opcode)
+  {
+    fields.Sort();
+    exporter_etw::detail::SpanPropertiesViewImpl<exporter_etw::detail::SpanEndProperties> view(
+        attributes, fields);
+    return writeTldImpl(providerData, view, activityId, relatedActivityId, opcode);
+  }
+
+  static const exporter_etw::PropertyValue &GetEventName(exporter_etw::Properties &properties)
+  {
+    return properties[ETW_FIELD_NAME];
+  }
+
+  template <typename Overrides>
+  static const exporter_etw::PropertyValue &GetEventName(
+      const exporter_etw::detail::SpanPropertiesViewImpl<Overrides> &properties)
+  {
+    const auto *name = properties.Find(ETW_FIELD_NAME);
+    static const exporter_etw::PropertyValue missing;
+    return name != nullptr ? *name : missing;
+  }
+
+  template <typename EventProperties>
+  unsigned long writeTldImpl(Handle &providerData,
+                             EventProperties &eventData,
+                             LPCGUID ActivityId,
+                             LPCGUID RelatedActivityId,
+                             uint8_t Opcode)
+  {
     // Make sure you stop sending event before register unregistering providerData
     if (providerData.providerHandle == INVALID_HANDLE)
     {
@@ -457,12 +498,14 @@ public:
 
     std::vector<BYTE> byteVector;
     std::vector<BYTE> byteDataVector;
+    // Avoid repeated growth for small TLD events; 512 is an initial capacity, not a limit.
+    byteVector.reserve(512);
+    byteDataVector.reserve(512);
     tld::EventMetadataBuilder<std::vector<BYTE>> builder(byteVector);
     tld::EventDataBuilder<std::vector<BYTE>> dbuilder(byteDataVector);
 
-    const std::string EVENT_NAME = ETW_FIELD_NAME;
-    std::string eventName        = "NoName";
-    auto nameField               = eventData[EVENT_NAME];
+    std::string eventName = "NoName";
+    const auto &nameField = GetEventName(eventData);
     switch (nameField.index())
     {
       case exporter_etw::PropertyType::kTypeString:
@@ -479,7 +522,7 @@ public:
 
     builder.Begin(eventName.c_str(), eventTags);
 
-    for (auto &kv : eventData)
+    for (const auto &kv : eventData)
     {
       const char *name = kv.first.data();
       auto &value      = kv.second;
@@ -591,6 +634,25 @@ public:
     }
 
     return (unsigned long)(writeResponse);
+  }
+
+public:
+  // TLD merges generated eventData fields over borrowed attributes. Other encodings
+  // require a complete owned eventData map, retaining serializer mutations across writes.
+  unsigned long write(Handle &providerData,
+                      exporter_etw::Properties &eventData,
+                      LPCGUID ActivityId,
+                      LPCGUID RelatedActivityId,
+                      uint8_t Opcode,
+                      ETWProvider::EventFormat format,
+                      const exporter_etw::Properties &attributes)
+  {
+    if (format == ETWProvider::EventFormat::ETW_MANIFEST)
+    {
+      exporter_etw::detail::SpanPropertiesView view(attributes, eventData);
+      return writeTldImpl(providerData, view, ActivityId, RelatedActivityId, Opcode);
+    }
+    return write(providerData, eventData, ActivityId, RelatedActivityId, Opcode, format);
   }
 
   unsigned long write(Handle &providerData,

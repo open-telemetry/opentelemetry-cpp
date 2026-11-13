@@ -10,6 +10,7 @@
 #include <opentelemetry/nostd/type_traits.h>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32
@@ -455,6 +456,133 @@ public:
    */
   size_t size() const noexcept override { return PropertyValueMap::size(); }
 };
+
+namespace detail
+{
+struct PropertyReference
+{
+  const std::string &first;
+  const PropertyValue &second;
+};
+
+// Read-only merge for synchronous encoding; overrides take precedence over source fields.
+template <typename Overrides>
+class SpanPropertiesViewImpl : public common::KeyValueIterable
+{
+public:
+  SpanPropertiesViewImpl(const Properties &source, const Overrides &overrides)
+      : source_(source), overrides_(overrides)
+  {}
+
+  class Iterator
+  {
+    using AddedIterator = decltype(std::declval<const Overrides &>().begin());
+
+  public:
+    Iterator(PropertyValueMap::const_iterator source,
+             PropertyValueMap::const_iterator source_end,
+             AddedIterator added,
+             AddedIterator added_end)
+        : source_(source), source_end_(source_end), added_(added), added_end_(added_end)
+    {}
+
+    PropertyReference operator*() const
+    {
+      if (UseSource())
+      {
+        return {source_->first, source_->second};
+      }
+      const auto &entry = *added_;
+      return {entry.first, entry.second};
+    }
+
+    Iterator &operator++()
+    {
+      if (UseSource())
+      {
+        ++source_;
+      }
+      else
+      {
+        if (source_ != source_end_ &&
+            nostd::string_view(source_->first) == nostd::string_view((*added_).first))
+        {
+          ++source_;
+        }
+        ++added_;
+      }
+      return *this;
+    }
+
+    bool operator!=(const Iterator &other) const
+    {
+      return source_ != other.source_ || added_ != other.added_;
+    }
+
+  private:
+    bool UseSource() const
+    {
+      return source_ != source_end_ &&
+             (!(added_ != added_end_) ||
+              nostd::string_view(source_->first) < nostd::string_view((*added_).first));
+    }
+
+    PropertyValueMap::const_iterator source_, source_end_;
+    AddedIterator added_, added_end_;
+  };
+
+  Iterator begin() const
+  {
+    return {source_.begin(), source_.end(), overrides_.begin(), overrides_.end()};
+  }
+
+  Iterator end() const
+  {
+    return {source_.end(), source_.end(), overrides_.end(), overrides_.end()};
+  }
+
+  const PropertyValue *Find(const std::string &key) const
+  {
+    const auto added = overrides_.find(key);
+    if (added != overrides_.end())
+    {
+      return &(*added).second;
+    }
+    const auto original = source_.find(key);
+    return original == source_.end() ? nullptr : &original->second;
+  }
+
+  bool empty() const noexcept { return source_.empty() && overrides_.empty(); }
+
+  size_t size() const noexcept override
+  {
+    size_t count = 0;
+    for (auto it = begin(); it != end(); ++it)
+    {
+      ++count;
+    }
+    return count;
+  }
+
+  bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>
+                           callback) const noexcept override
+  {
+    for (const auto &entry : *this)
+    {
+      if (!callback(entry.first, entry.second.ToAttributeValue()))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+private:
+  const Properties &source_;
+  const Overrides &overrides_;
+};
+using SpanPropertiesView = SpanPropertiesViewImpl<Properties>;
+}  // namespace detail
 
 }  // namespace etw
 }  // namespace exporter

@@ -32,6 +32,17 @@ otel_add_component(
 if(OTELCPP_BUILD_TESTING)
   add_executable(etw_provider_test test/etw_provider_test.cc)
   add_executable(etw_tracer_test test/etw_tracer_test.cc)
+  add_executable(etw_tracer_tld_test test/etw_tracer_tld_test.cc)
+  add_executable(etw_tracer_tld_end_time_test test/etw_tracer_tld_test.cc)
+  target_compile_definitions(etw_tracer_tld_end_time_test
+                             PRIVATE ETW_FIELD_ENDTTIME="EndTime")
+  add_executable(etw_tracer_tld_custom_fields_test test/etw_tracer_tld_test.cc)
+  target_compile_definitions(etw_tracer_tld_custom_fields_test
+                             PRIVATE CUSTOM_ETW_FIELDS_H="custom_etw_fields.h")
+  target_include_directories(etw_tracer_tld_custom_fields_test PRIVATE test)
+  add_executable(etw_tracer_msgpack_test test/etw_tracer_msgpack_test.cc)
+  target_compile_definitions(etw_tracer_msgpack_test PRIVATE HAVE_MSGPACK
+                                                             HAVE_FIELD_TIME)
   add_executable(etw_logger_test test/etw_logger_test.cc)
   add_executable(etw_properties_test test/etw_properties_test.cc)
   add_executable(etw_tracer_test_enable_env_properties test/etw_tracer_test.cc)
@@ -41,6 +52,17 @@ if(OTELCPP_BUILD_TESTING)
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
   target_link_libraries(etw_tracer_test ${GTEST_BOTH_LIBRARIES}
+                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+
+  target_link_libraries(etw_tracer_tld_test ${GTEST_BOTH_LIBRARIES}
+                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(etw_tracer_tld_end_time_test ${GTEST_BOTH_LIBRARIES}
+                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(
+    etw_tracer_tld_custom_fields_test ${GTEST_BOTH_LIBRARIES}
+    opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+
+  target_link_libraries(etw_tracer_msgpack_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
   target_link_libraries(etw_logger_test ${GTEST_BOTH_LIBRARIES}
@@ -76,6 +98,22 @@ if(OTELCPP_BUILD_TESTING)
     TARGET etw_tracer_test
     TEST_PREFIX exporter.
     TEST_LIST etw_tracer_test)
+  gtest_add_tests(
+    TARGET etw_tracer_msgpack_test
+    TEST_PREFIX exporter.
+    TEST_LIST etw_tracer_msgpack_test)
+  gtest_add_tests(
+    TARGET etw_tracer_tld_test
+    TEST_PREFIX exporter.
+    TEST_LIST etw_tracer_tld_test)
+  gtest_add_tests(
+    TARGET etw_tracer_tld_end_time_test
+    TEST_PREFIX exporter.with_end_time.
+    TEST_LIST etw_tracer_tld_end_time_test)
+  gtest_add_tests(
+    TARGET etw_tracer_tld_custom_fields_test
+    TEST_PREFIX exporter.with_custom_fields.
+    TEST_LIST etw_tracer_tld_custom_fields_test)
   gtest_add_tests(
     TARGET etw_logger_test
     TEST_PREFIX exporter.

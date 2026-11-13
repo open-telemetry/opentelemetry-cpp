@@ -265,6 +265,25 @@ static inline std::string formatUtcTimestampNsAsISO8601(int64_t timestampNs)
   {
     std::memset(&tm, 0, sizeof(tm));
   }
+  if (nanoseconds >= 0 && tm.tm_year >= -1900 && tm.tm_year <= 8099)
+  {
+    std::memcpy(buf, "0000-00-00T00:00:00.000000000Z", 31);
+    auto digits = [&](size_t position, size_t width, unsigned int value) {
+      while (width != 0)
+      {
+        buf[position + --width] = static_cast<char>('0' + value % 10);
+        value /= 10;
+      }
+    };
+    digits(0, 4, static_cast<unsigned int>(1900 + tm.tm_year));
+    digits(5, 2, static_cast<unsigned int>(1 + tm.tm_mon));
+    digits(8, 2, static_cast<unsigned int>(tm.tm_mday));
+    digits(11, 2, static_cast<unsigned int>(tm.tm_hour));
+    digits(14, 2, static_cast<unsigned int>(tm.tm_min));
+    digits(17, 2, static_cast<unsigned int>(tm.tm_sec));
+    digits(20, 9, static_cast<unsigned int>(nanoseconds));
+    return buf;
+  }
   ::_snprintf_s(buf, _TRUNCATE, "%04d-%02d-%02dT%02d:%02d:%02d.%09dZ", 1900 + tm.tm_year,
                 1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, nanoseconds);
 #else
