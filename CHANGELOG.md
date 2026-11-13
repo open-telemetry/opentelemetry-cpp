@@ -55,6 +55,17 @@ Increment the:
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
+* [METRICS SDK] Avoid materializing owned exemplar attributes before
+  fixed-size reservoir selection.
+  [#4475](https://github.com/open-telemetry/opentelemetry-cpp/pull/4475)
+
+* [METRICS SDK] Add non-owning `KeyValueIterable` overloads to the preview
+  `ExemplarReservoir` and `ReservoirCellSelector` interfaces. Custom reservoir
+  implementations inherit compatibility adapters but must be rebuilt because
+  the SDK vtable changes. Custom selector implementations must additionally
+  implement the new `int64_t` and `double` overloads.
+  [#4475](https://github.com/open-telemetry/opentelemetry-cpp/pull/4475)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
