@@ -43,14 +43,23 @@ set_target_version(opentelemetry_trace)
 target_link_libraries(
   opentelemetry_trace PUBLIC opentelemetry_common opentelemetry_resources
                              opentelemetry_instrumentation_scope)
+otel_link_libatomic(opentelemetry_trace)
 
 target_include_directories(
   opentelemetry_trace
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
 if(OTELCPP_INSTALL)
+  set(_trace_pc_extra_libs)
+  if(OPENTELEMETRY_ATOMIC_LIB)
+    list(APPEND _trace_pc_extra_libs ${OPENTELEMETRY_ATOMIC_LIB})
+  endif()
   opentelemetry_add_pkgconfig(
-    trace "OpenTelemetry SDK - Trace"
+    trace
+    "OpenTelemetry SDK - Trace"
     "Components for exporting traces in the OpenTelemetry SDK."
-    "opentelemetry_resources" "opentelemetry_instrumentation_scope")
+    "opentelemetry_resources"
+    "opentelemetry_instrumentation_scope"
+    EXTRA_LIBS
+    ${_trace_pc_extra_libs})
 endif()

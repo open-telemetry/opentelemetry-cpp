@@ -727,6 +727,8 @@ endif()
 add_subdirectory(api)
 
 if(NOT OTELCPP_WITH_API_ONLY)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/CheckAtomic.cmake")
+
   if(OTELCPP_WITH_OPENTRACING)
     add_subdirectory(opentracing-shim)
   endif()

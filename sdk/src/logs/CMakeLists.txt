@@ -30,6 +30,7 @@ set_target_properties(opentelemetry_logs PROPERTIES EXPORT_NAME logs)
 target_link_libraries(
   opentelemetry_logs PUBLIC opentelemetry_resources opentelemetry_common
                             opentelemetry_instrumentation_scope)
+otel_link_libatomic(opentelemetry_logs)
 set_target_version(opentelemetry_logs)
 
 target_include_directories(
@@ -37,8 +38,16 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
 if(OTELCPP_INSTALL)
+  set(_logs_pc_extra_libs)
+  if(OPENTELEMETRY_ATOMIC_LIB)
+    list(APPEND _logs_pc_extra_libs ${OPENTELEMETRY_ATOMIC_LIB})
+  endif()
   opentelemetry_add_pkgconfig(
-    logs "OpenTelemetry SDK - Logs"
+    logs
+    "OpenTelemetry SDK - Logs"
     "Components for exporting logs in the OpenTelemetry SDK."
-    "opentelemetry_resources" "opentelemetry_instrumentation_scope")
+    "opentelemetry_resources"
+    "opentelemetry_instrumentation_scope"
+    EXTRA_LIBS
+    ${_logs_pc_extra_libs})
 endif()
