@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] `PeriodicExportingMetricReader::Shutdown(timeout)` stops an in-flight
+  collection once its budget is spent: the SDK's `MetricCollector` stops
+  between meters and observable callbacks, and the partial result is not
+  exported.
+  [#4746](https://github.com/open-telemetry/opentelemetry-cpp/issues/4746)
 * [SDK] Skip completely empty span links (invalid span context, no attributes
   and no trace state), so they no longer count against `link_count_limit`
   [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)

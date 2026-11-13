@@ -20,6 +20,7 @@
 #include "opentelemetry/sdk/metrics/multi_observer_result.h"
 #include "opentelemetry/sdk/metrics/state/observable_registry.h"
 #include "opentelemetry/version.h"
+#include "src/metrics/collection_cancellation.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -217,6 +218,12 @@ void ObservableRegistry::Observe(opentelemetry::common::SystemTimestamp collecti
   std::lock_guard<std::mutex> lock_guard{callbacks_m_};
   for (const auto &pair : callbacks_)
   {
+    // Stop before the next callback once the reader has stopped waiting for this collection.
+    // MetricCollector then reports the collection as timed out.
+    if (CollectionCancellation::IsRequested())
+    {
+      break;
+    }
     auto &cb_record = pair.second;
     cb_record->observable_result.Reset();
     // Visitor will either invoke the single-instrument or multi-instrument form of the callback
