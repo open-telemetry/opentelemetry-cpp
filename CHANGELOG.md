@@ -56,6 +56,9 @@ Increment the:
   schedule delay.
   [#4741](https://github.com/open-telemetry/opentelemetry-cpp/pull/4741)
 
+* [EXPORTER] Prometheus exporter: export instrumentation scope schema URL and
+  attributes as labels
+  [#4735](https://github.com/open-telemetry/opentelemetry-cpp/pull/4735)
 * [SDK] Clamp `BatchLogRecordProcessor` max_export_batch_size to non-zero
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
