@@ -59,6 +59,10 @@ Increment the:
 * [SDK] Clamp `BatchLogRecordProcessor` max_export_batch_size to non-zero
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
+* [BUG] Decide Elasticsearch bulk export success from the HTTP status, the
+  errors flag, and one acknowledgement per record that names its target index
+  and says the operation applied
+  [#4297](https://github.com/open-telemetry/opentelemetry-cpp/pull/4297)
 
 ## [1.30.0] 2026-10-22
 
