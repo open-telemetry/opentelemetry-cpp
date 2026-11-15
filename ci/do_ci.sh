@@ -118,79 +118,17 @@ if [[ "$1" == "cmake.test" ]]; then
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
   exit 0
-elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
+elif [[ "$1" == "cmake.maintainer.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
-        -DOTELCPP_WITH_OPENTRACING=OFF \
-        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=OFF \
-        -DOTELCPP_MAINTAINER_MODE=ON \
-        -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
-  ctest --output-on-failure
-  exit 0
-elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
+        -C "${OTELCPP_CMAKE_CACHE_FILE_PATH}" \
+        -DBUILD_SHARED_LIBS="${BUILD_SHARED_LIBS:-OFF}" \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DOTELCPP_WITH_OPENTRACING=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
-  ctest --output-on-failure
-  exit 0
-elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -C ${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake \
-        -DOTELCPP_WITH_OPENTRACING=OFF \
-        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=OFF \
-        -DOTELCPP_MAINTAINER_MODE=ON \
-        -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
-  ctest --output-on-failure
-  exit 0
-elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_WITH_OTLP_HTTP=ON \
-        -DOTELCPP_WITH_OTLP_GRPC=ON \
-        -DOTELCPP_WITH_OTLP_FILE=ON \
-        -DOTELCPP_WITH_PROMETHEUS=ON \
-        -DOTELCPP_WITH_EXAMPLES=ON \
-        -DOTELCPP_WITH_EXAMPLES_HTTP=ON \
-        -DOTELCPP_WITH_ZIPKIN=ON \
-        -DOTELCPP_BUILD_W3CTRACECONTEXT_TEST=ON \
-        -DOTELCPP_WITH_ELASTICSEARCH=ON \
-        -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=OFF \
-        -DOTELCPP_MAINTAINER_MODE=ON \
-        -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON \
-        -DOTELCPP_WITH_OTLP_HTTP_COMPRESSION=ON \
-        -DOTELCPP_WITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
-        -DOTELCPP_WITH_CONFIGURATION=ON \
-        -DOTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW=ON \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
-  ctest --output-on-failure
-  exit 0
-elif [[ "$1" == "cmake.with_async_export.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_WITH_PROMETHEUS=ON \
-        -DOTELCPP_WITH_ZIPKIN=ON \
-        -DOTELCPP_WITH_ELASTICSEARCH=ON \
-        -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
-        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_INSTALL=OFF \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -406,43 +344,6 @@ elif [[ "$1" == "cmake.iwyu.test" ]]; then
   fi
   echo "Build log written to: $LOG_FILE"
   exit 0
-elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_WITH_OTLP_GRPC=ON \
-        -DOTELCPP_WITH_OTLP_HTTP=ON \
-        -DOTELCPP_WITH_OTLP_FILE=ON \
-        -DOTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
-  ctest --output-on-failure
-  exit 0
-elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_WITH_OTLP_GRPC=ON \
-        -DOTELCPP_WITH_OTLP_HTTP=ON \
-        -DOTELCPP_WITH_OTLP_FILE=ON \
-        -DBUILD_SHARED_LIBS=ON \
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
-  ctest --output-on-failure
-  exit 0
-elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_WITH_OTLP_GRPC=ON \
-        -DOTELCPP_WITH_OTLP_HTTP=ON \
-        -DOTELCPP_WITH_OTLP_FILE=ON \
-        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
-  ctest --output-on-failure
-  exit 0
 elif [[ "$1" == "cmake.w3c.trace-context.build-server" ]]; then
   echo "Building w3c trace context test server"
   cd "${BUILD_DIR}"
@@ -452,19 +353,6 @@ elif [[ "$1" == "cmake.w3c.trace-context.build-server" ]]; then
           -DCMAKE_CXX_STANDARD=${CXX_STANDARD} \
           "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
-  exit 0
-elif [[ "$1" == "cmake.do_not_install.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_WITH_OTLP_GRPC=ON \
-        -DOTELCPP_WITH_OTLP_HTTP=ON \
-        -DOTELCPP_WITH_OTLP_FILE=ON \
-        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DOTELCPP_INSTALL=OFF \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
-  ctest --output-on-failure
   exit 0
 elif [[ "$1" == "cmake.install_functions.test" ]]; then
   cd "${BUILD_DIR}"

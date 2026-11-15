@@ -49,7 +49,8 @@ OTEL_CONFIG_SCHEMA=/path/to/opentelemetry_configuration.json ./ci/do_ci.sh valid
 ### Testing
 
 ```sh
-./ci/do_ci.sh cmake.maintainer.sync.test
+./ci/do_ci.sh cmake.maintainer.test
+OTELCPP_CMAKE_CACHE_FILE=all-options-abiv2.cmake ./ci/do_ci.sh cmake.maintainer.test
 ./ci/do_ci.sh cmake.c++20.stl.test
 ./ci/run_docker.sh ./ci/do_ci.sh bazel.test
 ```
@@ -94,15 +95,14 @@ OTELCPP_CMAKE_BUILD_ARGS="--parallel 2 --verbose" ./ci/do_ci.sh code.coverage
 
 ### Maintainer CMake builds
 
-These targets use the `all-options-*` cache files in `test_common/cmake` and
-build all CMake components with preview options enabled.
+These targets build all CMake components in maintainer mode using the
+`all-options-*` cache files in `test_common/cmake`.
 
-* `cmake.maintainer.sync.test`: Maintainer mode ABI v1 build with synchronous
-  export and tests.
-* `cmake.maintainer.async.test`: Maintainer mode ABI v1 build with async export
-  and tests.
-* `cmake.maintainer.abiv2.test`: Maintainer mode ABI v2 build and tests.
-* `cmake.maintainer.yaml.test`: Maintainer mode build with YAML configuration.
+* `cmake.maintainer.test`: Maintainer mode build and tests using the cache
+  file from `OTELCPP_CMAKE_CACHE_FILE` (default
+  `all-options-abiv1-preview.cmake`) and `OTELCPP_INSTALL=OFF`. CI runs it for
+  ABI v1/v2 with preview options on/off; installs are tested by the CMake
+  install workflow.
 
 ### CMake language-standard matrix
 
@@ -122,19 +122,11 @@ These tests build the core API and SDK components in maintainer mode.
 
 ### CMake feature and packaging tests
 
-* `cmake.with_async_export.test`: Standard CMake build with async export
-  enabled.
 * `cmake.opentracing_shim.test`: OpenTracing shim build and tests.
 * `cmake.opentracing_shim.install.test`: OpenTracing shim install validation
   test.
-* `cmake.exporter.otprotocol.test`: OTLP exporter build and tests.
-* `cmake.exporter.otprotocol.shared_libs.with_static_grpc.test`: OTLP exporter
-  test with shared libraries enabled.
-* `cmake.exporter.otprotocol.with_async_export.test`: OTLP exporter test with
-  async export enabled.
 * `cmake.w3c.trace-context.build-server`: Build the W3C trace-context test
   server.
-* `cmake.do_not_install.test`: Build and test with installation disabled.
 * `cmake.install.test`: Install-tree validation and downstream CMake package
   test.
 * `cmake.fetch_content.test`: Validate building the project via

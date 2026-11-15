@@ -123,11 +123,10 @@ following command as an
 example:
 
 ```bash
-bash ci/do_ci.sh cmake.exporter.otprotocol.test
+bash ci/do_ci.sh cmake.maintainer.test
 ```
 
-This command initiates the CI pipeline, executing tests specifically for the
-**cmake.exporter.otprotocol** module.
+This command builds all components in maintainer mode and runs the tests.
 
 To reproduce CI's `include-what-you-use` warnings locally, run from inside
 the dev container (where IWYU is preinstalled):
