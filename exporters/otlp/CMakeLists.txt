@@ -132,6 +132,7 @@ if(OTELCPP_WITH_OTLP_GRPC)
            "$<BUILD_INTERFACE:opentelemetry_proto_grpc>"
     PRIVATE "$<INSTALL_INTERFACE:opentelemetry_proto_grpc>" gRPC::grpc++
             opentelemetry_ext)
+  otel_link_libatomic(opentelemetry_exporter_otlp_grpc_client)
 
   get_target_property(GRPC_INCLUDE_DIRECTORY gRPC::grpc++
                       INTERFACE_INCLUDE_DIRECTORIES)
@@ -295,7 +296,8 @@ if(OTELCPP_WITH_OTLP_GRPC)
   if(OTELCPP_INSTALL)
     opentelemetry_add_pkgconfig(
       exporter_otlp_grpc_client "OpenTelemetry OTLP - gRPC Client"
-      "gRPC client for OTLP protocol." "opentelemetry_api opentelemetry_common")
+      "gRPC client for OTLP protocol." "opentelemetry_api opentelemetry_common"
+      EXTRA_LIBS ${OPENTELEMETRY_ATOMIC_LIB})
 
     opentelemetry_add_pkgconfig(
       exporter_otlp_grpc

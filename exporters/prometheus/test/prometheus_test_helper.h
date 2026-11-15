@@ -3,13 +3,28 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/version.h"
+#include <gtest/gtest.h>
+#include <prometheus/metric_family.h>
+#include <prometheus/text_serializer.h>
+#include <algorithm>
+#include <chrono>
+#include <cstdint>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
 
-namespace metric_sdk      = opentelemetry::sdk::metrics;
-namespace nostd           = opentelemetry::nostd;
-namespace exportermetrics = opentelemetry::exporter::metrics;
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/resource/resource.h"
+
+namespace metric_sdk = opentelemetry::sdk::metrics;
+namespace nostd      = opentelemetry::nostd;
 
 namespace prometheus_test
 {
@@ -20,7 +35,10 @@ using opentelemetry::sdk::resource::ResourceAttributes;
 
 struct TestDataPoints
 {
-  Resource resource = Resource::Create(ResourceAttributes{});
+  Resource resource{ResourceAttributes{{"service.name", "test_service"},
+                                       {"service.namespace", "test_namespace"},
+                                       {"service.instance.id", "localhost:8000"},
+                                       {"custom_resource_attr", "custom_resource_value"}}};
   nostd::unique_ptr<InstrumentationScope> instrumentation_scope =
       InstrumentationScope::Create("library_name", "1.2.0");
   opentelemetry::common::SystemTimestamp start_ts =
@@ -42,6 +60,29 @@ struct TestDataPoints
     metric_sdk::MetricData metric_data{
         metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                          metric_sdk::InstrumentType::kCounter,
+                                         metric_sdk::InstrumentValueType::kDouble},
+        metric_sdk::AggregationTemporality::kDelta, start_ts, end_ts,
+        std::vector<metric_sdk::PointDataAttributes>{
+            {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data},
+            {metric_sdk::PointAttributes{{"a2", "b2"}}, sum_point_data2}}};
+    data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
+        {instrumentation_scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+    return data;
+  }
+
+  inline metric_sdk::ResourceMetrics CreateUpDownCounterPointData()
+  {
+    metric_sdk::SumPointData sum_point_data{};
+    sum_point_data.value_        = -10.5;
+    sum_point_data.is_monotonic_ = false;
+    metric_sdk::SumPointData sum_point_data2{};
+    sum_point_data2.value_        = 20.0;
+    sum_point_data2.is_monotonic_ = false;
+    metric_sdk::ResourceMetrics data;
+    data.resource_ = &resource;
+    metric_sdk::MetricData metric_data{
+        metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
+                                         metric_sdk::InstrumentType::kUpDownCounter,
                                          metric_sdk::InstrumentValueType::kDouble},
         metric_sdk::AggregationTemporality::kDelta, start_ts, end_ts,
         std::vector<metric_sdk::PointDataAttributes>{
@@ -104,133 +145,34 @@ struct TestDataPoints
         {instrumentation_scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
     return data;
   }
-
-  inline metric_sdk::ResourceMetrics CreateDropPointData()
-  {
-    metric_sdk::ResourceMetrics data;
-    data.resource_ = &resource;
-    metric_sdk::DropPointData drop_point_data{};
-    metric_sdk::DropPointData drop_point_data2{};
-    metric_sdk::MetricData metric_data{
-        metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
-                                         metric_sdk::InstrumentType::kCounter,
-                                         metric_sdk::InstrumentValueType::kDouble},
-        metric_sdk::AggregationTemporality::kDelta, start_ts, end_ts,
-        std::vector<metric_sdk::PointDataAttributes>{
-            {metric_sdk::PointAttributes{{"a1", "b1"}}, drop_point_data},
-            {metric_sdk::PointAttributes{{"a2", "b2"}}, drop_point_data2}}};
-    data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
-        {instrumentation_scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
-    return data;
-  }
 };
-}  // namespace prometheus_test
 
-OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
+inline std::string SerializeMetrics(const std::vector<::prometheus::MetricFamily> &metrics)
 {
-namespace metrics
-{
-inline bool operator==(const metric_sdk::MetricData &lhs, const metric_sdk::MetricData &rhs)
-{
-  if (lhs.start_ts != rhs.start_ts)
-  {
-    return false;
-  }
-  if (lhs.end_ts != rhs.end_ts)
-  {
-    return false;
-  }
-
-  if (lhs.instrument_descriptor.description_ != rhs.instrument_descriptor.description_)
-  {
-    return false;
-  }
-  if (lhs.instrument_descriptor.name_ != rhs.instrument_descriptor.name_)
-  {
-    return false;
-  }
-  if (lhs.instrument_descriptor.type_ != rhs.instrument_descriptor.type_)
-  {
-    return false;
-  }
-  if (lhs.instrument_descriptor.unit_ != rhs.instrument_descriptor.unit_)
-  {
-    return false;
-  }
-  if (lhs.instrument_descriptor.value_type_ != rhs.instrument_descriptor.value_type_)
-  {
-    return false;
-  }
-
-  if (lhs.point_data_attr_.size() != rhs.point_data_attr_.size())
-  {
-    return false;
-  }
-  for (uint32_t idx = 0; idx < lhs.point_data_attr_.size(); ++idx)
-  {
-    if (lhs.point_data_attr_.at(idx).attributes != rhs.point_data_attr_.at(idx).attributes)
-    {
-      return false;
-    }
-    auto &lhs_point_data = lhs.point_data_attr_.at(idx).point_data;
-    auto &rhs_point_data = rhs.point_data_attr_.at(idx).point_data;
-    if (nostd::holds_alternative<metric_sdk::SumPointData>(lhs_point_data))
-    {
-      if (nostd::get<metric_sdk::SumPointData>(lhs_point_data).value_ !=
-          nostd::get<metric_sdk::SumPointData>(rhs_point_data).value_)
-      {
-        return false;
-      }
-    }
-    else if (nostd::holds_alternative<metric_sdk::DropPointData>(lhs_point_data))
-    {
-      if (!nostd::holds_alternative<metric_sdk::DropPointData>(rhs_point_data))
-      {
-        return false;
-      }
-    }
-    else if (nostd::holds_alternative<metric_sdk::HistogramPointData>(lhs_point_data))
-    {
-      auto &lhs_histogram_d = nostd::get<metric_sdk::HistogramPointData>(lhs_point_data);
-      auto &rhs_histogram_d = nostd::get<metric_sdk::HistogramPointData>(rhs_point_data);
-      if (lhs_histogram_d.count_ != rhs_histogram_d.count_)
-      {
-        return false;
-      }
-      if (lhs_histogram_d.counts_ != rhs_histogram_d.counts_)
-      {
-        return false;
-      }
-      if (lhs_histogram_d.boundaries_ != rhs_histogram_d.boundaries_)
-      {
-        return false;
-      }
-      if (lhs_histogram_d.sum_ != rhs_histogram_d.sum_)
-      {
-        return false;
-      }
-    }
-    else if (nostd::holds_alternative<metric_sdk::LastValuePointData>(lhs_point_data))
-    {
-      auto &lhs_last_value_d = nostd::get<metric_sdk::LastValuePointData>(lhs_point_data);
-      auto &rhs_last_value_d = nostd::get<metric_sdk::LastValuePointData>(rhs_point_data);
-      if (lhs_last_value_d.is_lastvalue_valid_ != rhs_last_value_d.is_lastvalue_valid_)
-      {
-        return false;
-      }
-      if (lhs_last_value_d.sample_ts_ != rhs_last_value_d.sample_ts_)
-      {
-        return false;
-      }
-      if (lhs_last_value_d.value_ != rhs_last_value_d.value_)
-      {
-        return false;
-      }
-    }
-  }
-  return true;
+  ::prometheus::TextSerializer serializer;
+  return serializer.Serialize(metrics);
 }
-}  // namespace metrics
-}  // namespace sdk
-OPENTELEMETRY_END_NAMESPACE
+
+inline std::string ReadTestDataFile(const std::string &filename)
+{
+  const std::vector<std::string> candidate_paths = {
+      "exporters/prometheus/test/testdata/" + filename,
+      "testdata/" + filename,
+      "../exporters/prometheus/test/testdata/" + filename,
+  };
+  for (const auto &path : candidate_paths)
+  {
+    std::ifstream file(path, std::ios::in | std::ios::binary);
+    if (file.is_open())
+    {
+      std::ostringstream ss;
+      ss << file.rdbuf();
+      std::string content = ss.str();
+      content.erase(std::remove(content.begin(), content.end(), '\r'), content.end());
+      return content;
+    }
+  }
+  ADD_FAILURE() << "Failed to open testdata file: " << filename;
+  return "";
+}
+}  // namespace prometheus_test
