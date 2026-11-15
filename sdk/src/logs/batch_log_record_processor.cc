@@ -271,6 +271,12 @@ void BatchLogRecordProcessor::DoBackgroundWork()
     worker_thread_instrumentation_->OnEnd();
   }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
+  {
+    std::lock_guard<std::mutex> lock(synchronization_data_->worker_completion_m);
+    synchronization_data_->worker_completed = true;
+  }
+  synchronization_data_->worker_completion_cv.notify_all();
 }
 
 void BatchLogRecordProcessor::Export()
@@ -408,34 +414,68 @@ bool BatchLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexce
 
 BatchLogRecordProcessor::~BatchLogRecordProcessor()
 {
-  if (synchronization_data_->is_shutdown.load() == false)
-  {
-    InternalShutdown();
-  }
+  // The worker still accesses this processor. Never destroy its members
+  // while the worker is running, even after a timed-out Shutdown().
+  InternalShutdown();
 }
 
 bool BatchLogRecordProcessor::InternalShutdown(std::chrono::microseconds timeout) noexcept
 {
   auto start_time = std::chrono::system_clock::now();
+  const auto steady_start_time = std::chrono::steady_clock::now();
 
   std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};
-  bool already_shutdown = synchronization_data_->is_shutdown.exchange(true);
+  synchronization_data_->is_shutdown.store(true);
 
   if (worker_thread_.joinable())
   {
     {
       std::lock_guard<std::mutex> cv_lock(synchronization_data_->cv_m);
-      synchronization_data_->is_force_wakeup_background_worker.store(true,
-                                                                     std::memory_order_release);
+      synchronization_data_->is_force_wakeup_background_worker.store(
+          true, std::memory_order_release);
       synchronization_data_->cv.notify_all();
     }
+
+    {
+      std::unique_lock<std::mutex> completion_lock(
+          synchronization_data_->worker_completion_m);
+
+      if (timeout == (std::chrono::microseconds::max)())
+      {
+        synchronization_data_->worker_completion_cv.wait(
+            completion_lock,
+            [this] { return synchronization_data_->worker_completed; });
+      }
+      else
+      {
+        const auto elapsed =
+            std::chrono::steady_clock::now() - steady_start_time;
+        const auto remaining = timeout -
+            std::chrono::duration_cast<std::chrono::microseconds>(elapsed);
+        const auto deadline = std::chrono::steady_clock::now() +
+            (remaining > std::chrono::microseconds::zero()
+                 ? remaining
+                 : std::chrono::microseconds::zero());
+        if (!synchronization_data_->worker_completion_cv.wait_until(
+                completion_lock, deadline,
+                [this] { return synchronization_data_->worker_completed; }))
+        {
+          return false;
+        }
+      }
+    }
+
     worker_thread_.join();
   }
 
   GetWaitAdjustedTime(timeout, start_time);
-  // Should only shutdown exporter ONCE.
-  if (!already_shutdown && exporter_ != nullptr)
+
+  // A timed-out attempt may have requested shutdown without
+  // ever reaching the exporter shutdown step.
+  if (!synchronization_data_->exporter_shutdown_completed &&
+      exporter_ != nullptr)
   {
+    synchronization_data_->exporter_shutdown_completed = true;
     return exporter_->Shutdown(timeout);
   }
 

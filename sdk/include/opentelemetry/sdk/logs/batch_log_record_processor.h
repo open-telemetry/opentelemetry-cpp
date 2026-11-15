@@ -150,6 +150,12 @@ protected:
     std::condition_variable cv, force_flush_cv;
     std::mutex cv_m, force_flush_cv_m, shutdown_m;
 
+    // Signaled when the background worker has finished.
+    std::mutex worker_completion_m;
+    std::condition_variable worker_completion_cv;
+    bool worker_completed{false};
+    bool exporter_shutdown_completed{false};
+
     /* Important boolean flags to handle the workflow of the processor */
     std::atomic<bool> is_force_wakeup_background_worker{false};
     std::atomic<bool> is_shutdown{false};
