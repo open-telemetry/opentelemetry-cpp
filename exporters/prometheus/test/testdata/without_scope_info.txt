@@ -1,0 +1,7 @@
+# HELP target Target metadata
+# TYPE target gauge
+target_info{custom_resource_attr="custom_resource_value",service_instance_id="localhost:8000",service_name="test_service",service_namespace="test_namespace"} 1
+# HELP library_name_unit_total description
+# TYPE library_name_unit_total counter
+library_name_unit_total{a1="b1"} 10
+library_name_unit_total{a2="b2"} 20
