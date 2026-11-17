@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <cstdint>
+#include <initializer_list>
 #include <limits>
 #include <map>
 #include <memory>
@@ -214,16 +215,23 @@ public:
   {
     sum_ += value;
   }
-  void RecordDouble(double, const opentelemetry::context::Context &) noexcept override {}
+  void RecordDouble(double, const opentelemetry::context::Context &) noexcept override
+  {
+    ++double_count_;
+  }
   void RecordDouble(double,
                     const opentelemetry::common::KeyValueIterable &,
                     const opentelemetry::context::Context &) noexcept override
-  {}
+  {
+    ++double_count_;
+  }
 
   int64_t sum() const noexcept { return sum_; }
+  int double_count() const noexcept { return double_count_; }
 
 private:
-  int64_t sum_ = 0;
+  int64_t sum_      = 0;
+  int double_count_ = 0;
 };
 
 // Adds value through every Add overload.
@@ -238,6 +246,35 @@ void AddWithAllOverloads(LongCounter &counter, uint64_t value)
 }
 
 }  // namespace
+
+TEST(SyncInstruments, DoubleHistogramIgnoresNonFiniteValues)
+{
+  InstrumentDescriptor instrument_descriptor = {"double_histogram", "description", "1",
+                                                InstrumentType::kHistogram,
+                                                InstrumentValueType::kDouble};
+  auto *storage                              = new RecordingStorage();
+  std::unique_ptr<SyncWritableMetricStorage> metric_storage(storage);
+  DoubleHistogram histogram(instrument_descriptor, std::move(metric_storage),
+                            std::make_shared<MeterEnabledState>());
+  M attributes = {{"k", "v"}};
+
+  for (double value :
+       {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::infinity(),
+        -std::numeric_limits<double>::infinity()})
+  {
+    histogram.Record(value, opentelemetry::context::Context{});
+    histogram.Record(value, opentelemetry::common::KeyValueIterableView<M>(attributes),
+                     opentelemetry::context::Context{});
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    histogram.Record(value);
+    histogram.Record(value, opentelemetry::common::KeyValueIterableView<M>(attributes));
+#endif
+  }
+  EXPECT_EQ(storage->double_count(), 0);
+
+  histogram.Record(1.0, opentelemetry::context::Context{});
+  EXPECT_EQ(storage->double_count(), 1);
+}
 
 TEST(SyncInstruments, DisabledMeterStateSuppressesRecording)
 {
