@@ -15,6 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Fix a doc comment on the Elasticsearch log exporter's
+  `ResponseHandler::waitForResponse()` claiming a request timeout (set via
+  `SetTimeoutMs()`) arrives as a `SessionState::TimedOut` event. No
+  `HttpClient` implementation in this repo dispatches `TimedOut`. The curl
+  client maps a timeout to `ConnectFailed` or `SendFailed`, like any other
+  transport error, which is what the comment now says.
+  [#4604](https://github.com/open-telemetry/opentelemetry-cpp/issues/4604)
+
 * [BUILD] Link `libatomic` on platforms that need it for 64-bit `std::atomic`
   (32-bit powerpc and mips with GCC), so the curl HTTP client, the OTLP gRPC
   client, and the trace, logs, and metrics libraries link successfully.
