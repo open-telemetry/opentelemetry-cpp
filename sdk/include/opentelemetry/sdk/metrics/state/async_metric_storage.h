@@ -38,6 +38,8 @@ namespace metrics
 class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStorage
 {
 public:
+  // Back-compat overload preserving the original constructor signature for any external caller.
+  // See SyncMetricStorage's constructor comment for what `recording_cardinality_limit` is for.
   AsyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
                      const AggregationType aggregation_type,
                      std::shared_ptr<const AttributesProcessor> attributes_processor,
@@ -46,17 +48,36 @@ public:
                      nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
                      const AggregationConfig *aggregation_config)
+      : AsyncMetricStorage(
+            instrument_descriptor,
+            aggregation_type,
+            std::move(attributes_processor),
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+            exemplar_filter_type,
+            std::move(exemplar_reservoir),
+#endif
+            aggregation_config,
+            AggregationConfig::GetOrDefault(aggregation_config)->GetCardinalityLimit())
+  {}
+
+  AsyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
+                     const AggregationType aggregation_type,
+                     std::shared_ptr<const AttributesProcessor> attributes_processor,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+                     ExemplarFilterType exemplar_filter_type,
+                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
+#endif
+                     const AggregationConfig *aggregation_config,
+                     std::size_t recording_cardinality_limit)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         aggregation_config_{AggregationConfig::GetOrDefault(aggregation_config)},
+        recording_cardinality_limit_(recording_cardinality_limit),
         attributes_processor_{std::move(attributes_processor)},
         is_monotonic_sum_{IsMonotonicSum(aggregation_type, instrument_descriptor)},
-        last_observed_hash_map_(
-            std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
-        delta_hash_map_(
-            std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
-        round_hash_map_(
-            std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
+        last_observed_hash_map_(std::make_unique<AttributesHashMap>(recording_cardinality_limit_)),
+        delta_hash_map_(std::make_unique<AttributesHashMap>(recording_cardinality_limit_)),
+        round_hash_map_(std::make_unique<AttributesHashMap>(recording_cardinality_limit_)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_filter_type_(exemplar_filter_type),
         exemplar_reservoir_(std::move(exemplar_reservoir)),
@@ -139,9 +160,8 @@ public:
       {
         BuildDeltaFromRound();
       }
-      delta_metrics = std::move(delta_hash_map_);
-      delta_hash_map_ =
-          std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
+      delta_metrics   = std::move(delta_hash_map_);
+      delta_hash_map_ = std::make_unique<AttributesHashMap>(recording_cardinality_limit_);
     }
 
     auto status =
@@ -183,12 +203,22 @@ private:
    * a view collapses together and the observations from different callbacks all contribute.
    * Over-the-limit attribute sets resolve to the same otel.metric.overflow entry, which merges
    * too.
+   *
+   * `merged` here already equals the bucket's full new total (whatever GetOrSetDefault resolved
+   * `attributes` to, plus `delta`), so it must be written back with an unconditional overwrite,
+   * not through Set()'s own overflow-merge path: Set() merges on the assumption that what it is
+   * given is a fresh, independent contribution still waiting to be added, and applying that a
+   * second time here would double-count the bucket's prior total. Resolving the same key
+   * GetOrSetDefault used (the real attributes, or the shared overflow entry if they were over
+   * capacity) and overwriting that key directly sidesteps Set()'s overflow routing entirely.
    */
   void AccumulateDelta(const MetricAttributes &attributes, const Aggregation &delta)
   {
     auto merged =
         delta_hash_map_->GetOrSetDefault(attributes, create_default_aggregation_)->Merge(delta);
-    delta_hash_map_->Set(attributes, std::move(merged));
+    const MetricAttributes &target_key =
+        delta_hash_map_->Has(attributes) ? attributes : GetOverflowAttributes();
+    delta_hash_map_->Set(target_key, std::move(merged));
   }
 
   /**
@@ -216,7 +246,7 @@ private:
       return true;
     });
 
-    round_hash_map_ = std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
+    round_hash_map_ = std::make_unique<AttributesHashMap>(recording_cardinality_limit_);
   }
 
   /**
@@ -277,6 +307,9 @@ private:
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
   const AggregationConfig *aggregation_config_;
+  // Capacity used to (re)size last_observed_hash_map_/delta_hash_map_/round_hash_map_. See the
+  // constructor comment.
+  const std::size_t recording_cardinality_limit_;
   std::shared_ptr<const AttributesProcessor> attributes_processor_;
   bool is_monotonic_sum_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
