@@ -66,7 +66,14 @@ static constexpr const char *kFaasInstance = "faas.instance";
 /**
   The invocation ID of the current function invocation.
  */
-static constexpr const char *kFaasInvocationId = "faas.invocation_id";
+static constexpr const char *kFaasInvocationId = "faas.invocation.id";
+
+/**
+  A string containing the function invocation time in the <a
+  href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601</a> format expressed in <a
+  href="https://www.w3.org/TR/NOTE-datetime">UTC</a>.
+ */
+static constexpr const char *kFaasInvocationStartTime = "faas.invocation.start_time";
 
 /**
   The name of the invoked function.
@@ -123,8 +130,12 @@ static constexpr const char *kFaasName = "faas.name";
   A string containing the function invocation time in the <a
   href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601</a> format expressed in <a
   href="https://www.w3.org/TR/NOTE-datetime">UTC</a>.
+
+  @deprecated
+  {"note": "Replaced by @code faas.invocation.start_time @endcode.", "reason": "renamed",
+  "renamed_to": "faas.invocation.start_time"}
  */
-static constexpr const char *kFaasTime = "faas.time";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kFaasTime = "faas.time";
 
 /**
   Type of the trigger which caused this function invocation.
