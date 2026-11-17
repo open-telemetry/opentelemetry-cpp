@@ -76,9 +76,68 @@ static constexpr const char *kNetworkIoDirection = "network.io.direction";
 static constexpr const char *kNetworkLocalAddress = "network.local.address";
 
 /**
+  The <a href="https://www.iana.org/assignments/as-numbers/as-numbers.xhtml">Autonomous System
+  Number (ASN)</a> associated with the local IP address. <p> This attribute SHOULD only be set when
+  the local address is an IP address and the ASN is available from routing, enrichment, or lookup
+  data. The value SHOULD be represented as an integer without the @code AS @endcode prefix.
+ */
+static constexpr const char *kNetworkLocalAsNumber = "network.local.as.number";
+
+/**
+  The name of the organization associated with the autonomous system of the local IP address.
+  <p>
+  This attribute SHOULD only be set when @code network.local.as.number @endcode is set and the
+  organization name is available. The value SHOULD be the organization name as provided by the
+  lookup or enrichment source, not the AS name or short code.
+ */
+static constexpr const char *kNetworkLocalAsOrganization = "network.local.as.organization";
+
+/**
+  Local Media Access Control (MAC) address of the network connection.
+  <p>
+  MAC addresses MUST be represented in <a
+  href="https://standards.ieee.org/wp-content/uploads/import/documents/tutorials/eui.pdf">IEEE RA
+  hexadecimal form</a>: as hyphen-separated octets in uppercase hexadecimal form from most to least
+  significant. <blockquote>
+  [!WARNING]
+  <p>
+  This attribute may contain sensitive (PII) information.</blockquote>
+ */
+static constexpr const char *kNetworkLocalMacAddress = "network.local.mac.address";
+
+/**
   Local port number of the network connection.
  */
 static constexpr const char *kNetworkLocalPort = "network.local.port";
+
+/**
+  The IP prefix associated with the local IP address, in CIDR notation.
+  <blockquote>
+  [!WARNING]
+  <p>
+  This attribute may contain sensitive (PII) information. A @code /32 @endcode IPv4 prefix
+  or @code /128 @endcode IPv6 prefix preserves the complete endpoint IP address.
+  Using CIDR notation does not guarantee that the data is anonymous.</blockquote>
+  <p>
+  The value MUST be an IPv4 or IPv6 network prefix in CIDR notation, as defined in
+  <a href="https://www.rfc-editor.org/rfc/rfc4632.html">RFC 4632</a> for IPv4 and
+  <a href="https://www.rfc-editor.org/rfc/rfc4291.html#section-2.3">RFC 4291</a> for IPv6.
+  IPv4 prefixes MUST use a dotted-decimal address followed by @code / @endcode and a decimal
+  prefix length from 0 to 32. IPv6 prefixes MUST use the canonical address text
+  representation defined in <a href="https://www.rfc-editor.org/rfc/rfc5952.html">RFC 5952</a>,
+  followed by @code / @endcode and a decimal prefix length from 0 to 128. All host bits in
+  the address MUST be set to zero. The value MUST NOT contain a domain name,
+  UNIX domain socket name, or IPv6 zone identifier.
+  <p>
+  Instrumentation or Collector receivers that populate this attribute MUST
+  convert native representations, such as an address and subnet mask or an
+  address and prefix length, to equivalent CIDR notation before emitting it.
+  <p>
+  This attribute MAY be set whether or not @code network.local.address @endcode is set. If
+  @code network.local.address @endcode is also set to an IP address, it MUST use the same IP version
+  and be contained in this prefix.
+ */
+static constexpr const char *kNetworkLocalPrefix = "network.local.prefix";
 
 /**
   Peer address of the network connection - IP address or UNIX domain socket name.
@@ -86,9 +145,68 @@ static constexpr const char *kNetworkLocalPort = "network.local.port";
 static constexpr const char *kNetworkPeerAddress = "network.peer.address";
 
 /**
+  The <a href="https://www.iana.org/assignments/as-numbers/as-numbers.xhtml">Autonomous System
+  Number (ASN)</a> associated with the peer IP address. <p> This attribute SHOULD only be set when
+  the peer address is an IP address and the ASN is available from routing, enrichment, or lookup
+  data. The value SHOULD be represented as an integer without the @code AS @endcode prefix.
+ */
+static constexpr const char *kNetworkPeerAsNumber = "network.peer.as.number";
+
+/**
+  The name of the organization associated with the autonomous system of the peer IP address.
+  <p>
+  This attribute SHOULD only be set when @code network.peer.as.number @endcode is set and the
+  organization name is available. The value SHOULD be the organization name as provided by the
+  lookup or enrichment source, not the AS name or short code.
+ */
+static constexpr const char *kNetworkPeerAsOrganization = "network.peer.as.organization";
+
+/**
+  Peer Media Access Control (MAC) address of the network connection.
+  <p>
+  MAC addresses MUST be represented in <a
+  href="https://standards.ieee.org/wp-content/uploads/import/documents/tutorials/eui.pdf">IEEE RA
+  hexadecimal form</a>: as hyphen-separated octets in uppercase hexadecimal form from most to least
+  significant. <blockquote>
+  [!WARNING]
+  <p>
+  This attribute may contain sensitive (PII) information.</blockquote>
+ */
+static constexpr const char *kNetworkPeerMacAddress = "network.peer.mac.address";
+
+/**
   Peer port number of the network connection.
  */
 static constexpr const char *kNetworkPeerPort = "network.peer.port";
+
+/**
+  The IP prefix associated with the peer IP address, in CIDR notation.
+  <blockquote>
+  [!WARNING]
+  <p>
+  This attribute may contain sensitive (PII) information. A @code /32 @endcode IPv4 prefix
+  or @code /128 @endcode IPv6 prefix preserves the complete endpoint IP address.
+  Using CIDR notation does not guarantee that the data is anonymous.</blockquote>
+  <p>
+  The value MUST be an IPv4 or IPv6 network prefix in CIDR notation, as defined in
+  <a href="https://www.rfc-editor.org/rfc/rfc4632.html">RFC 4632</a> for IPv4 and
+  <a href="https://www.rfc-editor.org/rfc/rfc4291.html#section-2.3">RFC 4291</a> for IPv6.
+  IPv4 prefixes MUST use a dotted-decimal address followed by @code / @endcode and a decimal
+  prefix length from 0 to 32. IPv6 prefixes MUST use the canonical address text
+  representation defined in <a href="https://www.rfc-editor.org/rfc/rfc5952.html">RFC 5952</a>,
+  followed by @code / @endcode and a decimal prefix length from 0 to 128. All host bits in
+  the address MUST be set to zero. The value MUST NOT contain a domain name,
+  UNIX domain socket name, or IPv6 zone identifier.
+  <p>
+  Instrumentation or Collector receivers that populate this attribute MUST
+  convert native representations, such as an address and subnet mask or an
+  address and prefix length, to equivalent CIDR notation before emitting it.
+  <p>
+  This attribute MAY be set whether or not @code network.peer.address @endcode is set. If
+  @code network.peer.address @endcode is also set to an IP address, it MUST use the same IP version
+  and be contained in this prefix.
+ */
+static constexpr const char *kNetworkPeerPrefix = "network.peer.prefix";
 
 /**
   <a href="https://wikipedia.org/wiki/Application_layer">OSI application layer</a> or non-OSI
