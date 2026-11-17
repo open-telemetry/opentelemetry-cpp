@@ -347,6 +347,10 @@ public:
       override
   {
     ++create_log_record_context_calls_;
+    if (return_null_from_create_log_record_context_)
+    {
+      return nullptr;
+    }
     return CreateLogRecord();
   }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -382,6 +386,7 @@ public:
   nostd::unique_ptr<EnablementAwareTestLogRecord> last_emitted_record_;
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   size_t create_log_record_context_calls_{0};
+  bool return_null_from_create_log_record_context_{false};
   mutable bool last_variant_holds_span_context_{false};
   mutable bool last_variant_holds_context_{false};
   mutable trace::SpanContext last_span_context_{trace::SpanContext::GetInvalid()};
@@ -582,6 +587,21 @@ TEST(Logger, EmitLogRecordWithContextInArgsRoutesContextVariantToEnabledAndEmits
   EXPECT_FALSE(logger.last_variant_holds_span_context_);
   EXPECT_TRUE(logger.last_enabled_context_has_test_key_);
   EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
+}
+
+TEST(Logger, EmitLogRecordWithContextInArgsDoesNothingWhenCreateLogRecordReturnsNull)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+  logger.SetExtendedEnabledRequired(true);
+  logger.return_null_from_create_log_record_context_ = true;
+
+  context::Context test_context{"test-key", true};
+
+  logger.EmitLogRecord(Severity::kInfo, EventId{0x42, "info"}, nostd::string_view{"emitted"},
+                       test_context);
+
+  EXPECT_EQ(logger.create_log_record_context_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
 }
 
 TEST(Logger, EmitLogRecordWithContextInArgsShortCircuitsWhenEnabledImplementationReturnsFalse)

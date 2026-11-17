@@ -6,6 +6,7 @@
 #include <chrono>
 #include <memory>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -59,6 +60,35 @@ public:
    * @param record the log recordable object
    */
   virtual void OnEmit(std::unique_ptr<Recordable> &&record) noexcept = 0;
+
+  /**
+   * OnEmitWithContext is called by the SDK instead of OnEmit() for every log record, giving the
+   * processor access to the record's resolved context: the context explicitly supplied by the
+   * caller when one was given, otherwise the ambient context. The SDK always calls this method;
+   * a processor that has no use for the context simply does not override it.
+   *
+   * The supplied context is valid only for the duration of this call. Implementations must not
+   * retain it (or anything obtained from it, such as a Span) beyond the call, because doing so
+   * would keep the referenced span alive past its intended lifetime -- in particular, a
+   * processor that buffers recordables (e.g. a batching processor) must not stash the context
+   * on the recordable itself, since that would tie the span's effective lifetime to however
+   * long the recordable sits in the buffer before being exported.
+   *
+   * The default implementation ignores the context and forwards to OnEmit(), so existing
+   * processors continue to compile and behave exactly as before. A distinct name (rather than
+   * an OnEmit() overload) is used so that a derived class overriding only OnEmit() does not
+   * hide this method.
+   *
+   * @param record the log recordable object
+   * @param context the resolved context (SpanContext or Context variant)
+   */
+  virtual void OnEmitWithContext(std::unique_ptr<Recordable> &&record,
+                                 OPENTELEMETRY_MAYBE_UNUSED const opentelemetry::nostd::variant<
+                                     opentelemetry::trace::SpanContext,
+                                     opentelemetry::context::Context> &context) noexcept
+  {
+    OnEmit(std::move(record));
+  }
 
   /**
    * Enabled returns whether this processor is interested in a log with the given inputs.
