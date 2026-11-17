@@ -15,6 +15,17 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Fix the Elasticsearch log exporter's `Shutdown()` ignoring its
+  timeout and always reporting success. It now flushes pending exports against
+  the caller's deadline before cancelling sessions, and returns whether that
+  flush actually completed in time. Also closes a race where a session could
+  register for export after `Shutdown()` had already taken its snapshot of
+  in-flight sessions, so `ForceFlush()` could return without ever waiting for
+  it. Also fixes that wait turning into a CPU spin when `response_timeout_` is
+  not positive, which (like `SetTimeoutMs()`/`CURLOPT_TIMEOUT_MS`) means no
+  timeout rather than zero.
+  [#4359](https://github.com/open-telemetry/opentelemetry-cpp/issues/4359)
+
 * [BUILD] Link `libatomic` on platforms that need it for 64-bit `std::atomic`
   (32-bit powerpc and mips with GCC), so the curl HTTP client, the OTLP gRPC
   client, and the trace, logs, and metrics libraries link successfully.
