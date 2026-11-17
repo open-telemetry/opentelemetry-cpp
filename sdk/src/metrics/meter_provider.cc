@@ -7,11 +7,11 @@
 #include <mutex>
 #include <ostream>
 #include <utility>
-#include <vector>
 
 #include "opentelemetry/common/key_value_iterable.h"  // IWYU pragma: keep
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/noop.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -122,31 +122,32 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     name = "";
   }
 
-  const std::lock_guard<std::mutex> guard(lock_);
-
-  for (auto &meter : context_->GetMeters())
-  {
-    auto meter_lib = meter->GetInstrumentationScope();
-    if (meter_lib->equal(name, version, schema_url, attributes))
-    {
-      return nostd::shared_ptr<metrics_api::Meter>{meter};
-    }
-  }
-
-  // GetMeter is noexcept and does not surface an error, so callers cannot
-  // recover after a construction failure. Retrying would re-throw, catch, and
-  // log on later GetMeter calls. After the first failure, treat the provider
-  // as non-functional for new meters.
-  if (!initialized_)
-  {
-    return noop_meter_;
-  }
-
-  initialized_ = false;
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
 #endif
+    // Release the lock before construction-failure diagnostics can re-enter the provider.
+    const std::lock_guard<std::mutex> guard(lock_);
+
+    for (auto &meter : context_->GetMeters())
+    {
+      auto meter_lib = meter->GetInstrumentationScope();
+      if (meter_lib->equal(name, version, schema_url, attributes))
+      {
+        return nostd::shared_ptr<metrics_api::Meter>{meter};
+      }
+    }
+
+    // GetMeter is noexcept and does not surface an error, so callers cannot
+    // recover after a construction failure. Retrying would re-throw, catch, and
+    // log on later GetMeter calls. After the first failure, treat the provider
+    // as non-functional for new meters.
+    if (!initialized_)
+    {
+      return noop_meter_;
+    }
+
+    initialized_ = false;
     instrumentationscope::InstrumentationScopeAttributes attrs_map(attributes);
     auto scope =
         instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attrs_map);
@@ -206,6 +207,31 @@ void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selec
                             std::unique_ptr<View> view) noexcept
 {
   context_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
+}
+
+void MeterProvider::UpdateMeterConfigurator(
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
+        meter_configurator) noexcept
+{
+  if (!meter_configurator)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[MeterProvider::UpdateMeterConfigurator] meter_configurator must not be null, "
+        "ignoring.");
+    return;
+  }
+
+  // Shares the lock with GetMeter so a Meter is never returned while its MeterConfig is out of
+  // date with the provider configurator.
+  const std::lock_guard<std::mutex> guard(lock_);
+  context_->SetMeterConfigurator(std::move(meter_configurator));
+
+  // Takes meter_lock_ after lock_, the same order as GetMeter and RemoveMeter.
+  const auto &configurator = context_->GetMeterConfigurator();
+  context_->ForEachMeter([&configurator](std::shared_ptr<Meter> &meter) {
+    meter->UpdateMeterConfig(configurator.ComputeConfig(*meter->GetInstrumentationScope()));
+    return true;
+  });
 }
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW

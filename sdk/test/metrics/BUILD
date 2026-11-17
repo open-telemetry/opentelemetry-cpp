@@ -181,6 +181,21 @@ otel_cc_benchmark(
 )
 
 otel_cc_benchmark(
+    name = "instrument_metadata_validator_benchmark",
+    srcs = [
+        "instrument_metadata_validator_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+    ],
+)
+
+otel_cc_benchmark(
     name = "sync_instruments_benchmark",
     srcs = [
         "sync_instruments_benchmark.cc",

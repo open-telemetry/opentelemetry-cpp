@@ -198,6 +198,23 @@ TEST(JaegerPropagatorTest, InjectsContext)
   EXPECT_EQ(fields[0], opentelemetry::trace::propagation::kJaegerTraceHeader);
 }
 
+TEST(JaegerPropagatorTest, DoNotInjectEmptyContext)
+{
+  TextMapCarrierTest carrier;
+  context::Context ctx;
+  format.Inject(carrier, ctx);
+  EXPECT_TRUE(carrier.headers_.empty());
+}
+
+TEST(JaegerPropagatorTest, ExtractMissingHeaders)
+{
+  TextMapCarrierTest carrier;
+  context::Context ctx;
+  auto extracted = format.Extract(carrier, ctx);
+  EXPECT_FALSE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(
+      extracted.GetValue(trace::kSpanKey)));
+}
+
 TEST(JaegerPropagatorTest, DoNotInjectInvalidContext)
 {
   TextMapCarrierTest carrier;

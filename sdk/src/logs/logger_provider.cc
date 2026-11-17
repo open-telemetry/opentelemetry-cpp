@@ -116,34 +116,35 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
     name = logger_name;
   }
 
-  // Ensure only one thread can read/write from the map of loggers
-  std::lock_guard<std::mutex> lock_guard{lock_};
-
-  // If a logger with a name "logger_name" already exists, return it
-  for (auto &logger : loggers_)
-  {
-    auto &logger_lib = logger->GetInstrumentationScope();
-    if (logger->GetName() == logger_name &&
-        logger_lib.equal(name, version, schema_url, &attributes))
-    {
-      return opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
-    }
-  }
-
-  // GetLogger is noexcept and does not surface an error, so callers cannot
-  // recover after a construction failure. Retrying would re-throw, catch, and
-  // log on later GetLogger calls. After the first failure, treat the provider
-  // as non-functional for new loggers.
-  if (!initialized_)
-  {
-    return noop_logger_;
-  }
-
-  initialized_ = false;
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
 #endif
+    // Release the lock before construction-failure diagnostics can re-enter the provider.
+    // Ensure only one thread can read/write from the map of loggers
+    std::lock_guard<std::mutex> lock_guard{lock_};
+
+    // If a logger with a name "logger_name" already exists, return it
+    for (auto &logger : loggers_)
+    {
+      auto &logger_lib = logger->GetInstrumentationScope();
+      if (logger->GetName() == logger_name &&
+          logger_lib.equal(name, version, schema_url, &attributes))
+      {
+        return opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
+      }
+    }
+
+    // GetLogger is noexcept and does not surface an error, so callers cannot
+    // recover after a construction failure. Retrying would re-throw, catch, and
+    // log on later GetLogger calls. After the first failure, treat the provider
+    // as non-functional for new loggers.
+    if (!initialized_)
+    {
+      return noop_logger_;
+    }
+
+    initialized_ = false;
     std::unique_ptr<instrumentationscope::InstrumentationScope> lib =
         instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attributes);
 

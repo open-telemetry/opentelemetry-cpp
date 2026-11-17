@@ -116,6 +116,7 @@ For more information about the maintainer role, see the [community repository](h
 
 ### Approvers
 
+* [Mateen Anjum](https://github.com/mateenali66)
 * [Tom Tan](https://github.com/ThomsonTan)
 * [WenTao Ou](https://github.com/owent)
 

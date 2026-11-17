@@ -73,6 +73,23 @@ TEST(EntryTest, SetValue)
 using opentelemetry::common::KeyValueStringTokenizer;
 using opentelemetry::common::KeyValueStringTokenizerOptions;
 
+TEST(KVStringTokenizer, PreserveExistingWhitespaceNormalization)
+{
+  // OTLP headers and resource attributes also rely on member-edge trimming.
+  KeyValueStringTokenizer tk(" \t\r\n\v\fAuthorization=token\r\n,resource=value\v\f");
+  bool valid = false;
+  nostd::string_view key, value;
+  ASSERT_TRUE(tk.next(valid, key, value));
+  EXPECT_TRUE(valid);
+  EXPECT_EQ(key, "Authorization");
+  EXPECT_EQ(value, "token");
+  ASSERT_TRUE(tk.next(valid, key, value));
+  EXPECT_TRUE(valid);
+  EXPECT_EQ(key, "resource");
+  EXPECT_EQ(value, "value");
+  EXPECT_FALSE(tk.next(valid, key, value));
+}
+
 TEST(KVStringTokenizer, SinglePair)
 {
   bool valid_kv{};

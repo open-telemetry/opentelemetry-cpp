@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <functional>
 #include <future>
+#include <memory>  // IWYU pragma: keep
 #include <mutex>
 #include <stdexcept>
 #include <string>
@@ -29,6 +30,7 @@
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/event_logger_provider.h"          // IWYU pragma: keep
@@ -44,6 +46,7 @@
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
 using namespace opentelemetry::sdk::logs;
 namespace logs_api  = opentelemetry::logs;
@@ -679,6 +682,61 @@ TEST(LoggerProviderSDK, ConstructorsAreNotNoexcept)
 }
 
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
+TEST(LoggerProviderSDK, ConstructionFailureDiagnosticsAllowProviderReentry)
+{
+  using opentelemetry::sdk::common::internal_log::LogLevel;
+  using opentelemetry::test_common::ScopedTestLogHandler;
+  for (int exception_type = 0; exception_type < 2; ++exception_type)
+  {
+    SCOPED_TRACE(exception_type);
+    int construct_attempts = 0;
+    auto configurator      = std::make_unique<scope_sdk::ScopeConfigurator<LoggerConfig>>(
+        scope_sdk::ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default())
+            .AddCondition(
+                [&](const scope_sdk::InstrumentationScope &scope) {
+                  ++construct_attempts;
+                  if (scope.GetName() == "throwing-scope")
+                  {
+                    if (exception_type == 0)
+                    {
+                      throw std::runtime_error("injected construction failure");
+                    }
+                    throw 1;
+                  }
+                  return false;
+                },
+                LoggerConfig::Default())
+            .Build());
+    LoggerProvider provider(std::vector<std::unique_ptr<LogRecordProcessor>>{},
+                            opentelemetry::sdk::resource::Resource::Create({}),
+                            std::move(configurator));
+    auto cached = provider.GetLogger("cached-logger", "cached-scope");
+    nostd::shared_ptr<logs_api::Logger> reentrant_noop;
+    int diagnostics = 0;
+    ScopedTestLogHandler handler(LogLevel::Error, [&](const ScopedTestLogHandler::Entry &entry) {
+      ++diagnostics;
+      EXPECT_EQ(entry.level, LogLevel::Error);
+      EXPECT_EQ(provider.GetLogger("cached-logger", "cached-scope"), cached);
+      reentrant_noop = provider.GetLogger("uncached-logger", "uncached-scope");
+    });
+
+    auto failed = provider.GetLogger("throwing-logger", "throwing-scope");
+    ASSERT_NE(failed, nullptr);
+    EXPECT_EQ(diagnostics, 1);
+    EXPECT_EQ(reentrant_noop, failed);
+    EXPECT_EQ(failed->GetName(), "noop logger");
+    EXPECT_EQ(provider.GetLogger("cached-logger", "cached-scope"), cached);
+    EXPECT_EQ(provider.GetLogger("another-logger", "another-scope"), failed);
+    EXPECT_EQ(construct_attempts, 2);
+    EXPECT_EQ(diagnostics, 1);
+    auto entries = handler.Drain();
+    ASSERT_EQ(entries.size(), 1u);
+    EXPECT_NE(entries[0].msg.find(exception_type == 0 ? "injected construction failure"
+                                                      : "unknown exception"),
+              std::string::npos);
+  }
+}
+
 TEST(LoggerProviderSDK, GetLoggerReturnsNoopOnConstructionFailure)
 {
   auto should_throw          = std::make_shared<bool>(true);

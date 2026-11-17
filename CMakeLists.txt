@@ -9,7 +9,7 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.20.0")
   cmake_policy(SET CMP0117 NEW)
 endif()
 
-set(OPENTELEMETRY_VERSION_NUMBER "1.30.0")
+set(OPENTELEMETRY_VERSION_NUMBER "1.31.0")
 set(OPENTELEMETRY_VERSION_SUFFIX "-dev")
 set(OPENTELEMETRY_VERSION
     "${OPENTELEMETRY_VERSION_NUMBER}${OPENTELEMETRY_VERSION_SUFFIX}")
@@ -727,6 +727,8 @@ endif()
 add_subdirectory(api)
 
 if(NOT OTELCPP_WITH_API_ONLY)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/CheckAtomic.cmake")
+
   if(OTELCPP_WITH_OPENTRACING)
     add_subdirectory(opentracing-shim)
   endif()

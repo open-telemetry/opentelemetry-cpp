@@ -383,9 +383,10 @@ CreateAsyncDoubleMetricK8sContainerCpuRequestDesired(metrics::Meter *meter)
   The current CPU request reflects the request applied to the running container, as reported by
   <a
   href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#containerstatus-v1-core">ContainerStatus</a>.
-  The value range is [0.0,1.0]. A value of 1.0 means the container is using 100% of its actual CPU
-  request. If the CPU request is not set, this metric SHOULD NOT be emitted for that container. <p>
-  gauge
+  A value of 1.0 means the container is using exactly its CPU request. Since a CPU request is a
+  scheduling reservation and not a hard cap, values above 1.0 are possible and indicate the
+  container is using more CPU than requested. If the CPU request is not set, this metric SHOULD NOT
+  be emitted for that container. <p> gauge
  */
 static constexpr const char *kMetricK8sContainerCpuRequestUtilization =
     "k8s.container.cpu.request.utilization";
@@ -431,9 +432,9 @@ CreateAsyncDoubleMetricK8sContainerCpuRequestUtilization(metrics::Meter *meter)
 /**
   Maximum ephemeral storage resource limit set for the container.
   <p>
-  See
-  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core
-  for details. <p> updowncounter
+  See the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core">Kubernetes
+  ResourceRequirements API</a> for details. <p> updowncounter
  */
 static constexpr const char *kMetricK8sContainerEphemeralStorageLimit =
     "k8s.container.ephemeral_storage.limit";
@@ -476,9 +477,9 @@ CreateAsyncDoubleMetricK8sContainerEphemeralStorageLimit(metrics::Meter *meter)
 /**
   Ephemeral storage resource requested for the container.
   <p>
-  See
-  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core
-  for details. <p> updowncounter
+  See the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core">Kubernetes
+  ResourceRequirements API</a> for details. <p> updowncounter
  */
 static constexpr const char *kMetricK8sContainerEphemeralStorageRequest =
     "k8s.container.ephemeral_storage.request";
@@ -720,6 +721,58 @@ CreateAsyncDoubleMetricK8sContainerMemoryLimitDesired(metrics::Meter *meter)
 }
 
 /**
+  The ratio of container memory working set to its current memory limit.
+  <p>
+  The numerator is the container memory working set, as reported by @code
+  container.memory.working_set @endcode. The current memory limit reflects the actual resources
+  applied to the container, as reported by <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#containerstatus-v1-core">ContainerStatus</a>.
+  A value of 1.0 means the container is using 100% of its actual memory limit. Values above 1.0 can
+  occur transiently, since memory usage can briefly exceed the limit. If the memory limit is not
+  set, this metric SHOULD NOT be emitted for that container. <p> gauge
+ */
+static constexpr const char *kMetricK8sContainerMemoryLimitUtilization =
+    "k8s.container.memory.limit.utilization";
+static constexpr const char *descrMetricK8sContainerMemoryLimitUtilization =
+    "The ratio of container memory working set to its current memory limit.";
+static constexpr const char *unitMetricK8sContainerMemoryLimitUtilization = "1";
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
+CreateSyncInt64MetricK8sContainerMemoryLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64Gauge(kMetricK8sContainerMemoryLimitUtilization,
+                                 descrMetricK8sContainerMemoryLimitUtilization,
+                                 unitMetricK8sContainerMemoryLimitUtilization);
+}
+
+static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricK8sContainerMemoryLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricK8sContainerMemoryLimitUtilization,
+                                  descrMetricK8sContainerMemoryLimitUtilization,
+                                  unitMetricK8sContainerMemoryLimitUtilization);
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sContainerMemoryLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableGauge(kMetricK8sContainerMemoryLimitUtilization,
+                                           descrMetricK8sContainerMemoryLimitUtilization,
+                                           unitMetricK8sContainerMemoryLimitUtilization);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sContainerMemoryLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricK8sContainerMemoryLimitUtilization,
+                                            descrMetricK8sContainerMemoryLimitUtilization,
+                                            unitMetricK8sContainerMemoryLimitUtilization);
+}
+
+/**
   Deprecated, use @code k8s.container.memory.request.desired @endcode and @code
   k8s.container.memory.request.current @endcode instead.
 
@@ -873,6 +926,59 @@ CreateAsyncDoubleMetricK8sContainerMemoryRequestDesired(metrics::Meter *meter)
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sContainerMemoryRequestDesired,
                                                     descrMetricK8sContainerMemoryRequestDesired,
                                                     unitMetricK8sContainerMemoryRequestDesired);
+}
+
+/**
+  The ratio of container memory working set to its current memory request.
+  <p>
+  The numerator is the container memory working set, as reported by @code
+  container.memory.working_set @endcode. The current memory request reflects the request applied to
+  the running container, as reported by <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#containerstatus-v1-core">ContainerStatus</a>.
+  A value of 1.0 means the container is using exactly its memory request. Since a memory request is
+  a scheduling reservation and not a hard cap, values above 1.0 are possible and indicate the
+  container is using more memory than requested. If the memory request is not set, this metric
+  SHOULD NOT be emitted for that container. <p> gauge
+ */
+static constexpr const char *kMetricK8sContainerMemoryRequestUtilization =
+    "k8s.container.memory.request.utilization";
+static constexpr const char *descrMetricK8sContainerMemoryRequestUtilization =
+    "The ratio of container memory working set to its current memory request.";
+static constexpr const char *unitMetricK8sContainerMemoryRequestUtilization = "1";
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
+CreateSyncInt64MetricK8sContainerMemoryRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64Gauge(kMetricK8sContainerMemoryRequestUtilization,
+                                 descrMetricK8sContainerMemoryRequestUtilization,
+                                 unitMetricK8sContainerMemoryRequestUtilization);
+}
+
+static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricK8sContainerMemoryRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricK8sContainerMemoryRequestUtilization,
+                                  descrMetricK8sContainerMemoryRequestUtilization,
+                                  unitMetricK8sContainerMemoryRequestUtilization);
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sContainerMemoryRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableGauge(kMetricK8sContainerMemoryRequestUtilization,
+                                           descrMetricK8sContainerMemoryRequestUtilization,
+                                           unitMetricK8sContainerMemoryRequestUtilization);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sContainerMemoryRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricK8sContainerMemoryRequestUtilization,
+                                            descrMetricK8sContainerMemoryRequestUtilization,
+                                            unitMetricK8sContainerMemoryRequestUtilization);
 }
 
 /**
@@ -1055,9 +1161,9 @@ CreateAsyncDoubleMetricK8sContainerStatusState(metrics::Meter *meter)
 /**
   Maximum storage resource limit set for the container.
   <p>
-  See
-  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core
-  for details. <p> updowncounter
+  See the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core">Kubernetes
+  ResourceRequirements API</a> for details. <p> updowncounter
  */
 static constexpr const char *kMetricK8sContainerStorageLimit = "k8s.container.storage.limit";
 static constexpr const char *descrMetricK8sContainerStorageLimit =
@@ -1099,9 +1205,9 @@ CreateAsyncDoubleMetricK8sContainerStorageLimit(metrics::Meter *meter)
 /**
   Storage resource requested for the container.
   <p>
-  See
-  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core
-  for details. <p> updowncounter
+  See the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core">Kubernetes
+  ResourceRequirements API</a> for details. <p> updowncounter
  */
 static constexpr const char *kMetricK8sContainerStorageRequest = "k8s.container.storage.request";
 static constexpr const char *descrMetricK8sContainerStorageRequest =
@@ -3307,9 +3413,9 @@ CreateAsyncDoubleMetricK8sNodeEphemeralStorageAllocatable(metrics::Meter *meter)
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.AvailableBytes</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.AvailableBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
   of the Kubelet's stats API.
   <p>
   updowncounter
@@ -3356,9 +3462,9 @@ CreateAsyncDoubleMetricK8sNodeFilesystemAvailable(metrics::Meter *meter)
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.CapacityBytes</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.CapacityBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
   of the Kubelet's stats API.
   <p>
   updowncounter
@@ -3404,9 +3510,9 @@ CreateAsyncDoubleMetricK8sNodeFilesystemCapacity(metrics::Meter *meter)
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.Inodes</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.Inodes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
   of the Kubelet's stats API.
   <p>
   updowncounter
@@ -3453,9 +3559,9 @@ CreateAsyncDoubleMetricK8sNodeFilesystemInodeCount(metrics::Meter *meter)
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.InodesFree</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.InodesFree</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
   of the Kubelet's stats API.
   <p>
   updowncounter
@@ -3500,14 +3606,16 @@ CreateAsyncDoubleMetricK8sNodeFilesystemInodeFree(metrics::Meter *meter)
 /**
   Node filesystem usage.
   <p>
-  This may not equal capacity - available.
-  <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.UsedBytes</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.UsedBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
   of the Kubelet's stats API.
+  <p>
+  Capacity and available are reported for the backing filesystem,
+  which may be shared with other workloads; therefore,
+  usage may not equal @code capacity - available @endcode.
   <p>
   updowncounter
  */
@@ -3784,7 +3892,12 @@ CreateAsyncDoubleMetricK8sNodeMemoryUsage(metrics::Meter *meter)
   Node memory working set.
   <p>
   The amount of working set memory. This includes recently accessed memory, dirty memory, and kernel
-  memory. WorkingSetBytes is <= UsageBytes. This metric is derived from the <a
+  memory. On Linux, the working set is calculated by excluding inactive file-backed memory from
+  memory usage (@code inactive_file @endcode on cgroup v2, @code total_inactive_file @endcode on
+  cgroup v1), so active file-backed memory remains included. On Linux, the kubelet uses the node
+  working set when determining memory availability for the @code memory.available @endcode eviction
+  signal. @code WorkingSetBytes @endcode is less than or equal to @code UsageBytes @endcode. This
+  metric is derived from the <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats">MemoryStats.WorkingSetBytes</a>
   field of the <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Memory</a>
@@ -3903,14 +4016,19 @@ CreateAsyncDoubleMetricK8sNodeNetworkIo(metrics::Meter *meter)
 /**
   Node memory paging faults.
   <p>
-  Cumulative number of major/minor page faults.
-  This metric is derived from the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats">MemoryStats.PageFaults</a>
-  and <a
+  Cumulative number of major and minor page faults.
+  The <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats">MemoryStats.MajorPageFaults</a>
-  fields of the <a
+  field of the <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Memory</a>
-  of the Kubelet's stats API. <p> counter
+  of the Kubelet's stats API maps directly to @code system.paging.fault.type=major @endcode. The <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats">MemoryStats.PageFaults</a>
+  field reports the total number of page faults (equivalent to @code pgfault @endcode in the cgroup
+  @code memory.stat @endcode), with minor and major combined. The minor page faults MUST therefore
+  be derived as @code MemoryStats.PageFaults - MemoryStats.MajorPageFaults @endcode, so that summing
+  the metric over @code system.paging.fault.type @endcode yields the total number of page faults.
+  <p>
+  counter
  */
 static constexpr const char *kMetricK8sNodePagingFaults     = "k8s.node.paging.faults";
 static constexpr const char *descrMetricK8sNodePagingFaults = "Node memory paging faults.";
@@ -3942,6 +4060,94 @@ CreateAsyncDoubleMetricK8sNodePagingFaults(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableCounter(
       kMetricK8sNodePagingFaults, descrMetricK8sNodePagingFaults, unitMetricK8sNodePagingFaults);
+}
+
+/**
+  Total number of processes/threads allowed by the operating system on the node.
+  <p>
+  Derived from the Kubelet Summary API
+  (<a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#RlimitStats">RlimitStats.MaxPID</a>)
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Rlimit</a>,
+  representing the system-wide task limit (the lower of @code kernel.pid_max @endcode and @code
+  kernel.threads-max @endcode). <p> updowncounter
+ */
+static constexpr const char *kMetricK8sNodePidLimit = "k8s.node.pid.limit";
+static constexpr const char *descrMetricK8sNodePidLimit =
+    "Total number of processes/threads allowed by the operating system on the node.";
+static constexpr const char *unitMetricK8sNodePidLimit = "{thread}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sNodePidLimit(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sNodePidLimit, descrMetricK8sNodePidLimit,
+                                         unitMetricK8sNodePidLimit);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sNodePidLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sNodePidLimit, descrMetricK8sNodePidLimit,
+                                          unitMetricK8sNodePidLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sNodePidLimit(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(
+      kMetricK8sNodePidLimit, descrMetricK8sNodePidLimit, unitMetricK8sNodePidLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sNodePidLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
+      kMetricK8sNodePidLimit, descrMetricK8sNodePidLimit, unitMetricK8sNodePidLimit);
+}
+
+/**
+  Total number of existing processes and threads on the node.
+  <p>
+  Derived from the Kubelet Summary API
+  (<a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#RlimitStats">RlimitStats.NumOfRunningProcesses</a>)
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Rlimit</a>,
+  which reads the total count of scheduling entities (threads/processes across all states) from
+  @code /proc/loadavg @endcode. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sNodePidUsage = "k8s.node.pid.usage";
+static constexpr const char *descrMetricK8sNodePidUsage =
+    "Total number of existing processes and threads on the node.";
+static constexpr const char *unitMetricK8sNodePidUsage = "{thread}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sNodePidUsage(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sNodePidUsage, descrMetricK8sNodePidUsage,
+                                         unitMetricK8sNodePidUsage);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sNodePidUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sNodePidUsage, descrMetricK8sNodePidUsage,
+                                          unitMetricK8sNodePidUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sNodePidUsage(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(
+      kMetricK8sNodePidUsage, descrMetricK8sNodePidUsage, unitMetricK8sNodePidUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sNodePidUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
+      kMetricK8sNodePidUsage, descrMetricK8sNodePidUsage, unitMetricK8sNodePidUsage);
 }
 
 /**
@@ -4188,7 +4394,11 @@ CreateAsyncDoubleMetricK8sNodeSystemContainerMemoryWorkingSet(metrics::Meter *me
   <p>
   Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
   as a floating point number with the highest precision available. The actual accuracy would depend
-  on the instrumentation and operating system. <p> gauge
+  on the instrumentation and operating system. This metric is derived from the <a
+  href="https://github.com/kubernetes/kubelet/blob/v0.35.2/pkg/apis/stats/v1alpha1/types.go#L42">NodeStats.StartTime</a>
+  field of Kubelet's stats API, which is set to the <a
+  href="https://github.com/kubernetes/kubernetes/blob/v1.36.3/pkg/kubelet/server/stats/summary.go#L113">system
+  boot time</a>. This value resets when the node reboots. <p> gauge
  */
 static constexpr const char *kMetricK8sNodeUptime     = "k8s.node.uptime";
 static constexpr const char *descrMetricK8sNodeUptime = "The time the Node has been running.";
@@ -4461,6 +4671,315 @@ CreateAsyncDoubleMetricK8sPersistentvolumeclaimStorageRequest(metrics::Meter *me
 }
 
 /**
+  Maximum CPU resource limit currently configured for a running Pod.
+  <p>
+  This metric aligns with the limit in the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core">@code
+  resources @endcode</a> field of <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core">K8s
+  PodStatus</a> (status.resources). Also see @code Actual Resources @endcode in <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/</a>
+  for more details. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sPodCpuLimitCurrent = "k8s.pod.cpu.limit.current";
+static constexpr const char *descrMetricK8sPodCpuLimitCurrent =
+    "Maximum CPU resource limit currently configured for a running Pod.";
+static constexpr const char *unitMetricK8sPodCpuLimitCurrent = "{cpu}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodCpuLimitCurrent(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodCpuLimitCurrent,
+                                         descrMetricK8sPodCpuLimitCurrent,
+                                         unitMetricK8sPodCpuLimitCurrent);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodCpuLimitCurrent(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodCpuLimitCurrent,
+                                          descrMetricK8sPodCpuLimitCurrent,
+                                          unitMetricK8sPodCpuLimitCurrent);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodCpuLimitCurrent(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodCpuLimitCurrent,
+                                                   descrMetricK8sPodCpuLimitCurrent,
+                                                   unitMetricK8sPodCpuLimitCurrent);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodCpuLimitCurrent(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodCpuLimitCurrent,
+                                                    descrMetricK8sPodCpuLimitCurrent,
+                                                    unitMetricK8sPodCpuLimitCurrent);
+}
+
+/**
+  Maximum CPU resource limit as defined by the Pod spec.
+  <p>
+  This metric aligns with the limit in the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core">@code
+  resources @endcode</a> field of <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podspec-v1-core">K8s
+  PodSpec</a> (spec.resources). See <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/</a>
+  for more details on Pod level resources. Note that Kubernetes can default unset Pod level limits
+  based on the aggregated limits of the Pod's containers. Also see @code Desired Resources @endcode
+  in <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/</a>.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricK8sPodCpuLimitDesired = "k8s.pod.cpu.limit.desired";
+static constexpr const char *descrMetricK8sPodCpuLimitDesired =
+    "Maximum CPU resource limit as defined by the Pod spec.";
+static constexpr const char *unitMetricK8sPodCpuLimitDesired = "{cpu}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodCpuLimitDesired(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodCpuLimitDesired,
+                                         descrMetricK8sPodCpuLimitDesired,
+                                         unitMetricK8sPodCpuLimitDesired);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodCpuLimitDesired(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodCpuLimitDesired,
+                                          descrMetricK8sPodCpuLimitDesired,
+                                          unitMetricK8sPodCpuLimitDesired);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodCpuLimitDesired(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodCpuLimitDesired,
+                                                   descrMetricK8sPodCpuLimitDesired,
+                                                   unitMetricK8sPodCpuLimitDesired);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodCpuLimitDesired(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodCpuLimitDesired,
+                                                    descrMetricK8sPodCpuLimitDesired,
+                                                    unitMetricK8sPodCpuLimitDesired);
+}
+
+/**
+  The ratio of Pod CPU usage to its current CPU limit.
+  <p>
+  The current CPU limit reflects the actual resources applied at the Pod level, as reported by
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core">PodStatus</a>.
+  The value range is [0.0,1.0]. A value of 1.0 means the Pod is using 100% of its actual CPU limit.
+  If the CPU limit is not set, this metric SHOULD NOT be emitted for that Pod.
+  <p>
+  gauge
+ */
+static constexpr const char *kMetricK8sPodCpuLimitUtilization = "k8s.pod.cpu.limit.utilization";
+static constexpr const char *descrMetricK8sPodCpuLimitUtilization =
+    "The ratio of Pod CPU usage to its current CPU limit.";
+static constexpr const char *unitMetricK8sPodCpuLimitUtilization = "1";
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
+CreateSyncInt64MetricK8sPodCpuLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64Gauge(kMetricK8sPodCpuLimitUtilization,
+                                 descrMetricK8sPodCpuLimitUtilization,
+                                 unitMetricK8sPodCpuLimitUtilization);
+}
+
+static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricK8sPodCpuLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricK8sPodCpuLimitUtilization,
+                                  descrMetricK8sPodCpuLimitUtilization,
+                                  unitMetricK8sPodCpuLimitUtilization);
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodCpuLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableGauge(kMetricK8sPodCpuLimitUtilization,
+                                           descrMetricK8sPodCpuLimitUtilization,
+                                           unitMetricK8sPodCpuLimitUtilization);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodCpuLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricK8sPodCpuLimitUtilization,
+                                            descrMetricK8sPodCpuLimitUtilization,
+                                            unitMetricK8sPodCpuLimitUtilization);
+}
+
+/**
+  CPU resource requested currently configured for a running Pod.
+  <p>
+  This metric aligns with the request in the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core">@code
+  resources @endcode</a> field of <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core">K8s
+  PodStatus</a> (status.resources). Also see @code Actual Resources @endcode in <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/</a>
+  for more details. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sPodCpuRequestCurrent = "k8s.pod.cpu.request.current";
+static constexpr const char *descrMetricK8sPodCpuRequestCurrent =
+    "CPU resource requested currently configured for a running Pod.";
+static constexpr const char *unitMetricK8sPodCpuRequestCurrent = "{cpu}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodCpuRequestCurrent(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodCpuRequestCurrent,
+                                         descrMetricK8sPodCpuRequestCurrent,
+                                         unitMetricK8sPodCpuRequestCurrent);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodCpuRequestCurrent(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodCpuRequestCurrent,
+                                          descrMetricK8sPodCpuRequestCurrent,
+                                          unitMetricK8sPodCpuRequestCurrent);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodCpuRequestCurrent(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodCpuRequestCurrent,
+                                                   descrMetricK8sPodCpuRequestCurrent,
+                                                   unitMetricK8sPodCpuRequestCurrent);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodCpuRequestCurrent(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodCpuRequestCurrent,
+                                                    descrMetricK8sPodCpuRequestCurrent,
+                                                    unitMetricK8sPodCpuRequestCurrent);
+}
+
+/**
+  CPU resource requested as defined by the Pod spec.
+  <p>
+  This metric aligns with the request in the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core">@code
+  resources @endcode</a> field of <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podspec-v1-core">K8s
+  PodSpec</a> (spec.resources). See <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/</a>
+  for more details on Pod level resources. Note that Kubernetes can default unset Pod level requests
+  based on the aggregated requests of the Pod's containers. Also see @code Desired Resources
+  @endcode in <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/</a>.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricK8sPodCpuRequestDesired = "k8s.pod.cpu.request.desired";
+static constexpr const char *descrMetricK8sPodCpuRequestDesired =
+    "CPU resource requested as defined by the Pod spec.";
+static constexpr const char *unitMetricK8sPodCpuRequestDesired = "{cpu}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodCpuRequestDesired(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodCpuRequestDesired,
+                                         descrMetricK8sPodCpuRequestDesired,
+                                         unitMetricK8sPodCpuRequestDesired);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodCpuRequestDesired(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodCpuRequestDesired,
+                                          descrMetricK8sPodCpuRequestDesired,
+                                          unitMetricK8sPodCpuRequestDesired);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodCpuRequestDesired(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodCpuRequestDesired,
+                                                   descrMetricK8sPodCpuRequestDesired,
+                                                   unitMetricK8sPodCpuRequestDesired);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodCpuRequestDesired(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodCpuRequestDesired,
+                                                    descrMetricK8sPodCpuRequestDesired,
+                                                    unitMetricK8sPodCpuRequestDesired);
+}
+
+/**
+  The ratio of Pod CPU usage to its current CPU request.
+  <p>
+  The current CPU request reflects the request applied at the Pod level, as reported by
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core">PodStatus</a>.
+  A value of 1.0 means the Pod is using exactly its CPU request. Since a CPU request is a scheduling
+  reservation and not a hard cap, values above 1.0 are possible and indicate the Pod is using more
+  CPU than requested. If the CPU request is not set, this metric SHOULD NOT be emitted for that Pod.
+  <p>
+  gauge
+ */
+static constexpr const char *kMetricK8sPodCpuRequestUtilization = "k8s.pod.cpu.request.utilization";
+static constexpr const char *descrMetricK8sPodCpuRequestUtilization =
+    "The ratio of Pod CPU usage to its current CPU request.";
+static constexpr const char *unitMetricK8sPodCpuRequestUtilization = "1";
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
+CreateSyncInt64MetricK8sPodCpuRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64Gauge(kMetricK8sPodCpuRequestUtilization,
+                                 descrMetricK8sPodCpuRequestUtilization,
+                                 unitMetricK8sPodCpuRequestUtilization);
+}
+
+static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricK8sPodCpuRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricK8sPodCpuRequestUtilization,
+                                  descrMetricK8sPodCpuRequestUtilization,
+                                  unitMetricK8sPodCpuRequestUtilization);
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodCpuRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableGauge(kMetricK8sPodCpuRequestUtilization,
+                                           descrMetricK8sPodCpuRequestUtilization,
+                                           unitMetricK8sPodCpuRequestUtilization);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodCpuRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricK8sPodCpuRequestUtilization,
+                                            descrMetricK8sPodCpuRequestUtilization,
+                                            unitMetricK8sPodCpuRequestUtilization);
+}
+
+/**
   Total CPU time consumed.
   <p>
   Total CPU time consumed by the specific Pod on all available CPU cores
@@ -4547,9 +5066,9 @@ CreateAsyncDoubleMetricK8sPodCpuUsage(metrics::Meter *meter)
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.AvailableBytes</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.AvailableBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats.EphemeralStorage</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats">PodStats.EphemeralStorage</a>
   of the Kubelet's stats API.
   <p>
   updowncounter
@@ -4596,9 +5115,9 @@ CreateAsyncDoubleMetricK8sPodFilesystemAvailable(metrics::Meter *meter)
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.CapacityBytes</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.CapacityBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats.EphemeralStorage</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats">PodStats.EphemeralStorage</a>
   of the Kubelet's stats API.
   <p>
   updowncounter
@@ -4642,14 +5161,15 @@ CreateAsyncDoubleMetricK8sPodFilesystemCapacity(metrics::Meter *meter)
 /**
   Pod filesystem usage.
   <p>
-  This may not equal capacity - available.
-  <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.UsedBytes</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.UsedBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats.EphemeralStorage</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats">PodStats.EphemeralStorage</a>
   of the Kubelet's stats API.
+  <p>
+  Capacity and available are reported for the backing filesystem, which may be shared
+  with other workloads; therefore, usage may not equal @code capacity - available @endcode.
   <p>
   updowncounter
  */
@@ -4736,6 +5256,161 @@ CreateAsyncDoubleMetricK8sPodMemoryAvailable(metrics::Meter *meter)
 }
 
 /**
+  Maximum memory resource limit currently configured for a running Pod.
+  <p>
+  This metric aligns with the limit in the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core">@code
+  resources @endcode</a> field of <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core">K8s
+  PodStatus</a> (status.resources). Also see @code Actual Resources @endcode in <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/</a>
+  for more details. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sPodMemoryLimitCurrent = "k8s.pod.memory.limit.current";
+static constexpr const char *descrMetricK8sPodMemoryLimitCurrent =
+    "Maximum memory resource limit currently configured for a running Pod.";
+static constexpr const char *unitMetricK8sPodMemoryLimitCurrent = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodMemoryLimitCurrent(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodMemoryLimitCurrent,
+                                         descrMetricK8sPodMemoryLimitCurrent,
+                                         unitMetricK8sPodMemoryLimitCurrent);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodMemoryLimitCurrent(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodMemoryLimitCurrent,
+                                          descrMetricK8sPodMemoryLimitCurrent,
+                                          unitMetricK8sPodMemoryLimitCurrent);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodMemoryLimitCurrent(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodMemoryLimitCurrent,
+                                                   descrMetricK8sPodMemoryLimitCurrent,
+                                                   unitMetricK8sPodMemoryLimitCurrent);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodMemoryLimitCurrent(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodMemoryLimitCurrent,
+                                                    descrMetricK8sPodMemoryLimitCurrent,
+                                                    unitMetricK8sPodMemoryLimitCurrent);
+}
+
+/**
+  Maximum memory resource limit as defined by the Pod spec.
+  <p>
+  This metric aligns with the limit in the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core">@code
+  resources @endcode</a> field of <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podspec-v1-core">K8s
+  PodSpec</a> (spec.resources). See <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/</a>
+  for more details on Pod level resources. Note that Kubernetes can default unset Pod level limits
+  based on the aggregated limits of the Pod's containers. Also see @code Desired Resources @endcode
+  in <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/</a>.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricK8sPodMemoryLimitDesired = "k8s.pod.memory.limit.desired";
+static constexpr const char *descrMetricK8sPodMemoryLimitDesired =
+    "Maximum memory resource limit as defined by the Pod spec.";
+static constexpr const char *unitMetricK8sPodMemoryLimitDesired = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodMemoryLimitDesired(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodMemoryLimitDesired,
+                                         descrMetricK8sPodMemoryLimitDesired,
+                                         unitMetricK8sPodMemoryLimitDesired);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodMemoryLimitDesired(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodMemoryLimitDesired,
+                                          descrMetricK8sPodMemoryLimitDesired,
+                                          unitMetricK8sPodMemoryLimitDesired);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodMemoryLimitDesired(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodMemoryLimitDesired,
+                                                   descrMetricK8sPodMemoryLimitDesired,
+                                                   unitMetricK8sPodMemoryLimitDesired);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodMemoryLimitDesired(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodMemoryLimitDesired,
+                                                    descrMetricK8sPodMemoryLimitDesired,
+                                                    unitMetricK8sPodMemoryLimitDesired);
+}
+
+/**
+  The ratio of Pod memory working set to its current memory limit.
+  <p>
+  The numerator is the Pod memory working set, as reported by @code k8s.pod.memory.working_set
+  @endcode. The current memory limit reflects the actual resources applied at the Pod level, as
+  reported by <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core">PodStatus</a>.
+  A value of 1.0 means the Pod is using 100% of its actual memory limit. Values above 1.0 can occur
+  transiently, since memory usage can briefly exceed the limit. If the memory limit is not set, this
+  metric SHOULD NOT be emitted for that Pod. <p> gauge
+ */
+static constexpr const char *kMetricK8sPodMemoryLimitUtilization =
+    "k8s.pod.memory.limit.utilization";
+static constexpr const char *descrMetricK8sPodMemoryLimitUtilization =
+    "The ratio of Pod memory working set to its current memory limit.";
+static constexpr const char *unitMetricK8sPodMemoryLimitUtilization = "1";
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
+CreateSyncInt64MetricK8sPodMemoryLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64Gauge(kMetricK8sPodMemoryLimitUtilization,
+                                 descrMetricK8sPodMemoryLimitUtilization,
+                                 unitMetricK8sPodMemoryLimitUtilization);
+}
+
+static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricK8sPodMemoryLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricK8sPodMemoryLimitUtilization,
+                                  descrMetricK8sPodMemoryLimitUtilization,
+                                  unitMetricK8sPodMemoryLimitUtilization);
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodMemoryLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableGauge(kMetricK8sPodMemoryLimitUtilization,
+                                           descrMetricK8sPodMemoryLimitUtilization,
+                                           unitMetricK8sPodMemoryLimitUtilization);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodMemoryLimitUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricK8sPodMemoryLimitUtilization,
+                                            descrMetricK8sPodMemoryLimitUtilization,
+                                            unitMetricK8sPodMemoryLimitUtilization);
+}
+
+/**
   Deprecated, use @code k8s.pod.paging.faults @endcode instead.
 
   @deprecated
@@ -4794,6 +5469,162 @@ CreateAsyncDoubleMetricK8sPodMemoryPagingFaults(metrics::Meter *meter)
                                               descrMetricK8sPodMemoryPagingFaults,
                                               unitMetricK8sPodMemoryPagingFaults);
   OPENTELEMETRY_SUPPRESS_DEPRECATED_END
+}
+
+/**
+  Memory resource request currently configured for a running Pod.
+  <p>
+  This metric aligns with the request in the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core">@code
+  resources @endcode</a> field of <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core">K8s
+  PodStatus</a> (status.resources). Also see @code Actual Resources @endcode in <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/</a>
+  for more details. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sPodMemoryRequestCurrent = "k8s.pod.memory.request.current";
+static constexpr const char *descrMetricK8sPodMemoryRequestCurrent =
+    "Memory resource request currently configured for a running Pod.";
+static constexpr const char *unitMetricK8sPodMemoryRequestCurrent = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodMemoryRequestCurrent(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodMemoryRequestCurrent,
+                                         descrMetricK8sPodMemoryRequestCurrent,
+                                         unitMetricK8sPodMemoryRequestCurrent);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodMemoryRequestCurrent(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodMemoryRequestCurrent,
+                                          descrMetricK8sPodMemoryRequestCurrent,
+                                          unitMetricK8sPodMemoryRequestCurrent);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodMemoryRequestCurrent(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodMemoryRequestCurrent,
+                                                   descrMetricK8sPodMemoryRequestCurrent,
+                                                   unitMetricK8sPodMemoryRequestCurrent);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodMemoryRequestCurrent(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodMemoryRequestCurrent,
+                                                    descrMetricK8sPodMemoryRequestCurrent,
+                                                    unitMetricK8sPodMemoryRequestCurrent);
+}
+
+/**
+  Memory resource requested as defined by the Pod spec.
+  <p>
+  This metric aligns with the request in the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core">@code
+  resources @endcode</a> field of <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podspec-v1-core">K8s
+  PodSpec</a> (spec.resources). See <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/</a>
+  for more details on Pod level resources. Note that Kubernetes can default unset Pod level requests
+  based on the aggregated requests of the Pod's containers. Also see @code Desired Resources
+  @endcode in <a
+  href="https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/">https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/</a>.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricK8sPodMemoryRequestDesired = "k8s.pod.memory.request.desired";
+static constexpr const char *descrMetricK8sPodMemoryRequestDesired =
+    "Memory resource requested as defined by the Pod spec.";
+static constexpr const char *unitMetricK8sPodMemoryRequestDesired = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodMemoryRequestDesired(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodMemoryRequestDesired,
+                                         descrMetricK8sPodMemoryRequestDesired,
+                                         unitMetricK8sPodMemoryRequestDesired);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodMemoryRequestDesired(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodMemoryRequestDesired,
+                                          descrMetricK8sPodMemoryRequestDesired,
+                                          unitMetricK8sPodMemoryRequestDesired);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodMemoryRequestDesired(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodMemoryRequestDesired,
+                                                   descrMetricK8sPodMemoryRequestDesired,
+                                                   unitMetricK8sPodMemoryRequestDesired);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodMemoryRequestDesired(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodMemoryRequestDesired,
+                                                    descrMetricK8sPodMemoryRequestDesired,
+                                                    unitMetricK8sPodMemoryRequestDesired);
+}
+
+/**
+  The ratio of Pod memory working set to its current memory request.
+  <p>
+  The numerator is the Pod memory working set, as reported by @code k8s.pod.memory.working_set
+  @endcode. The current memory request reflects the request applied at the Pod level, as reported by
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core">PodStatus</a>.
+  A value of 1.0 means the Pod is using exactly its memory request. Since a memory request is a
+  scheduling reservation and not a hard cap, values above 1.0 are possible and indicate the Pod is
+  using more memory than requested. If the memory request is not set, this metric SHOULD NOT be
+  emitted for that Pod. <p> gauge
+ */
+static constexpr const char *kMetricK8sPodMemoryRequestUtilization =
+    "k8s.pod.memory.request.utilization";
+static constexpr const char *descrMetricK8sPodMemoryRequestUtilization =
+    "The ratio of Pod memory working set to its current memory request.";
+static constexpr const char *unitMetricK8sPodMemoryRequestUtilization = "1";
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
+CreateSyncInt64MetricK8sPodMemoryRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64Gauge(kMetricK8sPodMemoryRequestUtilization,
+                                 descrMetricK8sPodMemoryRequestUtilization,
+                                 unitMetricK8sPodMemoryRequestUtilization);
+}
+
+static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricK8sPodMemoryRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricK8sPodMemoryRequestUtilization,
+                                  descrMetricK8sPodMemoryRequestUtilization,
+                                  unitMetricK8sPodMemoryRequestUtilization);
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodMemoryRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableGauge(kMetricK8sPodMemoryRequestUtilization,
+                                           descrMetricK8sPodMemoryRequestUtilization,
+                                           unitMetricK8sPodMemoryRequestUtilization);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodMemoryRequestUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricK8sPodMemoryRequestUtilization,
+                                            descrMetricK8sPodMemoryRequestUtilization,
+                                            unitMetricK8sPodMemoryRequestUtilization);
 }
 
 /**
@@ -4884,7 +5715,11 @@ CreateAsyncDoubleMetricK8sPodMemoryUsage(metrics::Meter *meter)
   Pod memory working set.
   <p>
   The amount of working set memory. This includes recently accessed memory, dirty memory, and kernel
-  memory. WorkingSetBytes is <= UsageBytes. This metric is derived from the <a
+  memory. On Linux, the working set is calculated by excluding inactive file-backed memory from
+  memory usage (@code inactive_file @endcode on cgroup v2, @code total_inactive_file @endcode on
+  cgroup v1), so active file-backed memory remains included. The kubelet uses the Pod working set
+  when ranking Pods for eviction under memory pressure. @code WorkingSetBytes @endcode is less than
+  or equal to @code UsageBytes @endcode. This metric is derived from the <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats">MemoryStats.WorkingSetBytes</a>
   field of the <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats">PodStats.Memory</a>
@@ -5003,14 +5838,19 @@ CreateAsyncDoubleMetricK8sPodNetworkIo(metrics::Meter *meter)
 /**
   Pod memory paging faults.
   <p>
-  Cumulative number of major/minor page faults.
-  This metric is derived from the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats">MemoryStats.PageFaults</a>
-  and <a
+  Cumulative number of major and minor page faults.
+  The <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats">MemoryStats.MajorPageFaults</a>
   field of the <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats">PodStats.Memory</a>
-  of the Kubelet's stats API. <p> counter
+  of the Kubelet's stats API maps directly to @code system.paging.fault.type=major @endcode. The <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats">MemoryStats.PageFaults</a>
+  field reports the total number of page faults (equivalent to @code pgfault @endcode in the cgroup
+  @code memory.stat @endcode), with minor and major combined. The minor page faults MUST therefore
+  be derived as @code MemoryStats.PageFaults - MemoryStats.MajorPageFaults @endcode, so that summing
+  the metric over @code system.paging.fault.type @endcode yields the total number of page faults.
+  <p>
+  counter
  */
 static constexpr const char *kMetricK8sPodPagingFaults     = "k8s.pod.paging.faults";
 static constexpr const char *descrMetricK8sPodPagingFaults = "Pod memory paging faults.";
@@ -5131,7 +5971,13 @@ CreateAsyncDoubleMetricK8sPodStatusReason(metrics::Meter *meter)
   <p>
   Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
   as a floating point number with the highest precision available. The actual accuracy would depend
-  on the instrumentation and operating system. <p> gauge
+  on the instrumentation and operating system. This metric is derived from the <a
+  href="https://github.com/kubernetes/kubelet/blob/v0.35.2/pkg/apis/stats/v1alpha1/types.go#L122">PodStats.StartTime</a>
+  field of Kubelet's stats API, where @code StartTime @endcode represents the pod sandbox creation
+  time as <a
+  href="https://github.com/kubernetes/kubernetes/blob/v1.36.3/pkg/kubelet/stats/cri_stats_provider.go#L299">noted
+  in the Kubelet source</a>. This value resets when the node restarts, as the pod sandbox is
+  recreated. <p> gauge
  */
 static constexpr const char *kMetricK8sPodUptime     = "k8s.pod.uptime";
 static constexpr const char *descrMetricK8sPodUptime = "The time the Pod has been running.";
@@ -5173,9 +6019,9 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.AvailableBytes</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.AvailableBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
   the Kubelet's stats API. <p> updowncounter
  */
 static constexpr const char *kMetricK8sPodVolumeAvailable = "k8s.pod.volume.available";
@@ -5220,9 +6066,9 @@ CreateAsyncDoubleMetricK8sPodVolumeAvailable(metrics::Meter *meter)
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.CapacityBytes</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.CapacityBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
   the Kubelet's stats API. <p> updowncounter
  */
 static constexpr const char *kMetricK8sPodVolumeCapacity     = "k8s.pod.volume.capacity";
@@ -5262,9 +6108,9 @@ CreateAsyncDoubleMetricK8sPodVolumeCapacity(metrics::Meter *meter)
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.Inodes</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.Inodes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
   the Kubelet's stats API. <p> updowncounter
  */
 static constexpr const char *kMetricK8sPodVolumeInodeCount = "k8s.pod.volume.inode.count";
@@ -5309,9 +6155,9 @@ CreateAsyncDoubleMetricK8sPodVolumeInodeCount(metrics::Meter *meter)
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.InodesFree</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.InodesFree</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
   the Kubelet's stats API. <p> updowncounter
  */
 static constexpr const char *kMetricK8sPodVolumeInodeFree = "k8s.pod.volume.inode.free";
@@ -5356,9 +6202,9 @@ CreateAsyncDoubleMetricK8sPodVolumeInodeFree(metrics::Meter *meter)
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.InodesUsed</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.InodesUsed</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
   the Kubelet's stats API. <p> This may not be equal to @code inodes - free @endcode because
   filesystem may share inodes with other filesystems. <p> updowncounter
  */
@@ -5406,9 +6252,9 @@ CreateAsyncDoubleMetricK8sPodVolumeInodeUsed(metrics::Meter *meter)
   <p>
   This metric is derived from the
   <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.UsedBytes</a>
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.UsedBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
   the Kubelet's stats API. <p> updowncounter
  */
 static constexpr const char *kMetricK8sPodVolumeUsage     = "k8s.pod.volume.usage";
@@ -7173,6 +8019,50 @@ CreateAsyncDoubleMetricK8sStatefulsetDesiredPods(metrics::Meter *meter)
                                                     descrMetricK8sStatefulsetDesiredPods,
                                                     unitMetricK8sStatefulsetDesiredPods);
   OPENTELEMETRY_SUPPRESS_DEPRECATED_END
+}
+
+/**
+  Total number of available replica pods (ready for at least minReadySeconds) targeted by this
+  statefulset. <p> This metric aligns with the @code availableReplicas @endcode field of the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps">K8s
+  StatefulSetStatus</a>. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sStatefulsetPodAvailable = "k8s.statefulset.pod.available";
+static constexpr const char *descrMetricK8sStatefulsetPodAvailable =
+    "Total number of available replica pods (ready for at least minReadySeconds) targeted by this "
+    "statefulset.";
+static constexpr const char *unitMetricK8sStatefulsetPodAvailable = "{pod}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sStatefulsetPodAvailable(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sStatefulsetPodAvailable,
+                                         descrMetricK8sStatefulsetPodAvailable,
+                                         unitMetricK8sStatefulsetPodAvailable);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sStatefulsetPodAvailable(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sStatefulsetPodAvailable,
+                                          descrMetricK8sStatefulsetPodAvailable,
+                                          unitMetricK8sStatefulsetPodAvailable);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sStatefulsetPodAvailable(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sStatefulsetPodAvailable,
+                                                   descrMetricK8sStatefulsetPodAvailable,
+                                                   unitMetricK8sStatefulsetPodAvailable);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sStatefulsetPodAvailable(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sStatefulsetPodAvailable,
+                                                    descrMetricK8sStatefulsetPodAvailable,
+                                                    unitMetricK8sStatefulsetPodAvailable);
 }
 
 /**
