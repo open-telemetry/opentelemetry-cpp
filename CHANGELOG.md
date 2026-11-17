@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Parse the `event_to_span_event_bridge/development` log
+  record processor configuration in declarative configuration. The SDK
+  implementation of this processor is not yet available; `SdkBuilder` logs a
+  warning and skips it when configured.
+  [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
+
 * [BUILD] Link `libatomic` on platforms that need it for 64-bit `std::atomic`
   (32-bit powerpc and mips with GCC), so the curl HTTP client, the OTLP gRPC
   client, and the trace, logs, and metrics libraries link successfully.
