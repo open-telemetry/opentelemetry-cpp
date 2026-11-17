@@ -37,6 +37,7 @@ add_library(
   view/view_factory.cc
   view/view_registry.cc
   view/view_registry_factory.cc
+  view/predicate_factory.cc
   sync_instruments.cc)
 
 set_target_properties(opentelemetry_metrics PROPERTIES EXPORT_NAME metrics)
@@ -45,14 +46,23 @@ set_target_version(opentelemetry_metrics)
 target_link_libraries(
   opentelemetry_metrics PUBLIC opentelemetry_common opentelemetry_resources
                                opentelemetry_instrumentation_scope)
+otel_link_libatomic(opentelemetry_metrics)
 
 target_include_directories(
   opentelemetry_metrics
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
 if(OTELCPP_INSTALL)
+  set(_metrics_pc_extra_libs)
+  if(OPENTELEMETRY_ATOMIC_LIB)
+    list(APPEND _metrics_pc_extra_libs ${OPENTELEMETRY_ATOMIC_LIB})
+  endif()
   opentelemetry_add_pkgconfig(
-    metrics "OpenTelemetry SDK - Metrics"
+    metrics
+    "OpenTelemetry SDK - Metrics"
     "Components for exporting metrics in the OpenTelemetry SDK."
-    "opentelemetry_resources" "opentelemetry_instrumentation_scope")
+    "opentelemetry_resources"
+    "opentelemetry_instrumentation_scope"
+    EXTRA_LIBS
+    ${_metrics_pc_extra_libs})
 endif()

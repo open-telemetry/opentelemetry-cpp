@@ -21,12 +21,6 @@
 
 // IWYU pragma: no_include <features.h>
 
-#if defined(HAVE_GSL)
-#  include <gsl/gsl>
-#else
-#  include <cassert>
-#endif
-
 #ifdef _MSC_VER
 #  define strcasecmp _stricmp
 #else
@@ -103,6 +97,7 @@
 #  define OTLP_FILE_OPEN(f, path, mode) f = std::fopen(path, mode)
 #endif
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_runtime_options.h"
@@ -714,23 +709,6 @@ public:
 #endif
 };
 
-static inline char HexEncode(unsigned char byte)
-{
-#if defined(HAVE_GSL)
-  Expects(byte <= 16);
-#else
-  assert(byte <= 16);
-#endif
-  if (byte >= 10)
-  {
-    return static_cast<char>(byte - 10 + 'a');
-  }
-  else
-  {
-    return static_cast<char>(byte + '0');
-  }
-}
-
 static std::string HexEncode(const std::string &bytes)
 {
   std::string ret;
@@ -738,8 +716,8 @@ static std::string HexEncode(const std::string &bytes)
   for (std::string::size_type i = 0; i < bytes.size(); ++i)
   {
     unsigned char byte = static_cast<unsigned char>(bytes[i]);
-    ret.push_back(HexEncode(byte >> 4));
-    ret.push_back(HexEncode(byte & 0x0f));
+    ret.push_back(opentelemetry::common::detail::LowerHexDigit(byte >> 4));
+    ret.push_back(opentelemetry::common::detail::LowerHexDigit(byte));
   }
   return ret;
 }

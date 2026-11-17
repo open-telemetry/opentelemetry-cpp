@@ -17,6 +17,7 @@ cc_test(
         "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/resource",
         "//sdk/src/trace",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -41,6 +42,21 @@ cc_test(
     name = "span_data_test",
     srcs = [
         "span_data_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "span_status_test",
+    srcs = [
+        "span_status_test.cc",
     ],
     tags = [
         "test",
@@ -94,6 +110,7 @@ cc_test(
     ],
     deps = [
         "//sdk/src/trace",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )

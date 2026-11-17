@@ -167,13 +167,16 @@ struct SocketAddr
 {
   static u_long const Loopback = 0x7F000001;
 
-  sockaddr m_data{};
+  // sockaddr_storage is the socket API's type for holding an address of any family: it is large
+  // enough and aligned strictly enough for a sockaddr_in, which a plain sockaddr is not on every
+  // ABI. See addr() and addr_len() for how it is passed to the socket API.
+  sockaddr_storage m_data{};
 
   /// <summary>
   /// SocketAddr constructor
   /// </summary>
   /// <returns>SocketAddr</returns>
-  SocketAddr() {}
+  SocketAddr() { m_data.ss_family = AF_UNSPEC; }
 
   SocketAddr(u_long addr, uint16_t port)
   {
@@ -264,13 +267,18 @@ struct SocketAddr
     }
   }
 
-  operator sockaddr *() { return &m_data; }
+  /// The stored address as the socket API takes it. Only AF_INET addresses are stored, so
+  /// addr_len() is the length of a sockaddr_in rather than of the whole storage: bind() and
+  /// connect() reject a length that is too large for the address family on some platforms.
+  sockaddr *addr() { return reinterpret_cast<sockaddr *>(&m_data); }
 
-  operator const sockaddr *() const { return &m_data; }
+  const sockaddr *addr() const { return reinterpret_cast<const sockaddr *>(&m_data); }
+
+  socklen_t addr_len() const { return static_cast<socklen_t>(sizeof(sockaddr_in)); }
 
   int port() const
   {
-    switch (m_data.sa_family)
+    switch (m_data.ss_family)
     {
       case AF_INET: {
         // Copy out rather than binding a sockaddr_in glvalue to sockaddr storage, which is an
@@ -289,7 +297,7 @@ struct SocketAddr
   {
     std::ostringstream os;
 
-    switch (m_data.sa_family)
+    switch (m_data.ss_family)
     {
       case AF_INET: {
         sockaddr_in inet4{};
@@ -302,23 +310,22 @@ struct SocketAddr
       }
 
       default:
-        os << "[?AF?" << m_data.sa_family << ']';
+        os << "[?AF?" << m_data.ss_family << ']';
     }
     return os.str();
   }
 };
 
-// The parser memcpys a sockaddr_in into m_data, and the socket syscalls pass sizeof(SocketAddr)
-// as the address length. This wrapper is IPv4-only, so require sockaddr and sockaddr_in to have
-// the exact same size rather than trusting every ABI: passing an address length that is too large
-// for the family is a documented EINVAL for connect()/bind(). Exact equality also keeps the memcpy
-// safe. Together with the assertion below, sizeof(SocketAddr) == sizeof(sockaddr_in).
-static_assert(sizeof(sockaddr) == sizeof(sockaddr_in),
-              "SocketAddr is IPv4-only: sockaddr and sockaddr_in must have identical size");
-static_assert(offsetof(sockaddr, sa_family) == offsetof(sockaddr_in, sin_family),
-              "sockaddr and sockaddr_in must place the address family at the same offset");
-static_assert(sizeof(SocketAddr) == sizeof(sockaddr),
-              "SocketAddr must add no storage beyond its sockaddr, since syscalls use its size");
+// The constructors stores a sockaddr_in into m_data, port() and toString() reads it back out, and
+// the address family is read through ss_family. Those are only well defined if the storage is
+// large enough and aligned strictly enough for a sockaddr_in and places the address family where
+// a sockaddr_in does.
+static_assert(sizeof(sockaddr_storage) >= sizeof(sockaddr_in),
+              "sockaddr_storage must be large enough to hold a sockaddr_in");
+static_assert(alignof(sockaddr_storage) >= alignof(sockaddr_in),
+              "sockaddr_storage must be aligned strictly enough for a sockaddr_in");
+static_assert(offsetof(sockaddr_storage, ss_family) == offsetof(sockaddr_in, sin_family),
+              "sockaddr_storage and sockaddr_in must place the address family at the same offset");
 
 /// <summary>
 /// Encapsulation of a socket (non-exclusive ownership)
@@ -388,7 +395,7 @@ struct Socket
   bool connect(SocketAddr const &addr)
   {
     assert(m_sock != Invalid);
-    return (::connect(m_sock, addr, sizeof(addr)) == 0);
+    return (::connect(m_sock, addr.addr(), addr.addr_len()) == 0);
   }
 
   void close()
@@ -418,18 +425,18 @@ struct Socket
   bool bind(SocketAddr const &addr)
   {
     assert(m_sock != Invalid);
-    return (::bind(m_sock, addr, sizeof(addr)) == 0);
+    return (::bind(m_sock, addr.addr(), addr.addr_len()) == 0);
   }
 
   bool getsockname(SocketAddr &addr) const
   {
     assert(m_sock != Invalid);
 #ifdef _WIN32
-    int addrlen = sizeof(addr);
+    int addrlen = sizeof(addr.m_data);
 #else
-    socklen_t addrlen = sizeof(addr);
+    socklen_t addrlen = sizeof(addr.m_data);
 #endif
-    return (::getsockname(m_sock, addr, &addrlen) == 0);
+    return (::getsockname(m_sock, addr.addr(), &addrlen) == 0);
   }
 
   bool listen(int backlog)
@@ -442,11 +449,11 @@ struct Socket
   {
     assert(m_sock != Invalid);
 #ifdef _WIN32
-    int addrlen = sizeof(caddr);
+    int addrlen = sizeof(caddr.m_data);
 #else
-    socklen_t addrlen = sizeof(caddr);
+    socklen_t addrlen = sizeof(caddr.m_data);
 #endif
-    csock = ::accept(m_sock, caddr, &addrlen);
+    csock = ::accept(m_sock, caddr.addr(), &addrlen);
     return !csock.invalid();
   }
 

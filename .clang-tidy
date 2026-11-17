@@ -16,7 +16,6 @@ Checks: >
   -bugprone-implicit-widening-of-multiplication-result,
   -bugprone-inc-dec-in-conditions,
   -bugprone-unchecked-optional-access,
-  -bugprone-unhandled-exception-at-new,
   google-*,
   -google-build-using-namespace,
   -google-default-arguments,

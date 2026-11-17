@@ -42,6 +42,7 @@ cc_library(
     tags = ["prometheus"],
     deps = [
         ":prometheus_exporter",
+        "//sdk/src/configuration:configuration_core",
     ],
 )
 
@@ -93,6 +94,8 @@ cc_library(
         "//api",
         "//sdk:headers",
         "//sdk/src/trace",
+        "@com_github_jupp0r_prometheus_cpp//core",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -118,6 +121,7 @@ cc_test(
     srcs = [
         "test/collector_test.cc",
     ],
+    data = glob(["test/testdata/*.txt"]),
     tags = [
         "prometheus",
         "test",
@@ -135,6 +139,7 @@ cc_test(
     srcs = [
         "test/exporter_utils_test.cc",
     ],
+    data = glob(["test/testdata/*.txt"]),
     tags = [
         "prometheus",
         "test",

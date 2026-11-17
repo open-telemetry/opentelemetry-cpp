@@ -17,6 +17,7 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"  // IWYU pragma: keep
 // clang-format on
 
+#include <opentelemetry/exporters/otlp/otlp_builder_utils.h>
 #include <opentelemetry/exporters/otlp/otlp_environment.h>
 #include <opentelemetry/exporters/otlp/otlp_log_recordable.h>
 #include <opentelemetry/exporters/otlp/otlp_metric_utils.h>
@@ -164,4 +165,23 @@ TEST(ExportersOtlpCommon, ExportMetricsServiceRequest)
   const auto &scope_attributes_proto = scope_proto.attributes(0);
   EXPECT_EQ("scope_key", scope_attributes_proto.key());
   EXPECT_EQ("scope_value", scope_attributes_proto.value().string_value());
+}
+
+TEST(ExportersOtlpCommon, OtlpBuilderUtilsConvertHeadersConfigurationModel)
+{
+  opentelemetry::sdk::configuration::HeadersConfiguration headers_config;
+  headers_config.kv_map["k1"] = "v1";
+
+  auto headers =
+      otlp_exporter::OtlpBuilderUtils::ConvertHeadersConfigurationModel(&headers_config, "k2=v2");
+
+  ASSERT_EQ(headers.size(), 2);
+}
+
+TEST(ExportersOtlpCommon, OtlpBuilderUtilsConvertTemporalityPreference)
+{
+  auto temporality = otlp_exporter::OtlpBuilderUtils::ConvertTemporalityPreference(
+      opentelemetry::sdk::configuration::TemporalityPreference::delta);
+
+  EXPECT_EQ(temporality, otlp_exporter::PreferredAggregationTemporality::kDelta);
 }

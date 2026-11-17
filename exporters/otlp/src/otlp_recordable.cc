@@ -124,6 +124,7 @@ void OtlpRecordable::SetSpanLimits(const opentelemetry::sdk::trace::SpanLimits &
   span_limits_ = {
       (std::min)(span_limits_.attribute_count_limit, limits.attribute_count_limit),
       (std::min)(span_limits_.attribute_value_length_limit, limits.attribute_value_length_limit),
+      (std::min)(span_limits_.attribute_value_depth_limit, limits.attribute_value_depth_limit),
       (std::min)(span_limits_.event_count_limit, limits.event_count_limit),
       (std::min)(span_limits_.link_count_limit, limits.link_count_limit),
       (std::min)(span_limits_.event_attribute_count_limit, limits.event_attribute_count_limit),
@@ -212,6 +213,10 @@ void OtlpRecordable::SetStatus(trace::StatusCode code, nostd::string_view descri
   if (code == trace::StatusCode::kError)
   {
     span_.mutable_status()->set_message(description.data(), description.size());
+  }
+  else
+  {
+    span_.mutable_status()->clear_message();
   }
 }
 

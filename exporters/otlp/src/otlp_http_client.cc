@@ -17,13 +17,8 @@
 #include <utility>
 #include <vector>
 
-#if defined(HAVE_GSL)
-#  include <gsl/gsl>
-#else
-#  include <cassert>
-#endif
-
 #include "nlohmann/json.hpp"
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
@@ -186,6 +181,10 @@ public:
                opentelemetry::nostd::string_view reason) noexcept override
   {
     // need to modify stopping_ under lock before calling callback
+    //
+    // Every state the client can end a request on. A state missing from here leaves the caller
+    // waiting for a callback that never comes. The exchange below decides ordering, so a state
+    // arriving after a response does not report a second time.
     bool need_stop = false;
     switch (state)
     {
@@ -195,6 +194,9 @@ public:
       case http_client::SessionState::SSLHandshakeFailed:
       case http_client::SessionState::TimedOut:
       case http_client::SessionState::NetworkError:
+      case http_client::SessionState::Destroyed:
+      case http_client::SessionState::ReadError:
+      case http_client::SessionState::WriteError:
       case http_client::SessionState::Cancelled: {
         need_stop = true;
       }
@@ -415,23 +417,6 @@ private:
   bool console_debug_ = false;
 };
 
-static inline char HexEncode(unsigned char byte)
-{
-#if defined(HAVE_GSL)
-  Expects(byte <= 16);
-#else
-  assert(byte <= 16);
-#endif
-  if (byte >= 10)
-  {
-    return static_cast<char>(byte - 10 + 'a');
-  }
-  else
-  {
-    return static_cast<char>(byte + '0');
-  }
-}
-
 static std::string HexEncode(const std::string &bytes)
 {
   std::string ret;
@@ -439,8 +424,8 @@ static std::string HexEncode(const std::string &bytes)
   for (std::string::size_type i = 0; i < bytes.size(); ++i)
   {
     unsigned char byte = static_cast<unsigned char>(bytes[i]);
-    ret.push_back(HexEncode(byte >> 4));
-    ret.push_back(HexEncode(byte & 0x0f));
+    ret.push_back(opentelemetry::common::detail::LowerHexDigit(byte >> 4));
+    ret.push_back(opentelemetry::common::detail::LowerHexDigit(byte));
   }
   return ret;
 }

@@ -43,9 +43,13 @@ otel_add_component(
   EXCLUDE)
 
 if(OTELCPP_INSTALL)
+  set(_zipkin_pc_requires "opentelemetry_trace")
+  if(OTELCPP_WITH_HTTP_CLIENT_CURL)
+    string(APPEND _zipkin_pc_requires " opentelemetry_http_client_curl")
+  endif()
   opentelemetry_add_pkgconfig(
     exporter_zipkin_trace "OpenTelemetry Exporter - Zipkin"
-    "Exports trace spans in Zipkin format." "opentelemetry_trace")
+    "Exports trace spans in Zipkin format." "${_zipkin_pc_requires}")
 endif()
 
 if(OTELCPP_BUILD_TESTING)

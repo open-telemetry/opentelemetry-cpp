@@ -38,8 +38,8 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_container_resource_detector_builder
-  PRIVATE opentelemetry_container_resource_detector
-          opentelemetry_configuration_core)
+  PUBLIC opentelemetry_resources opentelemetry_configuration_core
+  PRIVATE opentelemetry_container_resource_detector)
 
 #
 # opentelemetry_env_entity_resource_detector
@@ -95,7 +95,8 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_host_resource_detector_builder
-  PRIVATE opentelemetry_host_resource_detector opentelemetry_configuration_core)
+  PUBLIC opentelemetry_resources opentelemetry_configuration_core
+  PRIVATE opentelemetry_host_resource_detector)
 
 #
 # opentelemetry_process_resource_detector
@@ -133,8 +134,8 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_process_resource_detector_builder
-  PRIVATE opentelemetry_process_resource_detector
-          opentelemetry_configuration_core)
+  PUBLIC opentelemetry_resources opentelemetry_configuration_core
+  PRIVATE opentelemetry_process_resource_detector)
 
 #
 # opentelemetry_service_resource_detector_utils
@@ -191,8 +192,8 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_service_resource_detector_builder
-  PRIVATE opentelemetry_service_resource_detector
-          opentelemetry_configuration_core)
+  PUBLIC opentelemetry_resources opentelemetry_configuration_core
+  PRIVATE opentelemetry_service_resource_detector)
 
 #
 # opentelemetry_resource_detectors (interface to all detectors)

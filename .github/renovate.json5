@@ -1,0 +1,43 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "config:best-practices",
+    "helpers:pinGitHubActionDigestsToSemver",
+    ":separateMultipleMajorReleases",
+  ],
+  ignorePaths: [],
+  packageRules: [
+    {
+      description: "Bundles all patches into 1 easy to review pr",
+      groupName: "all [patches]",
+      matchUpdateTypes: ["patch", "digest"],
+      schedule: ["before 6am every weekday"],
+    },
+    {
+      description: "Bundle all minor infra updates into 1 update",
+      groupName: "infra [minor]",
+      matchCategories: ["ci", "docker"],
+      matchUpdateTypes: ["minor"],
+      schedule: ["before 8am on Monday"],
+    },
+    {
+      description: "Allow major/minor updates to be raised each Monday without approval",
+      matchUpdateTypes: ["major", "minor"],
+      schedule: ["before 8am on Monday"],
+    },
+    {
+      dependencyDashboardApproval: true,
+      matchCategories: ["bazel", "docker"],
+      matchUpdateTypes: ["major"],
+    },
+    {
+      description: "Keep the Windows 2022 install test on its intended runner",
+      matchDatasources: ["github-runners"],
+      matchPackageNames: ["windows"],
+      matchCurrentValue: "2022",
+      matchFileNames: [".github/workflows/cmake_install.yml"],
+      enabled: false,
+    },
+  ],
+  labels: ["dependencies"],
+}

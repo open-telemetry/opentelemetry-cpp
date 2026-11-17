@@ -15,6 +15,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk/src/logs",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -117,6 +118,20 @@ cc_test(
     srcs = [
         "batch_log_record_processor_test.cc",
     ],
+    tags = [
+        "logs",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/logs",
+        "//test_common:headers",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "batch_log_record_processor_test_stress",
+    srcs = glob(["*_test_stress.cc"]),
     tags = [
         "logs",
         "test",

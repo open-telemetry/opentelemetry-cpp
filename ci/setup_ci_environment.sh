@@ -11,6 +11,7 @@ apt-get install --no-install-recommends --no-install-suggests -y \
                 ca-certificates \
                 wget \
                 git \
+                openssh-client \
                 valgrind \
                 lcov \
                 pkg-config

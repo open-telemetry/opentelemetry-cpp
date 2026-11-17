@@ -65,6 +65,7 @@ CXX_STANDARD=14|17|20|23
 BUILD_SHARED_LIBS=ON|OFF
 OTELCPP_CMAKE_BUILD_ARGS=<cmake-build-args>
 OTELCPP_CMAKE_CACHE_FILE=<cache-file-name>
+OTELCPP_WITH_STL=OFF|ON|CXX14|CXX17|CXX20|CXX23
 ```
 
 `OTELCPP_CMAKE_CACHE_FILE` should be the basename of a cache file from
@@ -115,6 +116,9 @@ These tests build the core API and SDK components in maintainer mode.
 * `cmake.c++17.stl.test`: C++17, OTELCPP_WITH_STL=CXX17
 * `cmake.c++20.stl.test`: C++20, OTELCPP_WITH_STL=CXX20
 * `cmake.c++23.stl.test`: C++23, OTELCPP_WITH_STL=CXX23
+* `cmake.cxx_standard.test`: C++ standard from `CXX_STANDARD`, STL from
+  `OTELCPP_WITH_STL` (default `OFF`; `ON` matches `CXX_STANDARD`). Used by the
+  CI C++ standard matrix.
 
 ### CMake feature and packaging tests
 
@@ -135,7 +139,6 @@ These tests build the core API and SDK components in maintainer mode.
   test.
 * `cmake.fetch_content.test`: Validate building the project via
   `FetchContent`.
-* `cmake.test_example_plugin`: Build and load-test the example plugin.
 
 ### Bazel targets
 
