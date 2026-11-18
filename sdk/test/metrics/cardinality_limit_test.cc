@@ -168,6 +168,70 @@ INSTANTIATE_TEST_SUITE_P(All,
                          WritableMetricStorageCardinalityLimitTestFixture,
                          ::testing::Values(AggregationTemporality::kDelta));
 
+TEST(CardinalityLimit, SyncCumulativeKeepsExistingSeriesBeforeOverflow)
+{
+  constexpr size_t kCardinalityLimit = 2;
+  AggregationConfig aggregation_config{kCardinalityLimit};
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kCounter,
+                                     InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> attributes_processor{
+      new DefaultAttributesProcessor{}};
+  SyncMetricStorage storage(instr_desc, AggregationType::kSum, attributes_processor,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+                            ExemplarFilterType::kAlwaysOff,
+                            ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+                            &aggregation_config);
+
+  auto sdk_start_ts = std::chrono::system_clock::now();
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kCumulative));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  auto record = [&storage](const std::string &id, int64_t value) {
+    std::map<std::string, std::string> attributes = {{"id", id}};
+    storage.RecordLong(value, KeyValueIterableView<std::map<std::string, std::string>>(attributes),
+                       opentelemetry::context::Context{});
+  };
+
+  record("a", 10);
+  record("b", 20);
+  size_t initial_point_count = 0;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, sdk_start_ts + std::chrono::seconds(5),
+                  [&](const MetricData &metric_data) {
+                    initial_point_count = metric_data.point_data_attr_.size();
+                    return true;
+                  });
+  EXPECT_EQ(2U, initial_point_count);
+
+  record("x", 7);
+  std::map<std::string, int64_t> values;
+  size_t point_count = 0;
+  storage.Collect(collector.get(), collectors, sdk_start_ts,
+                  sdk_start_ts + std::chrono::seconds(10), [&](const MetricData &metric_data) {
+                    point_count = metric_data.point_data_attr_.size();
+                    for (const auto &point : metric_data.point_data_attr_)
+                    {
+                      const auto value =
+                          nostd::get<int64_t>(nostd::get<SumPointData>(point.point_data).value_);
+                      auto id = point.attributes.find("id");
+                      if (id == point.attributes.end())
+                      {
+                        values["overflow"] = value;
+                      }
+                      else
+                      {
+                        values[nostd::get<std::string>(id->second)] = value;
+                      }
+                    }
+                    return true;
+                  });
+
+  EXPECT_EQ(3U, point_count);
+  EXPECT_EQ(10, values["a"]);
+  EXPECT_EQ(20, values["b"]);
+  EXPECT_EQ(7, values["overflow"]);
+}
+
 // Pin the overflow attribute key and value to the contract defined in the
 // OpenTelemetry Metrics SDK specification. The previous key value
 // `otel.metrics.overflow` (plural) silently diverged from the spec for years

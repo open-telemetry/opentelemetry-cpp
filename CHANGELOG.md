@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Stop exporting stale async attribute sets with cumulative
+  temporality. Preserve reader-scoped callback behavior and overflow
+  contributions, and bound per-reader monotonic counter baseline storage by
+  the configured cardinality limit.
+  [#4484](https://github.com/open-telemetry/opentelemetry-cpp/pull/4484)
+
 * [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
   measurements, so they no longer reach the histogram aggregations
 
