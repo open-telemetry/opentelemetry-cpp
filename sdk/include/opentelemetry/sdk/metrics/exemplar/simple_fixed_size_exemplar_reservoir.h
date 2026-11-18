@@ -8,6 +8,7 @@
 #  include <memory>
 #  include <vector>
 
+#  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
@@ -50,18 +51,42 @@ public:
   public:
     SimpleFixedSizeCellSelector(size_t size) : size_(size) {}
 
-    int ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
-                              int64_t value,
-                              const MetricAttributes &attributes,
-                              const opentelemetry::context::Context &context) override
+    int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
+                              int64_t /* value */,
+                              const MetricAttributes & /* attributes */,
+                              const opentelemetry::context::Context & /* context */) override
     {
-      return ReservoirCellIndexFor(cells, static_cast<double>(value), attributes, context);
+      return SelectCell();
     }
 
     int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
                               double /* value */,
                               const MetricAttributes & /* attributes */,
                               const opentelemetry::context::Context & /* context */) override
+    {
+      return SelectCell();
+    }
+
+    int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
+                              int64_t /* value */,
+                              const opentelemetry::common::KeyValueIterable & /* attributes */,
+                              const opentelemetry::context::Context & /* context */) override
+    {
+      return SelectCell();
+    }
+
+    int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
+                              double /* value */,
+                              const opentelemetry::common::KeyValueIterable & /* attributes */,
+                              const opentelemetry::context::Context & /* context */) override
+    {
+      return SelectCell();
+    }
+
+    void reset() override {}
+
+  private:
+    int SelectCell()
     {
       //
       // The simple reservoir sampling algorithm from the spec below is used.
@@ -88,9 +113,6 @@ public:
       return static_cast<int>(index);
     }
 
-    void reset() override {}
-
-  private:
     size_t measurements_seen_ = 0;
     size_t size_;
   };  // class SimpleFixedSizeCellSelector
