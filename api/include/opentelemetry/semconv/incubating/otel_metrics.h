@@ -458,13 +458,22 @@ CreateAsyncDoubleMetricOtelSdkExporterSpanInflightCount(metrics::Meter *meter)
 }
 
 /**
-  The number of logs submitted to enabled SDK Loggers.
+  The number of log records submitted to an enabled @code Logger @endcode.
+  <p>
+  In OpenTelemetry SDKs a @code Logger @endcode is enabled by default, and can be disabled via
+  configuration i.e. @code LoggerConfig.enabled @endcode = @code false @endcode when supported; a
+  disabled @code Logger @endcode is a No-op: emitting to it has no effect, so its records are not
+  counted. Every log record submitted to an enabled @code Logger @endcode is counted, even if it is
+  later filtered or dropped within the SDK (e.g. by minimum severity or trace-based rules, or by a
+  processor or the export pipeline), making this metric the top of the log delivery funnel. Records
+  not submitted to the SDK are not counted (e.g. a caller that skips calling @code Emit() @endcode
+  based on an @code Enabled() @endcode check, or an upstream logging library that filters first).
   <p>
   counter
  */
 static constexpr const char *kMetricOtelSdkLogCreated = "otel.sdk.log.created";
 static constexpr const char *descrMetricOtelSdkLogCreated =
-    "The number of logs submitted to enabled SDK Loggers.";
+    "The number of log records submitted to an enabled `Logger`.";
 static constexpr const char *unitMetricOtelSdkLogCreated = "{log_record}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricOtelSdkLogCreated(

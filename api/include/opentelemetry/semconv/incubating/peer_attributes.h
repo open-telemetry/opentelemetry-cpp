@@ -25,12 +25,13 @@ namespace peer
   remote service if any.
 
   @deprecated
-  {"note": "Replaced by @code service.peer.name @endcode.", "reason": "renamed", "renamed_to":
-  "service.peer.name"} <p> Examples of @code peer.service @endcode that users may specify: <ul>
-    <li>A Redis cache of auth tokens as @code peer.service="AuthTokenCache" @endcode.</li>
-    <li>A gRPC service @code rpc.service="io.opentelemetry.AuthService" @endcode may be hosted in
-  both a gateway, @code peer.service="ExternalApiService" @endcode and a backend, @code
-  peer.service="AuthService" @endcode.</li>
+  {"note": "Use @code server.service.name @endcode on the client side or @code client.service.name
+  @endcode on the server side.", "reason": "uncategorized"} <p> Examples of @code peer.service
+  @endcode that users may specify: <ul> <li>A Redis cache of auth tokens as @code
+  peer.service="AuthTokenCache" @endcode.</li> <li>A gRPC service @code
+  rpc.service="io.opentelemetry.AuthService" @endcode may be hosted in both a gateway, @code
+  peer.service="ExternalApiService" @endcode and a backend, @code peer.service="AuthService"
+  @endcode.</li>
   </ul>
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kPeerService = "peer.service";

@@ -21,6 +21,9 @@ Increment the:
   the configured cardinality limit.
   [#4484](https://github.com/open-telemetry/opentelemetry-cpp/pull/4484)
 
+* [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
+  measurements, so they no longer reach the histogram aggregations
+
 * [BUILD] Link `libatomic` on platforms that need it for 64-bit `std::atomic`
   (32-bit powerpc and mips with GCC), so the curl HTTP client, the OTLP gRPC
   client, and the trace, logs, and metrics libraries link successfully.
