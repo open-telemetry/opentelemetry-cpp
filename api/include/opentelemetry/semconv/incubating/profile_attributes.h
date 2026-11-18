@@ -96,6 +96,11 @@ static constexpr const char *kRust = "rust";
  */
 static constexpr const char *kLuajit = "luajit";
 
+/**
+  <a href="https://wikipedia.org/wiki/CUDA">CUDA</a>
+ */
+static constexpr const char *kCuda = "cuda";
+
 }  // namespace ProfileFrameTypeValues
 
 }  // namespace profile
