@@ -28,8 +28,8 @@ public:
    *
    * @param records a collection of metrics in OpenTelemetry
    * @param populate_target_info whether to populate target_info
-   * @param without_otel_scope whether to populate otel_scope_name and otel_scope_version
-   * attributes
+   * @param without_otel_scope whether to populate otel_scope_name, otel_scope_version,
+   * otel_scope_schema_url, and otel_scope_ attributes
    * @param without_units exporter configuration controlling whether to append unit suffix in
    * the exported metrics.
    * @param without_type_suffix exporter configuration controlling whether to append type suffix in
