@@ -66,7 +66,18 @@ ZipkinExporter::ZipkinExporter(
 
 std::unique_ptr<sdk::trace::Recordable> ZipkinExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (...)
+  {
+    return nullptr;
+  }
+#endif
 }
 
 sdk::common::ExportResult ZipkinExporter::Export(
