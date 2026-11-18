@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include <cstddef>
 #include <cstdlib>
+#include <future>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -128,12 +129,15 @@ public:
           std::shared_ptr<std::atomic<std::size_t>>(new std::atomic<std::size_t>(0)),
       std::shared_ptr<std::atomic<std::size_t>> export_call_count =
           std::shared_ptr<std::atomic<std::size_t>>(new std::atomic<std::size_t>(0)),
-      std::chrono::milliseconds export_delay = std::chrono::milliseconds(0)) noexcept
+      std::chrono::milliseconds export_delay = std::chrono::milliseconds(0),
+      std::shared_ptr<std::atomic<std::size_t>> shutdown_call_count =
+          std::make_shared<std::atomic<std::size_t>>(0)) noexcept
       : batch_sizes_(std::move(batch_sizes)),
         spans_received_count_(std::move(spans_received_count)),
         is_shutdown_(std::move(is_shutdown)),
         force_flush_counter_(std::move(force_flush_counter)),
         export_call_count_(std::move(export_call_count)),
+        shutdown_call_count_(std::move(shutdown_call_count)),
         export_delay_(export_delay)
   {}
 
@@ -177,16 +181,15 @@ public:
 
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
   {
+    ++(*shutdown_call_count_);
     *is_shutdown_ = true;
     return true;
   }
 
   void SetBlock(bool block)
   {
-    {
-      std::lock_guard<std::mutex> lock(mutex_);
-      block_export_.store(block);
-    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    block_export_.store(block);
     if (!block)
     {
       cv_.notify_all();
@@ -199,6 +202,7 @@ private:
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<std::size_t>> force_flush_counter_;
   std::shared_ptr<std::atomic<std::size_t>> export_call_count_;
+  std::shared_ptr<std::atomic<std::size_t>> shutdown_call_count_;
 
   mutable std::mutex mutex_;
   std::condition_variable cv_;
@@ -298,6 +302,166 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdownRespectsMaxExportBatchSize)
   {
     EXPECT_LE(size, options.max_export_batch_size);
   }
+}
+
+class BatchSpanProcessorShutdownTest : public testing::Test
+{
+protected:
+  void CreateProcessor()
+  {
+    exporter_ = new BlockingMockSpanExporter(batch_sizes_, spans_received_count_, is_shutdown_,
+                                             force_flush_counter_, export_call_count_,
+                                             std::chrono::milliseconds(0), shutdown_call_count_);
+
+    sdk::trace::BatchSpanProcessorOptions options{};
+    options.schedule_delay_millis = std::chrono::milliseconds(1);
+
+    processor_.reset(new sdk::trace::BatchSpanProcessor(
+        std::unique_ptr<sdk::trace::SpanExporter>(exporter_), options));
+  }
+
+  bool StartBlockedExport()
+  {
+    exporter_->SetBlock(true);
+
+    // If Shutdown() wrongly waits for the export, this still unblocks it, so that the test fails
+    // instead of hanging.
+    release_thread_ = std::thread([this] {
+      release_.get_future().wait_for(std::chrono::seconds(2));
+      exporter_->SetBlock(false);
+    });
+
+    processor_->OnEnd(processor_->MakeRecordable());
+    for (int i = 0; i < 1000 && export_call_count_->load() == 0; ++i)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    return export_call_count_->load() > 0;
+  }
+
+  void ReleaseExport()
+  {
+    release_.set_value();
+    release_thread_.join();
+  }
+
+  void TearDown() override
+  {
+    if (release_thread_.joinable())
+    {
+      ReleaseExport();
+    }
+  }
+
+  std::shared_ptr<std::vector<std::size_t>> batch_sizes_{new std::vector<std::size_t>()};
+  std::shared_ptr<std::atomic<std::size_t>> spans_received_count_{new std::atomic<std::size_t>(0)};
+  std::shared_ptr<std::atomic<bool>> is_shutdown_{new std::atomic<bool>(false)};
+  std::shared_ptr<std::atomic<std::size_t>> force_flush_counter_{new std::atomic<std::size_t>(0)};
+  std::shared_ptr<std::atomic<std::size_t>> export_call_count_{new std::atomic<std::size_t>(0)};
+  std::shared_ptr<std::atomic<std::size_t>> shutdown_call_count_{new std::atomic<std::size_t>(0)};
+  BlockingMockSpanExporter *exporter_{nullptr};  // owned by processor_
+  std::shared_ptr<sdk::trace::BatchSpanProcessor> processor_;
+  std::promise<void> release_;
+  std::thread release_thread_;
+};
+
+TEST_F(BatchSpanProcessorShutdownTest, HonorsTimeoutWhileExportIsBlocked)
+{
+  CreateProcessor();
+  ASSERT_TRUE(StartBlockedExport());
+
+  const auto start                   = std::chrono::steady_clock::now();
+  const bool shutdown_result         = processor_->Shutdown(std::chrono::milliseconds(10));
+  const auto elapsed                 = std::chrono::steady_clock::now() - start;
+  const auto exporter_shutdown_calls = shutdown_call_count_->load();
+  ReleaseExport();
+
+  EXPECT_FALSE(shutdown_result);
+  EXPECT_LT(elapsed, std::chrono::seconds(1));
+  EXPECT_EQ(0u, exporter_shutdown_calls);
+
+  processor_.reset();
+  EXPECT_EQ(1u, shutdown_call_count_->load());
+}
+
+TEST_F(BatchSpanProcessorShutdownTest, RepeatedShutdownReturnsImmediately)
+{
+  CreateProcessor();
+  ASSERT_TRUE(StartBlockedExport());
+
+  EXPECT_FALSE(processor_->Shutdown(std::chrono::milliseconds(10)));
+
+  const auto start                   = std::chrono::steady_clock::now();
+  const bool shutdown_result         = processor_->Shutdown();
+  const auto elapsed                 = std::chrono::steady_clock::now() - start;
+  const auto exporter_shutdown_calls = shutdown_call_count_->load();
+  ReleaseExport();
+
+  EXPECT_TRUE(shutdown_result);
+  EXPECT_LT(elapsed, std::chrono::seconds(1));
+  EXPECT_EQ(0u, exporter_shutdown_calls);
+
+  processor_.reset();
+  EXPECT_EQ(1u, shutdown_call_count_->load());
+}
+
+TEST_F(BatchSpanProcessorShutdownTest, ConcurrentShutdownDoesNotWait)
+{
+  CreateProcessor();
+  ASSERT_TRUE(StartBlockedExport());
+
+  auto first = std::async(std::launch::async, [this] { return processor_->Shutdown(); });
+  // Give the first call time to claim the shutdown. The assertions hold in either order.
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+  const auto start = std::chrono::steady_clock::now();
+  processor_->Shutdown(std::chrono::milliseconds(10));
+  const auto elapsed = std::chrono::steady_clock::now() - start;
+  ReleaseExport();
+
+  EXPECT_LT(elapsed, std::chrono::seconds(1));
+  EXPECT_TRUE(first.get());
+
+  processor_.reset();
+  EXPECT_EQ(1u, shutdown_call_count_->load());
+}
+
+TEST_F(BatchSpanProcessorShutdownTest, DestructorWaitsForConcurrentShutdown)
+{
+  CreateProcessor();
+  ASSERT_TRUE(StartBlockedExport());
+
+  auto *processor = processor_.get();
+  auto first      = std::async(std::launch::async, [processor] { return processor->Shutdown(); });
+  // Give the first call time to claim the shutdown. The assertions hold in either order.
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  processor_->Shutdown(std::chrono::milliseconds(10));
+
+  std::thread destroy([this] { processor_.reset(); });
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  ReleaseExport();
+  destroy.join();
+
+  EXPECT_TRUE(first.get());
+  EXPECT_EQ(1u, shutdown_call_count_->load());
+}
+
+TEST_F(BatchSpanProcessorTestPeer, TestShutdownPassesRemainingTimeToExporter)
+{
+  std::shared_ptr<std::atomic<std::size_t>> shut_down_counter(new std::atomic<std::size_t>(0));
+  std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
+  std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
+
+  auto exporter        = new MockSpanExporter(spans_received, shut_down_counter, is_shutdown);
+  auto batch_processor = std::shared_ptr<sdk::trace::BatchSpanProcessor>(
+      new sdk::trace::BatchSpanProcessor(std::unique_ptr<sdk::trace::SpanExporter>(exporter),
+                                         sdk::trace::BatchSpanProcessorOptions()));
+
+  EXPECT_TRUE(batch_processor->Shutdown(std::chrono::seconds(60)));
+
+  EXPECT_GT(exporter->GetShutdownTimeout(), std::chrono::microseconds::zero());
+  EXPECT_LE(exporter->GetShutdownTimeout(), std::chrono::seconds(60));
 }
 
 TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
