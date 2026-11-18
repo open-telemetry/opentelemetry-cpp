@@ -105,10 +105,8 @@ INSTANTIATE_TEST_SUITE_P(
                         ParsedUrl{"https", "example.com", 0, "/some/path", "", false}),
         std::make_tuple("https://example.com:18446744073709551616/some/path",
                         ParsedUrl{"https", "example.com", 0, "/some/path", "", false}),
-        std::make_tuple("vsock://3:100000",
-                        ParsedUrl{"vsock", "3", 100000, "/", "", true}),
-        std::make_tuple("vsock://3:4294967296",
-                        ParsedUrl{"vsock", "3", 0, "/", "", false})));
+        std::make_tuple("vsock://3:100000", ParsedUrl{"vsock", "3", 100000, "/", "", true}),
+        std::make_tuple("vsock://3:4294967296", ParsedUrl{"vsock", "3", 0, "/", "", false})));
 
 TEST_P(UrlParserTests, BasicTests)
 {

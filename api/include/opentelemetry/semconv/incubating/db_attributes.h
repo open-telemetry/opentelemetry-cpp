@@ -89,12 +89,12 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCassandraSpeculativeExe
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCassandraTable = "db.cassandra.table";
 
 /**
-  The name of the connection pool; unique within the instrumented application. In case the
-  connection pool implementation doesn't provide a name, instrumentation SHOULD use a combination of
-  parameters that would make the name unique, for example, combining attributes @code server.address
-  @endcode, @code server.port @endcode, and @code db.namespace @endcode, formatted as @code
-  server.address:server.port/db.namespace @endcode. Instrumentations that generate connection pool
-  name following different patterns SHOULD document it.
+  The name of the connection pool. If the connection pool does not have a name, instrumentation
+  SHOULD use @code db.namespace @endcode; otherwise @code server.address @endcode, with @code
+  server.port @endcode appended using @code : @endcode if set. When appending a port to an IPv6
+  address, instrumentation MUST enclose the address in square brackets. If @code server.address
+  @endcode is not available, instrumentation SHOULD use @code db.system.name @endcode; otherwise the
+  connection pool library name.
  */
 static constexpr const char *kDbClientConnectionPoolName = "db.client.connection.pool.name";
 
@@ -133,8 +133,9 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kDbClientConnectionsState 
   when the database system supports query text with multiple collections
   in non-batch operations.
   <p>
-  For batch operations, if the individual operations are known to have the same
-  collection name then that collection name SHOULD be used.
+  For batch operations, if the individual operations would all have the same
+  @code db.collection.name @endcode when executed as non-batch operations,
+  then that collection name SHOULD be used.
  */
 static constexpr const char *kDbCollectionName = "db.collection.name";
 
@@ -385,9 +386,10 @@ static constexpr const char *kDbOperationBatchSize = "db.operation.batch.size";
   If spaces can occur in the operation name, multiple consecutive spaces
   SHOULD be normalized to a single space.
   <p>
-  For batch operations, if the individual operations are known to have the same operation name
-  then that operation name SHOULD be used prepended by @code BATCH  @endcode,
-  otherwise @code db.operation.name @endcode SHOULD be @code BATCH @endcode or some other database
+  For batch operations, if the individual operations would all have the same
+  @code db.operation.name @endcode when executed as non-batch operations,
+  then that operation name SHOULD be used prepended by @code BATCH  @endcode.
+  Otherwise, @code db.operation.name @endcode SHOULD be @code BATCH @endcode or some other database
   system specific term if more applicable.
  */
 static constexpr const char *kDbOperationName = "db.operation.name";
@@ -443,9 +445,11 @@ static constexpr const char *kDbQueryParameter = "db.query.parameter";
   instrumentation hooks or other means. If it is not available, instrumentations
   that support query parsing SHOULD generate a summary following
   <a href="/docs/db/database-spans.md#generating-a-summary-of-the-query">Generating query
-  summary</a> section. <p> For batch operations, if the individual operations are known to have the
-  same query summary then that query summary SHOULD be used prepended by @code BATCH  @endcode,
-  otherwise @code db.query.summary @endcode SHOULD be @code BATCH @endcode or some other database
+  summary</a> section. <p> For batch operations, if the individual operations would all have the
+  same
+  @code db.query.summary @endcode when executed as non-batch operations,
+  then that query summary SHOULD be used prepended by @code BATCH  @endcode.
+  Otherwise, @code db.query.summary @endcode SHOULD be @code BATCH @endcode or some other database
   system specific term if more applicable.
  */
 static constexpr const char *kDbQuerySummary = "db.query.summary";
@@ -454,14 +458,14 @@ static constexpr const char *kDbQuerySummary = "db.query.summary";
   The database query being executed.
   <p>
   For sanitization see <a href="/docs/db/database-spans.md#sanitization-of-dbquerytext">Sanitization
-  of @code db.query.text @endcode</a>. For batch operations, if the individual operations are known
-  to have the same query text then that query text SHOULD be used, otherwise all of the individual
-  query texts SHOULD be concatenated with separator @code ;  @endcode or some other database system
-  specific separator if more applicable. Parameterized query text SHOULD NOT be sanitized. Even
-  though parameterized query text can potentially have sensitive data, by using a parameterized
-  query the user is giving a strong signal that any sensitive data will be passed as parameter
-  values, and the benefit to observability of capturing the static part of the query text by default
-  outweighs the risk.
+  of @code db.query.text @endcode</a>. For batch operations, if the individual operations would all
+  have the same @code db.query.text @endcode when executed as non-batch operations, then that query
+  text SHOULD be used. Otherwise, all of the individual query texts SHOULD be concatenated with
+  separator @code ;  @endcode or some other database system specific separator if more applicable.
+  Parameterized query text SHOULD NOT be sanitized. Even though parameterized query text can
+  potentially have sensitive data, by using a parameterized query the user is giving a strong signal
+  that any sensitive data will be passed as parameter values, and the benefit to observability of
+  capturing the static part of the query text by default outweighs the risk.
  */
 static constexpr const char *kDbQueryText = "db.query.text";
 
@@ -484,8 +488,10 @@ static constexpr const char *kDbResponseReturnedRows = "db.response.returned_row
   <p>
   The status code returned by the database. Usually it represents an error code, but may also
   represent partial success, warning, or differentiate between various types of successful outcomes.
-  Semantic conventions for individual database systems SHOULD document what @code
-  db.response.status_code @endcode means in the context of that system.
+  The value MAY use a standardized string representation of a numeric status code, if one exists,
+  instead of the numeric code. The value MAY be a synthetic status provided by the client library
+  rather than returned by the remote service. Semantic conventions for individual database systems
+  SHOULD document what @code db.response.status_code @endcode means in the context of that system.
  */
 static constexpr const char *kDbResponseStatusCode = "db.response.status_code";
 
@@ -513,8 +519,9 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kDbStatement = "db.stateme
   It is RECOMMENDED to capture the value as provided by the application
   without attempting to do any case normalization.
   <p>
-  For batch operations, if the individual operations are known to have the same
-  stored procedure name then that stored procedure name SHOULD be used.
+  For batch operations, if the individual operations would all have the same
+  @code db.stored_procedure.name @endcode when executed as non-batch operations,
+  then that stored procedure name SHOULD be used.
  */
 static constexpr const char *kDbStoredProcedureName = "db.stored_procedure.name";
 
@@ -1051,7 +1058,7 @@ static constexpr const char *kHive = "hive";
 static constexpr const char *kHsqldb = "hsqldb";
 
 /**
-  <a href="https://www.ibm.com/db2">IBM Db2</a>
+  <a href="https://www.ibm.com/products/db2">IBM Db2</a>
  */
 static constexpr const char *kIbmDb2 = "ibm.db2";
 

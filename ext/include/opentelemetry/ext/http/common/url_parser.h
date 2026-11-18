@@ -174,11 +174,11 @@ private:
 
   std::uint32_t GetPort(const std::string &s)
   {
-    char *e = nullptr;
-    errno   = 0;
-    auto port = std::strtoull(s.c_str(), &e, 10);
-    auto max_port = scheme_ == "vsock" ? std::numeric_limits<std::uint32_t>::max()
-                                        : std::numeric_limits<std::uint16_t>::max();
+    char *e       = nullptr;
+    errno         = 0;
+    auto port     = std::strtoull(s.c_str(), &e, 10);
+    auto max_port = scheme_ == "vsock" ? (std::numeric_limits<std::uint32_t>::max)()
+                                       : (std::numeric_limits<std::uint16_t>::max)();
     if (e == s.c_str() || e != s.c_str() + s.size() || errno == ERANGE || s[0] == '-' ||
         port > max_port)
     {

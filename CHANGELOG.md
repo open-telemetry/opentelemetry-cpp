@@ -18,6 +18,23 @@ Increment the:
 * [OTLP/gRPC] Support VSOCK endpoints on Linux
   [#4706](https://github.com/open-telemetry/opentelemetry-cpp/issues/4706)
 
+* [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
+  measurements, so they no longer reach the histogram aggregations
+
+* [BUILD] Link `libatomic` on platforms that need it for 64-bit `std::atomic`
+  (32-bit powerpc and mips with GCC), so the curl HTTP client, the OTLP gRPC
+  client, and the trace, logs, and metrics libraries link successfully.
+  [#4773](https://github.com/open-telemetry/opentelemetry-cpp/issues/4773)
+
+* [SDK] Skip completely empty span links (invalid span context, no attributes
+  and no trace state), so they no longer count against `link_count_limit`
+  [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)
+
+* [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
+  returns `false` when the Meter is disabled or every matching view uses the
+  Drop aggregation
+  [#4721](https://github.com/open-telemetry/opentelemetry-cpp/pull/4721)
+
 * [SDK] `BatchLogRecordProcessor` now exports at most one batch on normal
   wakeups instead of continuously draining the buffer, matching
   `BatchSpanProcessor`
@@ -39,6 +56,15 @@ Increment the:
 * [EXPORTER] Prometheus exporter: fix attribute serialization, label collision,
   and empty point guards
   [#4738](https://github.com/open-telemetry/opentelemetry-cpp/pull/4738)
+
+* [SDK] Fix lost wakeup in BatchSpanProcessor `OnEnd` notify when a span
+  fills the queue, which could stall the export and drop spans until the
+  schedule delay.
+  [#4741](https://github.com/open-telemetry/opentelemetry-cpp/pull/4741)
+
+* [SDK] Clamp `BatchLogRecordProcessor` max_export_batch_size to non-zero
+  max_queue_size, with a warning, matching `BatchSpanProcessor`.
+  [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
 ## [1.30.0] 2026-10-22
 
