@@ -54,6 +54,7 @@ endforeach()
 
 set_tests_properties(
   metrics.MeterProvider.ConstructionFailureDiagnosticsAllowProviderReentry
+  metrics.MeterProvider.UpdateMeterConfiguratorPreservesConfigOnMatcherFailure
   PROPERTIES TIMEOUT 10)
 
 if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)

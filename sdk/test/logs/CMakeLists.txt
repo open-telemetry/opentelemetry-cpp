@@ -29,4 +29,5 @@ endforeach()
 
 set_tests_properties(
   logs.LoggerProviderSDK.ConstructionFailureDiagnosticsAllowProviderReentry
+  logs.LoggerProviderSDK.UpdateLoggerConfiguratorPreservesConfigOnMatcherFailure
   PROPERTIES TIMEOUT 10)
