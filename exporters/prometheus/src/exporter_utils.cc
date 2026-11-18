@@ -226,6 +226,12 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
               &output);
   }
 
+  std::unordered_map<std::string, std::size_t> family_index_by_name;
+  for (std::size_t i = 0; i < output.size(); ++i)
+  {
+    family_index_by_name.emplace(output[i].name, i);
+  }
+
   for (const auto &instrumentation_info : data.scope_metric_data_)
   {
     for (const auto &metric_data : instrumentation_info.metric_data_)
@@ -234,20 +240,57 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
       {
         continue;
       }
-      prometheus_client::MetricFamily metric_family;
-      metric_family.help = metric_data.instrument_descriptor.description_;
-      auto front         = metric_data.point_data_attr_.front();
-      auto kind          = getAggregationType(front.point_data);
-      bool is_monotonic  = true;
+      auto front        = metric_data.point_data_attr_.front();
+      auto kind         = getAggregationType(front.point_data);
+      bool is_monotonic = true;
       if (kind == sdk::metrics::AggregationType::kSum)
       {
         is_monotonic = nostd::get<sdk::metrics::SumPointData>(front.point_data).is_monotonic_;
       }
       const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
-      metric_family.name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
-                                               metric_data.instrument_descriptor.unit_, type,
-                                               without_units, without_type_suffix);
-      metric_family.type = type;
+      if (type == prometheus_client::MetricType::Untyped)
+      {
+        OTEL_INTERNAL_LOG_WARN(
+            "[Prometheus Exporter] TranslateToPrometheus - "
+            "Unsupported aggregation type for metric '"
+            << metric_data.instrument_descriptor.name_ << "'. Dropping metric.");
+        continue;
+      }
+      const std::string name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
+                                                   metric_data.instrument_descriptor.unit_, type,
+                                                   without_units, without_type_suffix);
+      prometheus_client::MetricFamily *metric_family_ptr = nullptr;
+      auto existing_it                                   = family_index_by_name.find(name);
+      if (existing_it != family_index_by_name.end())
+      {
+        auto &existing_family = output[existing_it->second];
+        if (existing_family.type != type)
+        {
+          OTEL_INTERNAL_LOG_WARN(
+              "[Prometheus Exporter] TranslateToPrometheus - "
+              "Instrument type conflict for metric '"
+              << name << "'. Dropping conflicting metric.");
+          continue;
+        }
+        if (existing_family.help != metric_data.instrument_descriptor.description_)
+        {
+          OTEL_INTERNAL_LOG_WARN(
+              "[Prometheus Exporter] TranslateToPrometheus - "
+              "Instrument description conflict for metric '"
+              << name << "': '" << metric_data.instrument_descriptor.description_
+              << "', using existing description: '" << existing_family.help << "'.");
+        }
+        metric_family_ptr = &existing_family;
+      }
+      else
+      {
+        family_index_by_name.emplace(name, output.size());
+        output.emplace_back();
+        metric_family_ptr       = &output.back();
+        metric_family_ptr->name = name;
+        metric_family_ptr->help = metric_data.instrument_descriptor.description_;
+        metric_family_ptr->type = type;
+      }
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope =
           without_otel_scope ? nullptr : instrumentation_info.scope_;
 
@@ -269,7 +312,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             sum = static_cast<double>(nostd::get<int64_t>(histogram_point_data.sum_));
           }
           SetData(std::vector<double>{sum, static_cast<double>(histogram_point_data.count_)},
-                  boundaries, counts, point_data_attr.attributes, scope, &metric_family,
+                  boundaries, counts, point_data_attr.attributes, scope, metric_family_ptr,
                   data.resource_);
         }
         else if (type == prometheus_client::MetricType::Gauge)
@@ -280,7 +323,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto last_value_point_data =
                 nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
-            SetData(values, point_data_attr.attributes, scope, type, &metric_family,
+            SetData(values, point_data_attr.attributes, scope, type, metric_family_ptr,
                     data.resource_);
           }
           else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
@@ -288,7 +331,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, scope, type, &metric_family,
+            SetData(values, point_data_attr.attributes, scope, type, metric_family_ptr,
                     data.resource_);
           }
           else
@@ -305,7 +348,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, scope, type, &metric_family,
+            SetData(values, point_data_attr.attributes, scope, type, metric_family_ptr,
                     data.resource_);
           }
           else
@@ -316,7 +359,6 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
           }
         }
       }
-      output.emplace_back(metric_family);
     }
   }
   return output;
