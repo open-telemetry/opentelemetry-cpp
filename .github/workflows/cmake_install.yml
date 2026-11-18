@@ -138,7 +138,7 @@ jobs:
 
   ubuntu_2204_stable:
     name: Ubuntu 22.04 stable versions cxx17 (static libs - shared libs)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
       CXX_STANDARD: '17'
@@ -171,7 +171,7 @@ jobs:
 
   ubuntu_2204_minimum:
     name: Ubuntu 22.04 minimum versions cxx14 (static libs - shared libs)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
       # Set to the current minimum version of cmake
