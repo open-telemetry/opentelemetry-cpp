@@ -69,6 +69,13 @@ Increment the:
 * [SDK] Clamp `BatchLogRecordProcessor` max_export_batch_size to non-zero
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
+* [EXPORTER] `OtlpHttpClient::ForceFlush`, and `OtlpGrpcClient::ForceFlush`
+  under the async export preview, now wait for the requests that were pending
+  when they were called, instead of for as many completions as there were
+  requests started. A request begun after the call could supply one of those
+  completions, so the flush reported success with an earlier request still in
+  flight
+  [#4339](https://github.com/open-telemetry/opentelemetry-cpp/issues/4339)
 
 ## [1.30.0] 2026-10-22
 

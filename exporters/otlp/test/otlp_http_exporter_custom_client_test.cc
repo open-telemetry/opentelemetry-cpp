@@ -4,9 +4,12 @@
 #include <gtest/gtest.h>
 #include <atomic>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <initializer_list>
 #include <string>
+#include <thread>
 #include <utility>
 #include "gmock/gmock.h"
 
@@ -131,8 +134,25 @@ public:
         1);
   }
 
+  // Friendship is granted to this fixture and does not extend to the class TEST_F derives from
+  // it, so the two private things a case needs are read through these.
+  static std::uint64_t FlushCutoff(const OtlpHttpClient &otlp_client)
+  {
+    return otlp_client.start_session_counter_.load(std::memory_order_acquire);
+  }
+
+  static bool SnapshotSatisfied(OtlpHttpClient &otlp_client, std::uint64_t cutoff)
+  {
+    return otlp_client.allSessionsBeforeFinished(cutoff);
+  }
+
   // A non-zero request budget keeps the export asynchronous, so it returns while the session runs.
-  static void ExportOneRequest(OtlpHttpClient &otlp_client)
+  // The budget has to cover every session still registered, not just this one: Export registers
+  // first and then waits for the registry to fall back inside the budget, so too small a budget
+  // makes the call run the client timeout down and report failure.
+  static opentelemetry::sdk::common::ExportResult ExportOneRequest(
+      OtlpHttpClient &otlp_client,
+      std::size_t max_running_requests = 1)
   {
     auto arena = std::make_unique<google::protobuf::Arena>();
     auto *request =
@@ -142,10 +162,10 @@ public:
         google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceResponse>(
             arena.get());
 
-    otlp_client.Export(
+    return otlp_client.Export(
         *request, std::move(arena), response,
         [](opentelemetry::sdk::common::ExportResult, google::protobuf::Message *) { return true; },
-        1);
+        max_running_requests);
   }
 };
 
@@ -249,8 +269,7 @@ TEST_F(OtlpHttpExporterCustomClientTestPeer, ForceFlushReturnsWithinTheCallerDea
   sent.Finish(*pending);
 }
 
-// The result is the finished counter alone, so a flush with nothing left to wait for has to say
-// so. Guards the counter against the session bookkeeping it is derived from.
+// Once the pending session completes, the flush snapshot is satisfied.
 TEST_F(OtlpHttpExporterCustomClientTestPeer, ForceFlushReportsSuccessOnceTheSessionIsDone)
 {
   auto client         = http_client::HttpClientTestFactory::Create();
@@ -273,6 +292,219 @@ TEST_F(OtlpHttpExporterCustomClientTestPeer, ForceFlushReportsSuccessOnceTheSess
   sent.Finish(*pending);
 
   EXPECT_TRUE(otlp_client.ForceFlush(std::chrono::milliseconds{50}));
+}
+
+// A later registration cannot satisfy a flush while a request in its snapshot is still running.
+//
+// Nothing between starting the flush thread and joining it may assert. A gtest failure returns
+// from the case, a joinable std::thread terminates the process on destruction, and
+// ~OtlpHttpClient waits for the registry to empty with no deadline. So both cases below complete
+// every request and join, and only then assert.
+TEST_F(OtlpHttpExporterCustomClientTestPeer, ForceFlushDoesNotAcceptALaterRequestInPlaceOfItsOwn)
+{
+  auto client         = http_client::HttpClientTestFactory::Create();
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto first = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> first_pending;
+  EXPECT_CALL(*first, SendRequest)
+      .WillRepeatedly(
+          [&first_pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> cb) {
+            first_pending = std::move(cb);
+          });
+
+  // A short client timeout, so the bounded wait re-reads its predicate often.
+  OtlpHttpClient otlp_client(MakeOtlpHttpClientOptions(std::chrono::milliseconds{10}), client);
+
+  const auto first_result = ExportOneRequest(otlp_client, 2);
+
+  // Entered with the first request pending, so this is the request it has to wait for. How long it
+  // waits is the other half of the answer: ending early is what accepting the wrong completion
+  // looks like, so the duration is asserted as well as the result.
+  bool flushed = true;
+  std::chrono::steady_clock::duration waited{};
+  std::thread flusher([&otlp_client, &flushed, &waited] {
+    const auto entered = std::chrono::steady_clock::now();
+    flushed            = otlp_client.ForceFlush(std::chrono::milliseconds{500});
+    waited             = std::chrono::steady_clock::now() - entered;
+  });
+  std::this_thread::sleep_for(std::chrono::milliseconds{200});
+
+  // A second request, started after the flush. The nosend client hands out one session, and the
+  // running sessions are keyed by session pointer, so a second session object is what makes this a
+  // second entry rather than an overwrite of the first.
+  auto second = std::make_shared<http_client::nosend::Session>(*no_send_client);
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> second_pending;
+  EXPECT_CALL(*second, SendRequest)
+      .WillRepeatedly(
+          [&second_pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> cb) {
+            second_pending = std::move(cb);
+          });
+  no_send_client->session_ = second;
+
+  const auto second_result = ExportOneRequest(otlp_client, 2);
+
+  if (second_pending)
+  {
+    http_client::nosend::Response second_sent;
+    second_sent.Finish(*second_pending);
+  }
+
+  flusher.join();
+  if (first_pending)
+  {
+    http_client::nosend::Response first_sent;
+    first_sent.Finish(*first_pending);
+  }
+
+  const auto waited_ms = std::chrono::duration_cast<std::chrono::milliseconds>(waited).count();
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, first_result);
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, second_result);
+  EXPECT_NE(first_pending, nullptr);
+  EXPECT_NE(second_pending, nullptr);
+  EXPECT_FALSE(flushed) << "reported success while the request pending when it was entered was "
+                           "still in flight";
+  EXPECT_GE(waited_ms, 400) << "ended on the second request's completion rather than waiting for "
+                               "the first";
+}
+
+// Finishes whatever a case left registered, so that a fatal assertion ends the case instead of
+// hanging it. ~OtlpHttpClient waits for the registry to empty with no deadline, and the nosend
+// client delivers no completion of its own, so an early return with a session still registered
+// never comes back. Finishing an already finished handler does nothing, since ResponseHandler
+// clears its owner and session before releasing. Declare after the client, so this runs first.
+namespace
+{
+class FinishPendingOnExit
+{
+public:
+  FinishPendingOnExit(
+      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &first,
+      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &second) noexcept
+      : handlers_{&first, &second}
+  {}
+
+  ~FinishPendingOnExit()
+  {
+    for (auto *handler : handlers_)
+    {
+      if (*handler)
+      {
+        http_client::nosend::Response done;
+        done.Finish(**handler);
+      }
+    }
+  }
+
+  FinishPendingOnExit(const FinishPendingOnExit &)            = delete;
+  FinishPendingOnExit &operator=(const FinishPendingOnExit &) = delete;
+  FinishPendingOnExit(FinishPendingOnExit &&)                 = delete;
+  FinishPendingOnExit &operator=(FinishPendingOnExit &&)      = delete;
+
+private:
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> *handlers_[2]{};
+};
+}  // namespace
+
+// The cutoff a flush takes on entry, asked about directly. Driving these through ForceFlush needs
+// the second request to register after the flush has read the cutoff, and nothing a test can
+// observe says when that happened, so the order here is sequential rather than arranged with a
+// sleep. Two cases, because the two directions cannot share one sequence: whichever request is
+// completed first is no longer in the registry for the other question.
+TEST_F(OtlpHttpExporterCustomClientTestPeer, ACompletionFromALaterRequestDoesNotSatisfyTheSnapshot)
+{
+  auto client         = http_client::HttpClientTestFactory::Create();
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto first = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> first_pending;
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> second_pending;
+  EXPECT_CALL(*first, SendRequest)
+      .WillRepeatedly(
+          [&first_pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> cb) {
+            first_pending = std::move(cb);
+          });
+
+  OtlpHttpClient otlp_client(MakeOtlpHttpClientOptions(std::chrono::milliseconds{10}), client);
+  FinishPendingOnExit finish_pending{first_pending, second_pending};
+
+  ASSERT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, ExportOneRequest(otlp_client, 2));
+  ASSERT_NE(first_pending, nullptr);
+
+  // What ForceFlush would read on entry, with the first request already registered.
+  const std::uint64_t cutoff = FlushCutoff(otlp_client);
+
+  auto second = std::make_shared<http_client::nosend::Session>(*no_send_client);
+  EXPECT_CALL(*second, SendRequest)
+      .WillRepeatedly(
+          [&second_pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> cb) {
+            second_pending = std::move(cb);
+          });
+  no_send_client->session_ = second;
+
+  ASSERT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, ExportOneRequest(otlp_client, 2));
+  ASSERT_NE(second_pending, nullptr);
+
+  ASSERT_FALSE(SnapshotSatisfied(otlp_client, cutoff))
+      << "the request below the cutoff is still in flight";
+
+  http_client::nosend::Response second_sent;
+  second_sent.Finish(*second_pending);
+  EXPECT_FALSE(SnapshotSatisfied(otlp_client, cutoff))
+      << "a completion from a request started after the cutoff satisfied the snapshot";
+
+  http_client::nosend::Response first_sent;
+  first_sent.Finish(*first_pending);
+}
+
+// The direction that a flush waiting for the whole registry to empty would get wrong, which is why
+// the later request is left in flight for the assertion rather than completed first.
+TEST_F(OtlpHttpExporterCustomClientTestPeer, ALaterRequestStillInFlightDoesNotHoldTheSnapshotBack)
+{
+  auto client         = http_client::HttpClientTestFactory::Create();
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto first = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> first_pending;
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> second_pending;
+  EXPECT_CALL(*first, SendRequest)
+      .WillRepeatedly(
+          [&first_pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> cb) {
+            first_pending = std::move(cb);
+          });
+
+  OtlpHttpClient otlp_client(MakeOtlpHttpClientOptions(std::chrono::milliseconds{10}), client);
+  FinishPendingOnExit finish_pending{first_pending, second_pending};
+
+  ASSERT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, ExportOneRequest(otlp_client, 2));
+  ASSERT_NE(first_pending, nullptr);
+
+  // What ForceFlush would read on entry, with the first request already registered.
+  const std::uint64_t cutoff = FlushCutoff(otlp_client);
+
+  auto second = std::make_shared<http_client::nosend::Session>(*no_send_client);
+  EXPECT_CALL(*second, SendRequest)
+      .WillRepeatedly(
+          [&second_pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> cb) {
+            second_pending = std::move(cb);
+          });
+  no_send_client->session_ = second;
+
+  ASSERT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, ExportOneRequest(otlp_client, 2));
+  ASSERT_NE(second_pending, nullptr);
+
+  ASSERT_FALSE(SnapshotSatisfied(otlp_client, cutoff))
+      << "the request below the cutoff is still in flight";
+
+  http_client::nosend::Response first_sent;
+  first_sent.Finish(*first_pending);
+  EXPECT_TRUE(SnapshotSatisfied(otlp_client, cutoff))
+      << "the snapshot was not satisfied once the request below the cutoff finished, with a later "
+         "one still in flight";
+  EXPECT_NE(second_pending, nullptr);
+
+  http_client::nosend::Response second_sent;
+  second_sent.Finish(*second_pending);
 }
 
 // A client that finishes a transfer on ReadError, WriteError or Destroyed ends the request: the
