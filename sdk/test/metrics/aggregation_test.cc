@@ -488,6 +488,29 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(diffd_point.positive_buckets_->Get(2), 1);
 }
 
+TEST(Aggregation, Base2ExponentialHistogramAggregationIgnoresNonFiniteValues)
+{
+  Base2ExponentialHistogramAggregationConfig config;
+  config.record_min_max_ = true;
+  Base2ExponentialHistogramAggregation aggr(&config);
+
+  aggr.Aggregate(1.0, {});
+  aggr.Aggregate(std::numeric_limits<double>::quiet_NaN(), {});
+  aggr.Aggregate(std::numeric_limits<double>::infinity(), {});
+  aggr.Aggregate(-std::numeric_limits<double>::infinity(), {});
+  aggr.Aggregate(2.0, {});
+
+  auto point = nostd::get<Base2ExponentialHistogramPointData>(aggr.ToPoint());
+  EXPECT_EQ(point.count_, 2);
+  EXPECT_EQ(point.sum_, 3.0);
+  EXPECT_EQ(point.min_, 1.0);
+  EXPECT_EQ(point.max_, 2.0);
+  EXPECT_EQ(point.zero_count_, 0);
+  ASSERT_TRUE(point.positive_buckets_ != nullptr);
+  ASSERT_TRUE(point.negative_buckets_ != nullptr);
+  EXPECT_TRUE(point.negative_buckets_->Empty());
+}
+
 TEST(Aggregation, Base2ExponentialHistogramAggregationInvalidConfigFallsBackToDefault)
 {
   const Base2ExponentialHistogramAggregationConfig default_config;
