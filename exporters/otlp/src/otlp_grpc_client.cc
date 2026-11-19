@@ -67,6 +67,11 @@ public:
       opentelemetry::sdk::common::ExportResult::kFailure;
   GrpcAsyncCallback grpc_async_callback = nullptr;
 
+  // Where this call falls in the order calls were started, taken from start_request_counter
+  // before it is incremented. ForceFlush waits for the calls below the sequence it was entered
+  // with, rather than for a number of completions that a call started after it could supply.
+  std::uint64_t sequence = 0;
+
   OtlpGrpcAsyncCallDataBase()                                             = default;
   virtual ~OtlpGrpcAsyncCallDataBase()                                    = default;
   OtlpGrpcAsyncCallDataBase(const OtlpGrpcAsyncCallDataBase &)            = delete;
@@ -114,8 +119,7 @@ struct OtlpGrpcClientAsyncData
   // Running requests, this is used to limit the number of concurrent requests.
   std::atomic<std::size_t> running_requests{0};
   // Request counter is used to record ForceFlush.
-  std::atomic<std::size_t> start_request_counter{0};
-  std::atomic<std::size_t> finished_request_counter{0};
+  std::atomic<std::uint64_t> start_request_counter{0};
   std::size_t max_concurrent_requests = 64;
 
   // Condition variable and mutex to control the concurrency count of running requests.
@@ -205,10 +209,12 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
     return true;
   };
 
-  ++async_data->start_request_counter;
   ++async_data->running_requests;
   {
     std::lock_guard<std::mutex> lock{async_data->running_calls_lock};
+    // Counted inside the lock the flush predicate takes, so a ForceFlush cannot read a sequence
+    // that includes this call and then fail to find the call itself.
+    call_data->sequence = async_data->start_request_counter.fetch_add(1, std::memory_order_release);
     async_data->running_calls.insert(
         std::static_pointer_cast<OtlpGrpcAsyncCallDataBase>(call_data));
   }
@@ -225,10 +231,11 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
                    std::lock_guard<std::mutex> lock{async_data->running_calls_lock};
                    async_data->running_calls.erase(
                        std::static_pointer_cast<OtlpGrpcAsyncCallDataBase>(call_data));
+                   // Dropped under the same lock as the erase. ForceFlush answers from the
+                   // registry now, so releasing the lock first would leave a window where a
+                   // flush reports success and the next Export is still refused for capacity.
+                   --async_data->running_requests;
                  }
-
-                 --async_data->running_requests;
-                 ++async_data->finished_request_counter;
 
                  call_data->grpc_status = grpc_status;
                  if (call_data->grpc_status.ok())
@@ -719,6 +726,52 @@ bool OtlpGrpcClient::IsShutdown() const noexcept
   return is_shutdown_.load(std::memory_order_acquire);
 }
 
+#ifdef ENABLE_ASYNC_EXPORT
+namespace
+{
+/// Whether \p sequence was handed out before \p cutoff, across a wrap of the counter.
+///
+/// The counter is finite, so this is a distance and not a comparison. cutoff - sequence is
+/// evaluated in unsigned arithmetic: it is small for a request that started before the cutoff,
+/// including when the counter has since wrapped past zero, and close to the whole range for one
+/// that started after it. Half the range is the dividing line, so the answer holds while fewer
+/// than 2^63 sequences are handed out during the lifetime of the request being asked about.
+/// Nothing bounds that from the number of requests in flight at once, which is why the sequence
+/// is 64 bits wide rather than size_t: at a thousand registrations a second the boundary is a few
+/// hundred million years away, and at 32 bits it was twenty five days.
+bool StartedBefore(std::uint64_t sequence, std::uint64_t cutoff) noexcept
+{
+  const std::uint64_t distance = cutoff - sequence;
+  return distance != 0U && distance <= ((~static_cast<std::uint64_t>(0)) >> 1);
+}
+}  // namespace
+
+namespace
+{
+/// Whether every call started before the given sequence has finished.
+///
+/// A call started after the flush has a sequence at or above the given one, so it does not hold
+/// the answer back. Takes running_calls_lock. The check on the way into ForceFlush holds nothing
+/// else; the loop condition and the result hold session_waker_lock too, and that nesting, waker
+/// then calls, is the only one in this file. Nothing takes the two the other way round.
+bool AllCallsBeforeFinished(const std::shared_ptr<OtlpGrpcClientAsyncData> &async_data,
+                            std::uint64_t sequence) noexcept
+{
+  std::lock_guard<std::mutex> lock{async_data->running_calls_lock};
+
+  for (const auto &call_data : async_data->running_calls)
+  {
+    if (call_data && StartedBefore(call_data->sequence, sequence))
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+}  // namespace
+#endif
+
 bool OtlpGrpcClient::ForceFlush(
     OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
@@ -728,8 +781,12 @@ bool OtlpGrpcClient::ForceFlush(
   }
 
 #ifdef ENABLE_ASYNC_EXPORT
-  std::size_t request_counter = async_data_->start_request_counter.load(std::memory_order_acquire);
-  if (request_counter <= async_data_->finished_request_counter.load(std::memory_order_acquire))
+  // The calls to wait for are the ones already started, so the sequence is read once and the
+  // predicate is about those. A request that starts after this point cannot satisfy the flush and
+  // cannot hold it back either.
+  const std::uint64_t wait_sequence =
+      async_data_->start_request_counter.load(std::memory_order_acquire);
+  if (AllCallsBeforeFinished(async_data_, wait_sequence))
   {
     return true;
   }
@@ -750,7 +807,7 @@ bool OtlpGrpcClient::ForceFlush(
   }
 
   while (timeout_steady > std::chrono::steady_clock::duration::zero() &&
-         request_counter > async_data_->finished_request_counter.load(std::memory_order_acquire))
+         !AllCallsBeforeFinished(async_data_, wait_sequence))
   {
     // A completion can land between the loop condition and the wait, so the wait is bounded and the
     // condition re-read on every wakeup. Never wait past the caller's deadline.
@@ -765,7 +822,7 @@ bool OtlpGrpcClient::ForceFlush(
     timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
 
-  return request_counter <= async_data_->finished_request_counter.load(std::memory_order_acquire);
+  return AllCallsBeforeFinished(async_data_, wait_sequence);
 #else
   return true;
 #endif

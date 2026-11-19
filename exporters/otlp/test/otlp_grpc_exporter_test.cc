@@ -166,6 +166,25 @@ public:
     return true;
   }
 
+  // Completes whichever deferred request arrived last, false when there is none. A flush entered
+  // while an earlier request was pending must not be satisfied by this one.
+  bool CompleteLatestDeferred()
+  {
+    std::function<void(::grpc::Status)> callback;
+    {
+      std::lock_guard<std::mutex> guard(deferred_lock_);
+      if (deferred_.empty())
+      {
+        return false;
+      }
+      callback = std::move(deferred_.back());
+      deferred_.pop_back();
+    }
+
+    callback(::grpc::Status::OK);
+    return true;
+  }
+
   void CompleteAllDeferred()
   {
     while (CompleteOneDeferred())
@@ -405,6 +424,51 @@ TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushKeepsWaitingWhenAnotherRequestCo
   EXPECT_GE(elapsed.count(), 500);
   EXPECT_EQ(1u, mock_stub->DeferredCount());
 }
+
+// The result came from two lifetime totals, started and finished, so the question was how many
+// requests had finished and not which ones. A request that starts after the flush and finishes
+// before the pending one supplies one of those completions, and the flush then reported success
+// with the earlier request still in flight.
+TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushDoesNotAcceptALaterRequestInPlaceOfItsOwn)
+{
+  auto *mock_stub = new OtlpMockTraceServiceStub();
+  mock_stub->DeferCompletions();
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(stub_interface);
+  DrainDeferredCompletions drain{mock_stub};
+
+  auto first = exporter->MakeRecordable();
+  first->SetName("Test span 1");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> first_batch(&first, 1);
+  exporter->Export(first_batch);
+  ASSERT_EQ(1u, mock_stub->DeferredCount());
+
+  // Both started and completed once the flush below is parked, so the flush was entered with the
+  // first request pending and nothing else.
+  std::thread later([mock_stub, &exporter] {
+    std::this_thread::sleep_for(std::chrono::milliseconds{200});
+
+    auto second = exporter->MakeRecordable();
+    second->SetName("Test span 2");
+    nostd::span<std::unique_ptr<sdk::trace::Recordable>> second_batch(&second, 1);
+    exporter->Export(second_batch);
+    mock_stub->CompleteLatestDeferred();
+  });
+
+  const auto started = std::chrono::steady_clock::now();
+  const bool flushed = exporter->ForceFlush(std::chrono::milliseconds{1000});
+  const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - started);
+  later.join();
+
+  EXPECT_FALSE(flushed) << "reported success while the request pending when it was entered was "
+                           "still in flight";
+  // Ran its own deadline down rather than ending on the later request's completion.
+  EXPECT_GE(elapsed.count(), 500);
+  EXPECT_EQ(1u, mock_stub->DeferredCount());
+}
+
 }  // namespace
 
 // Create spans, let processor call Export()
