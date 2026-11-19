@@ -30,6 +30,14 @@
       matchCategories: ["bazel", "docker"],
       matchUpdateTypes: ["major"],
     },
+    {
+      description: "Keep the Windows 2022 install test on its intended runner",
+      matchDatasources: ["github-runners"],
+      matchPackageNames: ["windows"],
+      matchCurrentValue: "2022",
+      matchFileNames: [".github/workflows/cmake_install.yml"],
+      enabled: false,
+    },
   ],
   labels: ["dependencies"],
 }

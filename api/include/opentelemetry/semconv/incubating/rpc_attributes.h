@@ -20,72 +20,72 @@ namespace rpc
 {
 
 /**
-  Deprecated, use @code rpc.response.status_code @endcode attribute instead.
+  Deprecated, use @code rpc.status_code @endcode attribute instead.
 
   @deprecated
-  {"note": "Replaced by @code rpc.response.status_code @endcode.", "reason": "renamed",
-  "renamed_to": "rpc.response.status_code"}
+  {"note": "Replaced by @code rpc.status_code @endcode.", "reason": "renamed", "renamed_to":
+  "rpc.status_code"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kRpcConnectRpcErrorCode =
     "rpc.connect_rpc.error_code";
 
 /**
-  Deprecated, use @code rpc.request.metadata @endcode instead.
+  Deprecated, use @code rpc.request.header @endcode instead.
 
   @deprecated
-  {"note": "Replaced by @code rpc.request.metadata @endcode.", "reason": "renamed", "renamed_to":
-  "rpc.request.metadata"}
+  {"note": "Replaced by @code rpc.request.header @endcode.", "reason": "renamed", "renamed_to":
+  "rpc.request.header"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kRpcConnectRpcRequestMetadata =
     "rpc.connect_rpc.request.metadata";
 
 /**
-  Deprecated, use @code rpc.response.metadata @endcode instead.
+  Deprecated, use @code rpc.response.header @endcode and @code rpc.response.trailer @endcode.
 
   @deprecated
-  {"note": "Replaced by @code rpc.response.metadata @endcode.", "reason": "renamed", "renamed_to":
-  "rpc.response.metadata"}
+  {"note": "Split to @code rpc.response.header @endcode for metadata sent before the response
+  payload and @code rpc.response.trailer @endcode for metadata sent after it.\n", "reason":
+  "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kRpcConnectRpcResponseMetadata =
     "rpc.connect_rpc.response.metadata";
 
 /**
-  Deprecated, use @code rpc.request.metadata @endcode instead.
+  Deprecated, use @code rpc.request.header @endcode instead.
 
   @deprecated
-  {"note": "Replaced by @code rpc.request.metadata @endcode.", "reason": "renamed", "renamed_to":
-  "rpc.request.metadata"}
+  {"note": "Replaced by @code rpc.request.header @endcode.", "reason": "renamed", "renamed_to":
+  "rpc.request.header"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kRpcGrpcRequestMetadata =
     "rpc.grpc.request.metadata";
 
 /**
-  Deprecated, use @code rpc.response.metadata @endcode instead.
+  Deprecated, use @code rpc.response.header @endcode and @code rpc.response.trailer @endcode.
 
   @deprecated
-  {"note": "Replaced by @code rpc.response.metadata @endcode.", "reason": "renamed", "renamed_to":
-  "rpc.response.metadata"}
+  {"note": "Split to @code rpc.response.header @endcode for metadata sent before the response
+  payload and @code rpc.response.trailer @endcode for metadata sent after it.\n", "reason":
+  "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kRpcGrpcResponseMetadata =
     "rpc.grpc.response.metadata";
 
 /**
-  Deprecated, use string representation on the @code rpc.response.status_code @endcode attribute
-  instead.
+  Deprecated, use string representation on the @code rpc.status_code @endcode attribute instead.
 
   @deprecated
-  {"note": "Use string representation of the gRPC status code on the @code rpc.response.status_code
-  @endcode attribute.", "reason": "uncategorized"}
+  {"note": "Use string representation of the gRPC status code on the @code rpc.status_code @endcode
+  attribute.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kRpcGrpcStatusCode = "rpc.grpc.status_code";
 
 /**
-  Deprecated, use string representation on the @code rpc.response.status_code @endcode attribute
-  instead.
+  Deprecated, use string representation on the @code rpc.status_code @endcode attribute instead.
 
   @deprecated
-  {"note": "Use string representation of the error code on the @code rpc.response.status_code
-  @endcode attribute.", "reason": "uncategorized"}
+  {"note": "Use string representation of the error code on the @code rpc.status_code @endcode
+  attribute.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kRpcJsonrpcErrorCode =
     "rpc.jsonrpc.error_code";
@@ -189,37 +189,80 @@ static constexpr const char *kRpcMethod = "rpc.method";
 static constexpr const char *kRpcMethodOriginal = "rpc.method_original";
 
 /**
-  RPC request metadata, @code <key> @endcode being the normalized RPC metadata key (lowercase), the
-  value being the metadata values. <p> Instrumentations SHOULD require an explicit configuration of
-  which metadata values are to be captured. Including all request metadata values can be a security
-  risk - explicit configuration helps avoid leaking sensitive information. <p> For example, a
-  property @code my-custom-key @endcode with value @code ["1.2.3.4", "1.2.3.5"] @endcode SHOULD be
-  recorded as
-  @code rpc.request.metadata.my-custom-key @endcode attribute with value @code ["1.2.3.4",
-  "1.2.3.5"] @endcode
+  RPC request headers or metadata, @code <key> @endcode being the normalized header name
+  (lowercase), the value being the header values. <p> Instrumentations SHOULD require an explicit
+  configuration of which headers are to be captured. Including all request headers can be a security
+  risk - explicit configuration helps avoid leaking sensitive information. <p> For example, a header
+  @code my-custom-key @endcode with value @code ["1.2.3.4", "1.2.3.5"] @endcode SHOULD be recorded
+  as the @code rpc.request.header.my-custom-key @endcode attribute with value @code ["1.2.3.4",
+  "1.2.3.5"] @endcode <p> The attribute value MUST consist of either multiple header values as an
+  array of strings or a single-item array containing a possibly comma-concatenated string, depending
+  on the way the RPC library provides access to headers. <p> Values that the RPC system exposes as
+  binary data, or that are otherwise not valid UTF-8 strings, SHOULD be base64-encoded when
+  recorded.
  */
-static constexpr const char *kRpcRequestMetadata = "rpc.request.metadata";
+static constexpr const char *kRpcRequestHeader = "rpc.request.header";
 
 /**
-  RPC response metadata, @code <key> @endcode being the normalized RPC metadata key (lowercase), the
-  value being the metadata values. <p> Instrumentations SHOULD require an explicit configuration of
-  which metadata values are to be captured. Including all response metadata values can be a security
-  risk - explicit configuration helps avoid leaking sensitive information. <p> For example, a
-  property @code my-custom-key @endcode with value @code ["attribute_value"] @endcode SHOULD be
-  recorded as the @code rpc.response.metadata.my-custom-key @endcode attribute with value @code
-  ["attribute_value"] @endcode
+  Deprecated, use @code rpc.request.header @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rpc.request.header @endcode.", "reason": "renamed", "renamed_to":
+  "rpc.request.header"}
  */
-static constexpr const char *kRpcResponseMetadata = "rpc.response.metadata";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kRpcRequestMetadata = "rpc.request.metadata";
 
 /**
-  Status code of the RPC returned by the RPC server or generated by the client
+  RPC response headers or metadata sent before the response payload, @code <key> @endcode being the
+  normalized header name (lowercase), the value being the header values. <p> Instrumentations SHOULD
+  require an explicit configuration of which headers are to be captured. Including all response
+  headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
   <p>
-  Usually it represents an error code, but may also represent partial success, warning, or
-  differentiate between various types of successful outcomes. Semantic conventions for individual
-  RPC frameworks SHOULD document what @code rpc.response.status_code @endcode means in the context
-  of that system and which values are considered to represent errors.
+  For example, a header @code my-custom-key @endcode with value @code ["attribute_value"] @endcode
+  SHOULD be recorded as the @code rpc.response.header.my-custom-key @endcode attribute with value
+  @code ["attribute_value"] @endcode <p> The attribute value MUST consist of either multiple header
+  values as an array of strings or a single-item array containing a possibly comma-concatenated
+  string, depending on the way the RPC library provides access to headers. <p> Values that the RPC
+  system exposes as binary data, or that are otherwise not valid UTF-8 strings, SHOULD be
+  base64-encoded when recorded.
  */
-static constexpr const char *kRpcResponseStatusCode = "rpc.response.status_code";
+static constexpr const char *kRpcResponseHeader = "rpc.response.header";
+
+/**
+  Deprecated, use @code rpc.response.header @endcode and @code rpc.response.trailer @endcode.
+
+  @deprecated
+  {"note": "Split to @code rpc.response.header @endcode for metadata sent before the response
+  payload and @code rpc.response.trailer @endcode for metadata sent after it.\n", "reason":
+  "uncategorized"}
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kRpcResponseMetadata =
+    "rpc.response.metadata";
+
+/**
+  Deprecated, use @code rpc.status_code @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rpc.status_code @endcode.", "reason": "renamed", "renamed_to":
+  "rpc.status_code"}
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kRpcResponseStatusCode =
+    "rpc.response.status_code";
+
+/**
+  RPC response trailers or metadata sent after the response payload, @code <key> @endcode being the
+  normalized trailer name (lowercase), the value being the trailer values. <p> Instrumentations
+  SHOULD require an explicit configuration of which trailers are to be captured. Including all
+  response trailers can be a security risk - explicit configuration helps avoid leaking sensitive
+  information. <p> For example, a trailer @code my-custom-key @endcode with value @code
+  ["attribute_value"] @endcode SHOULD be recorded as the @code rpc.response.trailer.my-custom-key
+  @endcode attribute with value @code ["attribute_value"] @endcode <p> The attribute value MUST
+  consist of either multiple trailer values as an array of strings or a single-item array containing
+  a possibly comma-concatenated string, depending on the way the RPC library provides access to
+  trailers. <p> Values that the RPC system exposes as binary data, or that are otherwise not valid
+  UTF-8 strings, SHOULD be base64-encoded when recorded.
+ */
+static constexpr const char *kRpcResponseTrailer = "rpc.response.trailer";
 
 /**
   Deprecated, use fully-qualified @code rpc.method @endcode instead.
@@ -229,6 +272,19 @@ static constexpr const char *kRpcResponseStatusCode = "rpc.response.status_code"
   fully-qualified name.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kRpcService = "rpc.service";
+
+/**
+  Status code of the RPC returned by the RPC server or generated by the client
+  <p>
+  Usually it represents an error code, but may also represent partial success, warning, or
+  differentiate between various types of successful outcomes. The value MAY use a standardized
+  string representation of a numeric status code, if one exists, instead of the numeric code. The
+  value MAY be a synthetic status provided by the client library rather than returned by the remote
+  service. Semantic conventions for individual RPC frameworks SHOULD document what @code
+  rpc.status_code @endcode means in the context of that system and which values are considered to
+  represent errors.
+ */
+static constexpr const char *kRpcStatusCode = "rpc.status_code";
 
 /**
   Deprecated, use @code rpc.system.name @endcode attribute instead.
