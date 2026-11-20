@@ -111,8 +111,12 @@ public:
   // Return the current context.
   static Context GetCurrent() noexcept { return GetRuntimeContextStorage()->GetCurrent(); }
 
-  // Sets the current 'Context' object. Returns a token
-  // that can be used to reset to the previous Context.
+  /**
+   * Sets the current Context.
+   * @param context The Context to attach.
+   * @return A token to restore the previous Context. With the default storage,
+   * an active token must be detached or destroyed on the thread that called Attach.
+   */
   static nostd::unique_ptr<Token> Attach(const Context &context) noexcept
   {
     return GetRuntimeContextStorage()->Attach(context);
