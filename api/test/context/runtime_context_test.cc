@@ -53,6 +53,155 @@ TEST(RuntimeContextTest, DetachWrongContext)
   EXPECT_FALSE(context::RuntimeContext::Detach(*test_context_token));
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(RuntimeContextTest, DetachSameContextInner)
+{
+  const auto previous = context::RuntimeContext::GetCurrent();
+  context::Context repeated("request", int64_t{42});
+  auto outer = context::RuntimeContext::Attach(repeated);
+  auto inner = context::RuntimeContext::Attach(repeated);
+
+  EXPECT_TRUE(context::RuntimeContext::Detach(*inner));
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), repeated);
+  inner.reset();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), repeated);
+  outer.reset();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), previous);
+}
+
+TEST(RuntimeContextTest, RepeatedDetachSameContext)
+{
+  const auto previous = context::RuntimeContext::GetCurrent();
+  context::Context repeated("request", int64_t{42});
+  auto outer = context::RuntimeContext::Attach(repeated);
+  auto inner = context::RuntimeContext::Attach(repeated);
+
+  EXPECT_TRUE(context::RuntimeContext::Detach(*inner));
+  EXPECT_FALSE(context::RuntimeContext::Detach(*inner));
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), repeated);
+  inner.reset();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), repeated);
+  EXPECT_TRUE(context::RuntimeContext::Detach(*outer));
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), previous);
+}
+
+TEST(RuntimeContextTest, DetachSameContextOuter)
+{
+  const auto previous = context::RuntimeContext::GetCurrent();
+  context::Context repeated("request", int64_t{42});
+  auto outer = context::RuntimeContext::Attach(repeated);
+  auto inner = context::RuntimeContext::Attach(repeated);
+
+  EXPECT_TRUE(context::RuntimeContext::Detach(*outer));
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), previous);
+  EXPECT_FALSE(context::RuntimeContext::Detach(*outer));
+  EXPECT_FALSE(context::RuntimeContext::Detach(*inner));
+  inner.reset();
+  outer.reset();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), previous);
+}
+
+TEST(RuntimeContextTest, DetachedTokensDoNotDetachNewAttachment)
+{
+  const auto previous = context::RuntimeContext::GetCurrent();
+  context::Context repeated("request", int64_t{42});
+  auto outer = context::RuntimeContext::Attach(repeated);
+  auto inner = context::RuntimeContext::Attach(repeated);
+
+  EXPECT_TRUE(context::RuntimeContext::Detach(*outer));
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), previous);
+  auto replacement = context::RuntimeContext::Attach(repeated);
+  EXPECT_FALSE(context::RuntimeContext::Detach(*inner));
+  inner.reset();
+  outer.reset();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), repeated);
+  replacement.reset();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), previous);
+}
+
+TEST(RuntimeContextTest, DetachEmptyContext)
+{
+  const auto previous = context::RuntimeContext::GetCurrent();
+  context::Context parent_context("parent", int64_t{1});
+  auto parent = context::RuntimeContext::Attach(parent_context);
+  auto outer  = context::RuntimeContext::Attach(context::Context());
+  auto inner  = context::RuntimeContext::Attach(context::Context());
+
+  EXPECT_TRUE(context::RuntimeContext::Detach(*inner));
+  EXPECT_FALSE(context::RuntimeContext::Detach(*inner));
+  inner.reset();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), context::Context());
+  EXPECT_TRUE(context::RuntimeContext::Detach(*outer));
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), parent_context);
+  parent.reset();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), previous);
+  // An empty context on an empty stack is not an active attachment.
+  EXPECT_FALSE(context::RuntimeContext::Detach(*outer));
+}
+
+TEST(RuntimeContextTest, SameContextStackGrowth)
+{
+  context::Context parent_context("parent", int64_t{1});
+  context::Context repeated("request", int64_t{42});
+  auto parent = context::RuntimeContext::Attach(parent_context);
+  std::vector<nostd::unique_ptr<context::Token>> tokens;
+  for (size_t i = 0; i < 100; ++i)
+  {
+    tokens.push_back(context::RuntimeContext::Attach(repeated));
+  }
+
+  EXPECT_TRUE(context::RuntimeContext::Detach(*tokens[50]));
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), repeated);
+  EXPECT_FALSE(context::RuntimeContext::Detach(*tokens.back()));
+  EXPECT_TRUE(context::RuntimeContext::Detach(*tokens.front()));
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), parent_context);
+  tokens.clear();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), parent_context);
+}
+
+TEST(RuntimeContextTest, DetachAtContextDepthLimit)
+{
+  const auto previous = context::RuntimeContext::GetCurrent();
+  ASSERT_EQ(previous, context::Context());
+  constexpr size_t context_depth_limit = 1000000;
+  context::Context repeated("request", int64_t{42});
+  std::vector<nostd::unique_ptr<context::Token>> tokens;
+  tokens.reserve(context_depth_limit);
+  for (size_t i = 0; i < context_depth_limit; ++i)
+  {
+    tokens.push_back(context::RuntimeContext::Attach(repeated));
+  }
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), repeated);
+
+  auto overflow = context::RuntimeContext::Attach(repeated);
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), context::Context());
+  EXPECT_TRUE(context::RuntimeContext::Detach(*overflow));
+  EXPECT_FALSE(context::RuntimeContext::Detach(*overflow));
+  overflow.reset();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), repeated);
+
+  auto overflow_outer = context::RuntimeContext::Attach(repeated);
+  auto overflow_inner = context::RuntimeContext::Attach(repeated);
+  EXPECT_TRUE(context::RuntimeContext::Detach(*overflow_outer));
+  EXPECT_FALSE(context::RuntimeContext::Detach(*overflow_inner));
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), repeated);
+  overflow_inner.reset();
+  overflow_outer.reset();
+
+  overflow_outer = context::RuntimeContext::Attach(repeated);
+  overflow_inner = context::RuntimeContext::Attach(repeated);
+  EXPECT_TRUE(context::RuntimeContext::Detach(*tokens.front()));
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), previous);
+  auto replacement = context::RuntimeContext::Attach(repeated);
+  overflow_inner.reset();
+  overflow_outer.reset();
+  tokens.clear();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), repeated);
+  replacement.reset();
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), previous);
+}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 // Tests that the ThreadLocalContext can handle three attached contexts
 TEST(RuntimeContextTest, ThreeAttachDetach)
 {
