@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <thread>
 #include <utility>
 
 #include "opentelemetry/nostd/span.h"
@@ -24,6 +25,11 @@ namespace common
 /*
  * A lock-free circular buffer that supports multiple concurrent producers
  * and a single consumer.
+ *
+ * Add() never retries: a producer reserves space with a fetch-and-add on
+ * count_, then claims a slot with a fetch-and-add on head_, then stores its
+ * element into the slot. The consumer gives space back only after it has
+ * emptied the consumed slots, so a claimed slot is always empty.
  */
 template <class T>
 class CircularBuffer
@@ -38,7 +44,10 @@ public:
    *
    * Note: This method must only be called from the consumer thread.
    */
-  CircularBufferRange<const AtomicUniquePtr<T>> Peek() const noexcept { return PeekImpl(); }
+  CircularBufferRange<const AtomicUniquePtr<T>> Peek() const noexcept
+  {
+    return WaitForElements(PeekImpl());
+  }
 
   /**
    * Consume elements from the circular buffer's tail.
@@ -54,10 +63,12 @@ public:
   void Consume(size_t n, Callback callback) noexcept
   {
     assert(n <= static_cast<size_t>(head_ - tail_));
-    auto range = PeekImpl().Take(n);
+    auto range = WaitForElements(PeekImpl().Take(n));
     static_assert(noexcept(callback(range)), "callback not allowed to throw");
-    tail_ += n;
     callback(range);
+    tail_ += n;
+    // The callback has emptied the slots, so producers may now reuse them.
+    count_.fetch_sub(n, std::memory_order_release);
   }
 
   /**
@@ -83,37 +94,36 @@ public:
    */
   bool Add(std::unique_ptr<T> &ptr) noexcept
   {
-    while (true)
+    // A null element would leave a slot that the consumer waits on forever.
+    if (ptr == nullptr)
     {
-      uint64_t tail = tail_;
-      uint64_t head = head_;
-
-      // The circular buffer is full, so return false.
-      if (head - tail >= capacity_ - 1)
-      {
-        return false;
-      }
-
-      uint64_t head_index = head % capacity_;
-      if (data_[head_index].SwapIfNull(ptr))
-      {
-        auto new_head      = head + 1;
-        auto expected_head = head;
-        if (head_.compare_exchange_weak(expected_head, new_head, std::memory_order_release,
-                                        std::memory_order_relaxed))
-        {
-          // free the swapped out value
-          ptr.reset();
-
-          return true;
-        }
-
-        // If we reached this point (unlikely), it means that between the last
-        // iteration elements were added and then consumed from the circular
-        // buffer, so we undo the swap and attempt to add again.
-        data_[head_index].Swap(ptr);
-      }
+      return false;
     }
+
+    // Check for a full buffer with a plain load first, so that producers do
+    // not keep writing to count_ while the buffer stays full.
+    if (count_.load(std::memory_order_relaxed) >= capacity_ - 1)
+    {
+      return false;
+    }
+
+    // Reserve space. If the buffer filled up in the meantime, undo the
+    // reservation. While an undone reservation is in flight, a concurrent Add
+    // on a nearly full buffer can fail as well.
+    if (count_.fetch_add(1, std::memory_order_acquire) >= capacity_ - 1)
+    {
+      count_.fetch_sub(1, std::memory_order_relaxed);
+      return false;
+    }
+
+    // Claim a slot. The reservation guarantees that the consumer has emptied it.
+    uint64_t head = head_.fetch_add(1, std::memory_order_acq_rel);
+    data_[head % capacity_].Swap(ptr);
+
+    // ptr now holds the previous value of the slot, which is null as long as
+    // Consume callbacks empty the slots they are given.
+    ptr.reset();
+    return true;
   }
 
   bool Add(std::unique_ptr<T> &&ptr) noexcept
@@ -159,15 +169,36 @@ public:
   uint64_t consumption_count() const noexcept { return tail_; }
 
   /**
-   * @return the number of elements added to the circular buffer.
+   * @return the number of elements added, or being added, to the circular buffer.
    */
   uint64_t production_count() const noexcept { return head_; }
 
 private:
   std::unique_ptr<AtomicUniquePtr<T>[]> data_;
   size_t capacity_;
+  // Space reserved by producers and not yet given back by the consumer.
+  std::atomic<uint64_t> count_{0};
+  // Slots claimed by producers. A claimed slot may not be filled yet.
   std::atomic<uint64_t> head_{0};
   std::atomic<uint64_t> tail_{0};
+
+  /**
+   * A producer stores its element only after it has claimed a slot, so wait
+   * for the producers that have claimed a slot in the range but not stored
+   * into it yet. They only need to finish Add(), which never waits.
+   */
+  static CircularBufferRange<AtomicUniquePtr<T>> WaitForElements(
+      const CircularBufferRange<AtomicUniquePtr<T>> &range) noexcept
+  {
+    range.ForEach([](const AtomicUniquePtr<T> &ptr) noexcept {
+      while (ptr.IsNull())
+      {
+        std::this_thread::yield();
+      }
+      return true;
+    });
+    return range;
+  }
 
   CircularBufferRange<AtomicUniquePtr<T>> PeekImpl() const noexcept
   {
