@@ -228,6 +228,7 @@ TEST(CircularBufferTest, AddOnFullConcurrent)
   std::atomic<int> num_added{0};
   std::atomic<int> num_rejected{0};
   std::vector<std::thread> threads;
+  threads.reserve(num_threads);
   for (int thread_index = 0; thread_index < num_threads; ++thread_index)
   {
     threads.emplace_back([&, thread_index] {
@@ -277,6 +278,7 @@ TEST(CircularBufferTest, ConcurrentProducersKeepOrder)
   {
     CircularBuffer<uint64_t> buffer{max_size};
     std::vector<std::thread> producers;
+    producers.reserve(num_threads);
     for (uint64_t thread_index = 0; thread_index < num_threads; ++thread_index)
     {
       producers.emplace_back([&, thread_index] {
@@ -299,6 +301,11 @@ TEST(CircularBufferTest, ConcurrentProducersKeepOrder)
     while (num_consumed < num_threads * n)
     {
       const size_t num_to_consume = buffer.size();
+      if (num_to_consume == 0)
+      {
+        std::this_thread::yield();
+        continue;
+      }
       buffer.Consume(num_to_consume,
                      [&](CircularBufferRange<AtomicUniquePtr<uint64_t>> range) noexcept {
                        EXPECT_EQ(range.size(), num_to_consume);

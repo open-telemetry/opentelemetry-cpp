@@ -188,7 +188,7 @@ private:
    * into it yet. They only need to finish Add(), which never waits.
    */
   static CircularBufferRange<AtomicUniquePtr<T>> WaitForElements(
-      CircularBufferRange<AtomicUniquePtr<T>> range) noexcept
+      const CircularBufferRange<AtomicUniquePtr<T>> &range) noexcept
   {
     range.ForEach([](const AtomicUniquePtr<T> &ptr) noexcept {
       while (ptr.IsNull())
