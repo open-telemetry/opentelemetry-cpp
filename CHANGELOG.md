@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [OTLP/gRPC] Support VSOCK endpoints on Linux
+  [#4706](https://github.com/open-telemetry/opentelemetry-cpp/issues/4706)
+
 * [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
   measurements, so they no longer reach the histogram aggregations
 
