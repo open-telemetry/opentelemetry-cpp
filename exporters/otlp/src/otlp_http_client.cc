@@ -6,6 +6,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <list>
@@ -709,8 +710,7 @@ OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
     : is_shutdown_(false),
       options_(std::move(options)),
       http_client_(std::move(http_client)),
-      start_session_counter_(0),
-      finished_session_counter_(0)
+      start_session_counter_(0)
 {
   http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
 }
@@ -829,16 +829,16 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
     timeout_steady = (std::chrono::steady_clock::duration::max)();
   }
 
-  size_t wait_counter = start_session_counter_.load(std::memory_order_acquire);
+  // The sessions to wait for are the ones already started, so the sequence is read once and the
+  // predicate is about those. A request that starts after this point cannot satisfy the flush and
+  // cannot hold it back either.
+  const std::uint64_t wait_sequence = start_session_counter_.load(std::memory_order_acquire);
 
   while (timeout_steady > std::chrono::steady_clock::duration::zero())
   {
+    if (allSessionsBeforeFinished(wait_sequence))
     {
-      std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-      if (running_sessions_.empty())
-      {
-        break;
-      }
+      break;
     }
     // When changes of running_sessions_ and notify_one/notify_all happen between predicate
     // checking and waiting, we should not wait forever.We should cleanup gc sessions here as soon
@@ -852,18 +852,14 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
     {
       cleanupGCSessions();
     }
-    else if (finished_session_counter_.load(std::memory_order_acquire) >= wait_counter)
-    {
-      break;
-    }
 
     timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
 
-  // What the wait was for, rather than what is left of the deadline. A session that finishes
-  // between the last check and the last wait takes its notification with it, and the flush it was
-  // holding up has happened.
-  return finished_session_counter_.load(std::memory_order_acquire) >= wait_counter;
+  // The same question the loop asked, so the result and the reason the wait ended agree. A session
+  // that finishes between the last check and the last wait takes its notification with it, and the
+  // flush it was holding up has happened.
+  return allSessionsBeforeFinished(wait_sequence);
 }
 
 bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
@@ -902,7 +898,6 @@ void OtlpHttpClient::ReleaseSession(
     gc_sessions_.emplace_back(std::move(session_iter->second));
     running_sessions_.erase(session_iter);
 
-    finished_session_counter_.fetch_add(1, std::memory_order_release);
     has_session = true;
   }
 
@@ -1076,11 +1071,47 @@ void OtlpHttpClient::addSession(HttpSessionData &&session_data) noexcept
 
     HttpSessionData &store_session_data = running_sessions_[session.get()];
     store_session_data                  = std::move(session_data);
+    // Assigned after the move, which would otherwise overwrite it, and inside the lock the
+    // predicate takes, so a concurrent ForceFlush never reads an entry without a sequence.
+    store_session_data.sequence = start_session_counter_.fetch_add(1, std::memory_order_release);
   }
 
-  start_session_counter_.fetch_add(1, std::memory_order_release);
   // Send request after the session is added
   session->SendRequest(handle);
+}
+
+namespace
+{
+/// Whether \p sequence was handed out before \p cutoff, across a wrap of the counter.
+///
+/// The counter is finite, so this is a distance and not a comparison. cutoff - sequence is
+/// evaluated in unsigned arithmetic: it is small for a request that started before the cutoff,
+/// including when the counter has since wrapped past zero, and close to the whole range for one
+/// that started after it. Half the range is the dividing line, so the answer holds while fewer
+/// than 2^63 sequences are handed out during the lifetime of the request being asked about.
+/// Nothing bounds that from the number of requests in flight at once, which is why the sequence
+/// is 64 bits wide rather than size_t: at a thousand registrations a second the boundary is a few
+/// hundred million years away, and at 32 bits it was twenty five days.
+bool StartedBefore(std::uint64_t sequence, std::uint64_t cutoff) noexcept
+{
+  const std::uint64_t distance = cutoff - sequence;
+  return distance != 0U && distance <= ((~static_cast<std::uint64_t>(0)) >> 1);
+}
+}  // namespace
+
+bool OtlpHttpClient::allSessionsBeforeFinished(std::uint64_t sequence) noexcept
+{
+  std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+
+  for (const auto &running_session : running_sessions_)
+  {
+    if (StartedBefore(running_session.second.sequence, sequence))
+    {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 bool OtlpHttpClient::cleanupGCSessions() noexcept

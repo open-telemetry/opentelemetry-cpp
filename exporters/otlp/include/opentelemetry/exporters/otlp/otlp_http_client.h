@@ -7,6 +7,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <list>
 #include <memory>
@@ -244,6 +245,12 @@ private:
     std::unique_ptr<google::protobuf::Arena> arena;
     google::protobuf::Message *response = nullptr;
 
+    // Where this session falls in the order sessions were started, taken from
+    // start_session_counter_ before it is incremented. ForceFlush waits for the sessions below
+    // the sequence it was entered with, rather than for a number of completions that a session
+    // started after the call could supply.
+    std::uint64_t sequence = 0;
+
     HttpSessionData() noexcept;
     HttpSessionData(std::shared_ptr<opentelemetry::ext::http::client::Session> &&input_session,
                     std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &&input_handle,
@@ -286,6 +293,15 @@ private:
    */
   bool cleanupGCSessions() noexcept;
 
+  /**
+   * @brief Whether every session started before the given sequence has finished.
+   *
+   * Reads running_sessions_ under session_manager_lock_, so it answers for the moment it is
+   * called. A session started after the call has a sequence at or above the given one, so it
+   * does not hold the answer back.
+   */
+  bool allSessionsBeforeFinished(std::uint64_t sequence) noexcept;
+
   // Stores if this HTTP client had its Shutdown() method called
   std::atomic<bool> is_shutdown_;
 
@@ -308,8 +324,11 @@ private:
   // Condition variable and mutex to control the concurrency count of running sessions
   std::mutex session_waker_lock_;
   std::condition_variable session_waker_;
-  std::atomic<size_t> start_session_counter_;
-  std::atomic<size_t> finished_session_counter_;
+  std::atomic<std::uint64_t> start_session_counter_;
+
+  // For testing. Reaches start_session_counter_ and allSessionsBeforeFinished, so that the
+  // sequence a flush would take as its cutoff can be asked about without racing a real flush.
+  friend class OtlpHttpExporterCustomClientTestPeer;
 };
 }  // namespace otlp
 }  // namespace exporter

@@ -15,6 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] `OtlpHttpClient::ForceFlush`, and `OtlpGrpcClient::ForceFlush`
+  under the async export preview, now wait for the requests that were pending
+  when they were called, instead of for as many completions as there were
+  requests started. A request begun after the call could supply one of those
+  completions, so the flush reported success with an earlier request still in
+  flight
+  [#4339](https://github.com/open-telemetry/opentelemetry-cpp/issues/4339)
+
 * [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
   measurements, so they no longer reach the histogram aggregations
 
