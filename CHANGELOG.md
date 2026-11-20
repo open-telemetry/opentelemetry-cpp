@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Fix `ThreadLocalContextStorage` attachment matching (ABI v2).
+  Detaching or destroying an already-detached token no longer removes another
+  attachment of the same context. Detaching an outer token correctly removes
+  its child attachments even when they share the same context.
+  [#4790](https://github.com/open-telemetry/opentelemetry-cpp/issues/4790)
+
 * [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
   measurements, so they no longer reach the histogram aggregations
 
