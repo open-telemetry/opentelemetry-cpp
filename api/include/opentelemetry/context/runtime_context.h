@@ -14,6 +14,11 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include <exception>
+#  include <new>
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
@@ -417,7 +422,13 @@ private:
       if (size_ > max_capacity_)
       {
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-        overflow_ = new OverflowToken{token, overflow_};
+        auto *entry = new (std::nothrow) OverflowToken{token, overflow_};
+        if (entry == nullptr)
+        {
+          // Preserve the allocation-failure behavior of this noexcept API.
+          std::terminate();
+        }
+        overflow_ = entry;
 #endif
         return;
       }
@@ -448,7 +459,12 @@ private:
         new_capacity = max_capacity_;
       }
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-      Frame *temp = new Frame[new_capacity];
+      Frame *temp = new (std::nothrow) Frame[new_capacity];
+      if (temp == nullptr)
+      {
+        // Preserve the allocation-failure behavior of this noexcept API.
+        std::terminate();
+      }
 #else
       Context *temp = new Context[new_capacity];
 #endif

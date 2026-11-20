@@ -16,7 +16,6 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/version.h"
 
 using namespace opentelemetry;
 
