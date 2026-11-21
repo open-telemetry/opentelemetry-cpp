@@ -17,14 +17,20 @@
 #include <unordered_set>
 #include <utility>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <exception>
+#endif
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 #  include <zconf.h>
@@ -33,8 +39,6 @@
 #  include <array>
 
 #  include "opentelemetry/nostd/type_traits.h"
-#else
-#  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -255,7 +259,23 @@ void Session::SendRequest(
   {
     // We will try to create a background to poll events. But when the background is running, we
     // will reuse it instead of creating a new one.
-    http_client_.MaybeSpawnBackgroundThread();
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+    {
+#endif
+      http_client_.MaybeSpawnBackgroundThread();
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    }
+    catch (const std::exception &e)
+    {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[HTTP Client Curl] Failed to create the background thread: " << e.what());
+    }
+    catch (...)
+    {
+      OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] Failed to create the background thread");
+    }
+#endif
   }
   else
   {
