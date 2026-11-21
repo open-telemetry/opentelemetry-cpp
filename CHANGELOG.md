@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Log an error instead of calling `std::terminate` when the curl HTTP
+  client cannot create its background thread
+  [#4792](https://github.com/open-telemetry/opentelemetry-cpp/issues/4792)
+
 * [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
   measurements, so they no longer reach the histogram aggregations
 
