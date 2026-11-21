@@ -14,7 +14,7 @@ rapidyaml/0.9.0
 
 [options]
 grpc/*:fPIC=True
-grpc/*:shared=True
+grpc/*:shared=False
 grpc/*:csharp_plugin=False
 grpc/*:node_plugin=False
 grpc/*:objective_c_plugin=False
@@ -22,9 +22,9 @@ grpc/*:php_plugin=False
 grpc/*:python_plugin=False
 grpc/*:ruby_plugin=False
 protobuf/*:fPIC=True
-protobuf/*:shared=True
+protobuf/*:shared=False
 abseil/*:fPIC=True
-abseil/*:shared=True
+abseil/*:shared=False
 opentracing-cpp/*:fPIC=True
 opentracing-cpp/*:shared=False
 pcre2/*:with_bzip2=False
