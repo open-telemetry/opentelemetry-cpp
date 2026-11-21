@@ -212,7 +212,6 @@ jobs:
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
       CXX_STANDARD: '17'
-      CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Release/generators/conan_toolchain.cmake
       BUILD_TYPE: 'Release'
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -235,6 +234,7 @@ jobs:
         run: |
           conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
           conan cache clean --source --build --download --temp
+          echo "CMAKE_TOOLCHAIN_FILE=/home/runner/conan/build/Release/generators/conan_toolchain.cmake" >> "$GITHUB_ENV"
       - name: Run Install Functions Tests
         run: ./ci/do_ci.sh cmake.install_functions.test
       - name: Run Tests (static libs)
@@ -254,7 +254,6 @@ jobs:
     env:
       INSTALL_TEST_DIR: '/Users/runner/install_test'
       CXX_STANDARD: '17'
-      CMAKE_TOOLCHAIN_FILE: '/Users/runner/conan/build/Release/generators/conan_toolchain.cmake'
       CMAKE_VERSION: 3.31.0 # building the conan "stable" versions requires CMake 3.x
       BUILD_TYPE: 'Release'
     steps:
@@ -278,6 +277,7 @@ jobs:
       run: |
         conan install install/conan/conanfile_latest.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
         conan cache clean --source --build --download --temp
+        echo "CMAKE_TOOLCHAIN_FILE=/Users/runner/conan/build/Release/generators/conan_toolchain.cmake" >> "$GITHUB_ENV"
     - name: Run Install Functions Tests
       run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
