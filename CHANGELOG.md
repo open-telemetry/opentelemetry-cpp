@@ -63,6 +63,16 @@ Increment the:
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
+Breaking changes:
+
+* [EXPORTER] Allocate the OTLP trace and log recordable messages on an Arena
+  owned by the recordable
+  [#4580](https://github.com/open-telemetry/opentelemetry-cpp/pull/4580)
+  * Recording a field is an Arena bump instead of a heap allocation.
+  * `OtlpRecordable` and `OtlpLogRecordable` are larger and no longer
+    copyable or movable. `span()`, `log_record()` and
+    `OtlpRecordableUtils::PopulateRequest` are unchanged.
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
