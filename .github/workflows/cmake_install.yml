@@ -230,9 +230,14 @@ jobs:
           python3 -m pip install pip==25.0.1
           pip install "conan==2.21.0"
           conan profile detect --force
+          sudo apt-get install -y lld
       - name: Install or build all dependencies with Conan
         run: |
-          conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
+          # Limit concurrent links and use lld to reduce memory when linking the static gRPC tests
+          conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD} \
+            -c '&:tools.cmake.cmaketoolchain:extra_variables={"CMAKE_JOB_POOLS": "link=2", "CMAKE_JOB_POOL_LINK": "link"}' \
+            -c '&:tools.build:exelinkflags=["-fuse-ld=lld"]' \
+            -c '&:tools.build:sharedlinkflags=["-fuse-ld=lld"]'
           conan cache clean --source --build --download --temp
           echo "CMAKE_TOOLCHAIN_FILE=/home/runner/conan/build/Release/generators/conan_toolchain.cmake" >> "$GITHUB_ENV"
       - name: Run Install Functions Tests
@@ -275,7 +280,8 @@ jobs:
         conan profile detect --force
     - name: Install or build all dependencies with Conan
       run: |
-        conan install install/conan/conanfile_latest.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
+        conan install install/conan/conanfile_latest.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD} \
+          -c '&:tools.cmake.cmaketoolchain:extra_variables={"CMAKE_JOB_POOLS": "link=2", "CMAKE_JOB_POOL_LINK": "link"}'
         conan cache clean --source --build --download --temp
         echo "CMAKE_TOOLCHAIN_FILE=/Users/runner/conan/build/Release/generators/conan_toolchain.cmake" >> "$GITHUB_ENV"
     - name: Run Install Functions Tests
