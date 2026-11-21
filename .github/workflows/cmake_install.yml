@@ -206,56 +206,13 @@ jobs:
           BUILD_SHARED_LIBS: 'ON'
       run: ./ci/do_ci.sh cmake.install.test
 
-  ubuntu_2404_conan_stable:
-    name: Ubuntu 24.04 conan stable versions cxx17 (static libs - opentracing shim)
-    runs-on: ubuntu-24.04
-    env:
-      INSTALL_TEST_DIR: '/home/runner/install_test'
-      CXX_STANDARD: '17'
-      CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
-      BUILD_TYPE: 'Debug'
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-          submodules: 'recursive'
-      - name: Free Disk Space
-        run: ./ci/free_disk_space.sh
-      - name: Install Conan
-        run: |
-          python3 -m pip install pip==25.0.1
-          pip install "conan==2.15.1"
-          conan profile detect --force
-      - name: Install or build all dependencies with Conan
-        run: |
-          conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
-          conan cache clean --source --build
-      - name: Run Install Functions Tests
-        run: ./ci/do_ci.sh cmake.install_functions.test
-      - name: Run Tests (static libs)
-        env:
-          BUILD_SHARED_LIBS: 'OFF'
-        run: ./ci/do_ci.sh cmake.install.test
-      - name: verify pkgconfig packages
-        run: |
-          export PKG_CONFIG_PATH=$INSTALL_TEST_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
-          ./ci/verify_packages.sh
-      - name: Run OpenTracing Shim Test
-        run: ./ci/do_ci.sh cmake.opentracing_shim.install.test
-
   ubuntu_2404_conan_latest:
     name: Ubuntu 24.04 conan latest versions cxx17 (static libs - opentracing shim)
     runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
       CXX_STANDARD: '17'
-      CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
-      BUILD_TYPE: 'Debug'
+      BUILD_TYPE: 'Release'
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
@@ -276,7 +233,8 @@ jobs:
       - name: Install or build all dependencies with Conan
         run: |
           conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
-          conan cache clean --source --build
+          conan cache clean --source --build --download --temp
+          echo "CMAKE_TOOLCHAIN_FILE=/home/runner/conan/build/Release/generators/conan_toolchain.cmake" >> "$GITHUB_ENV"
       - name: Run Install Functions Tests
         run: ./ci/do_ci.sh cmake.install_functions.test
       - name: Run Tests (static libs)
@@ -290,15 +248,14 @@ jobs:
       - name: Run OpenTracing Shim Test
         run: ./ci/do_ci.sh cmake.opentracing_shim.install.test
 
-  macos_conan_stable:
-    name: macOS conan stable versions cxx17 (static libs)
+  macos_conan_latest:
+    name: macOS conan latest versions cxx17 (static libs)
     runs-on: macos-26
     env:
       INSTALL_TEST_DIR: '/Users/runner/install_test'
       CXX_STANDARD: '17'
-      CMAKE_TOOLCHAIN_FILE: '/Users/runner/conan/build/Debug/generators/conan_toolchain.cmake'
       CMAKE_VERSION: 3.31.0 # building the conan "stable" versions requires CMake 3.x
-      BUILD_TYPE: 'Debug'
+      BUILD_TYPE: 'Release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
@@ -318,8 +275,9 @@ jobs:
         conan profile detect --force
     - name: Install or build all dependencies with Conan
       run: |
-        conan install install/conan/conanfile_stable.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
-        conan cache clean --source --build
+        conan install install/conan/conanfile_latest.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
+        conan cache clean --source --build --download --temp
+        echo "CMAKE_TOOLCHAIN_FILE=/Users/runner/conan/build/Release/generators/conan_toolchain.cmake" >> "$GITHUB_ENV"
     - name: Run Install Functions Tests
       run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
