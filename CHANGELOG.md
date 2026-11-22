@@ -20,6 +20,9 @@ Increment the:
   compare-and-swap
   [#4795](https://github.com/open-telemetry/opentelemetry-cpp/pull/4795)
 
+* [SDK] Keep +Inf, -Inf and NaN out of the base2 exponential histogram's
+  count, sum, min and max, which they otherwise turn into `inf` or `nan`
+
 * [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
   measurements, so they no longer reach the histogram aggregations
 
