@@ -17,7 +17,6 @@
 #include <unordered_set>
 #include <utility>
 
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
@@ -30,6 +29,7 @@
 
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
 #  include <exception>
+#  include <ostream>
 #endif
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
