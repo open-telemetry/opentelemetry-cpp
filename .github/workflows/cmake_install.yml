@@ -11,12 +11,20 @@ permissions:
   contents: read
 
 jobs:
-  windows_2022_vcpkg_submodule:
-    name: Windows 2022 vcpkg submodule versions cxx17 (static libs - dll)
-    runs-on: windows-2022
+  windows_vcpkg_manifest:
+    name: ${{ matrix.os }} vcpkg manifest versions cxx${{ matrix.cxx_standard }} release (static libs - dll)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-2022, cxx_standard: '17' }
+          - { os: windows-2025, cxx_standard: '20' }
     env:
-      # cxx17 is the default for windows-2022
-      CXX_STANDARD: '17'
+      CXX_STANDARD: ${{ matrix.cxx_standard }}
+      BUILD_TYPE: 'Release'
+      VCPKG_TARGET_TRIPLET: 'x64-windows-release'
+      VCPKG_INSTALLED_DIR: 'C:\vcpkg_installed'
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
@@ -26,39 +34,23 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          submodules: 'recursive'
-      - name: Build dependencies with vcpkg submodule
+      - name: Checkout required submodules
         run: |
-          ./ci/setup_windows_ci_environment.ps1
+          git submodule update --init --depth 1 tools/vcpkg third_party/opentelemetry-proto
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Install dependencies with the vcpkg manifest
+        run: ./ci/setup_windows_ci_environment.ps1
+      - name: Print vcpkg build logs
+        if: failure()
+        run: |
+          Get-ChildItem -Path tools/vcpkg/buildtrees -Recurse -Include *-out.log,*-err.log -ErrorAction SilentlyContinue |
+            ForEach-Object { Write-Output "===== $($_.FullName)"; Get-Content $_.FullName -Tail 100 }
       - name: Run Install Functions Tests
         run: ./ci/do_ci.ps1 cmake.install_functions.test
       - name: Run Tests
         run: ./ci/do_ci.ps1 cmake.install.test
       - name: Run DLL Tests
         run: ./ci/do_ci.ps1 cmake.dll.install.test
-
-  windows_2025_vcpkg_submodule:
-    name: Windows 2025 vcpkg submodule versions cxx20 (static libs)
-    runs-on: windows-2025
-    env:
-      CXX_STANDARD: '20'
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-          submodules: 'recursive'
-      - name: Build dependencies with vcpkg submodule
-        run: |
-          ./ci/setup_windows_ci_environment.ps1
-      - name: Run Install Functions Tests
-        run: ./ci/do_ci.ps1 cmake.install_functions.test
-      - name: Run Tests
-        run: ./ci/do_ci.ps1 cmake.install.test
 
   ubuntu_2404_system_packages:
     name: Ubuntu 24.04 apt packages cxx17 (static libs - shared libs)

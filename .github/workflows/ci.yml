@@ -453,6 +453,9 @@ jobs:
   cmake_msvc_maintainer_test_stl_cxx20:
     name: CMake msvc (maintainer mode) with C++20
     runs-on: windows-2025
+    env:
+      BUILD_TYPE: 'Release'
+      VCPKG_TARGET_TRIPLET: 'x64-windows-release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
@@ -474,6 +477,9 @@ jobs:
   cmake_msvc_maintainer_abiv2_test:
     name: CMake msvc (maintainer mode, abiv2)
     runs-on: windows-2025
+    env:
+      BUILD_TYPE: 'Release'
+      VCPKG_TARGET_TRIPLET: 'x64-windows-release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
@@ -1022,6 +1028,9 @@ jobs:
   windows:
     name: CMake -> exporter proto
     runs-on: windows-2025
+    env:
+      BUILD_TYPE: 'Release'
+      VCPKG_TARGET_TRIPLET: 'x64-windows-release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
@@ -1043,6 +1052,9 @@ jobs:
   windows-build-dll:
     name: CMake -> exporter proto (Build as DLL)
     runs-on: windows-2025
+    env:
+      BUILD_TYPE: 'Release'
+      VCPKG_TARGET_TRIPLET: 'x64-windows-release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
@@ -1066,6 +1078,9 @@ jobs:
   windows_with_async_export:
     name: CMake (With async export) -> exporter proto
     runs-on: windows-2025
+    env:
+      BUILD_TYPE: 'Release'
+      VCPKG_TARGET_TRIPLET: 'x64-windows-release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0

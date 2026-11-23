@@ -27,6 +27,21 @@ $INSTALL_TEST_DIR = Join-Path "$SRC_DIR" "install_test"
 
 $VCPKG_DIR = Join-Path "$SRC_DIR" "tools/vcpkg"
 
+# Optional overrides for the vcpkg triplet, installed dir and build configuration
+$VCPKG_TARGET_TRIPLET = if ($env:VCPKG_TARGET_TRIPLET) { $env:VCPKG_TARGET_TRIPLET } else { "x64-windows" }
+$BUILD_CONFIG = if ($env:BUILD_TYPE) { $env:BUILD_TYPE } else { "Debug" }
+$VCPKG_CMAKE_OPTIONS = @(
+  "-DVCPKG_TARGET_TRIPLET=$VCPKG_TARGET_TRIPLET",
+  "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+)
+if ($env:VCPKG_INSTALLED_DIR) {
+  $VCPKG_CMAKE_OPTIONS += "-DVCPKG_INSTALLED_DIR=$env:VCPKG_INSTALLED_DIR"
+  $VCPKG_CMAKE_OPTIONS += "-DVCPKG_MANIFEST_MODE=OFF"
+}
+if ($env:BUILD_TYPE) {
+  $VCPKG_CMAKE_OPTIONS += "-DCMAKE_CONFIGURATION_TYPES=$BUILD_CONFIG"
+}
+
 $Env:CTEST_OUTPUT_ON_FAILURE = "1"
 
 function FindAndMergeDllPath {
@@ -69,18 +84,17 @@ switch ($action) {
   "cmake.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      $VCPKG_CMAKE_OPTIONS
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    ctest -C Debug
+    ctest -C $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -89,20 +103,19 @@ switch ($action) {
   "cmake.dll.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DOTELCPP_BUILD_DLL=1 `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      $VCPKG_CMAKE_OPTIONS
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    $env:PATH = FindAndMergeDllPath "$BUILD_DIR\ext\src\dll\Debug"
-    ctest -C Debug
+    $env:PATH = FindAndMergeDllPath "$BUILD_DIR\ext\src\dll\$BUILD_CONFIG"
+    ctest -C $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -112,20 +125,19 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DCMAKE_CXX_STANDARD=20 `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DOTELCPP_BUILD_DLL=1 `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      $VCPKG_CMAKE_OPTIONS
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    $env:PATH = FindAndMergeDllPath "$BUILD_DIR\ext\src\dll\Debug"
-    ctest -C Debug
+    $env:PATH = FindAndMergeDllPath "$BUILD_DIR\ext\src\dll\$BUILD_CONFIG"
+    ctest -C $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -138,13 +150,12 @@ switch ($action) {
       -DOTELCPP_WITH_OPENTRACING=OFF `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      $VCPKG_CMAKE_OPTIONS
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -153,7 +164,7 @@ switch ($action) {
     $env:PATH = FindAndMergeDllPath "."
     Write-Output "PATH=$env:PATH"
 
-    ctest -C Debug
+    ctest -C $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -168,13 +179,12 @@ switch ($action) {
       -DCMAKE_CXX_STANDARD=20 `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      $VCPKG_CMAKE_OPTIONS
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -183,7 +193,7 @@ switch ($action) {
     $env:PATH = FindAndMergeDllPath "."
     Write-Output "PATH=$env:PATH"
 
-    ctest -C Debug
+    ctest -C $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -196,13 +206,12 @@ switch ($action) {
       -DOTELCPP_WITH_OPENTRACING=OFF `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      $VCPKG_CMAKE_OPTIONS
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -211,7 +220,7 @@ switch ($action) {
     $env:PATH = FindAndMergeDllPath "."
     Write-Output "PATH=$env:PATH"
 
-    ctest -C Debug
+    ctest -C $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -252,14 +261,13 @@ switch ($action) {
   "cmake.with_async_export.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      $VCPKG_CMAKE_OPTIONS
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -268,7 +276,7 @@ switch ($action) {
     $env:PATH = FindAndMergeDllPath "."
     Write-Output "PATH=$env:PATH"
 
-    ctest -C Debug
+    ctest -C $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -279,13 +287,12 @@ switch ($action) {
     cmake $SRC_DIR `
       "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
       -DOTELCPP_WITH_OPENTRACING=OFF `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `      
-    "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      $VCPKG_CMAKE_OPTIONS
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -294,7 +301,7 @@ switch ($action) {
     $env:PATH = FindAndMergeDllPath "."
     Write-Output "PATH=$env:PATH"
 
-    ctest -C Debug
+    ctest -C $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -303,22 +310,21 @@ switch ($action) {
   "cmake.exporter.otprotocol.dll.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DOTELCPP_BUILD_DLL=1 `
       -DOTELCPP_WITH_OTLP_GRPC=ON `
       -DOTELCPP_WITH_OTLP_HTTP=ON `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      $VCPKG_CMAKE_OPTIONS
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    $env:PATH = FindAndMergeDllPath "$BUILD_DIR\ext\src\dll\Debug", "$BUILD_DIR\Debug"
-    ctest -C Debug
+    $env:PATH = FindAndMergeDllPath "$BUILD_DIR\ext\src\dll\$BUILD_CONFIG", "$BUILD_DIR\$BUILD_CONFIG"
+    ctest -C $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -329,14 +335,13 @@ switch ($action) {
     cmake $SRC_DIR `
       "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
       -DOTELCPP_WITH_OPENTRACING=OFF `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      $VCPKG_CMAKE_OPTIONS
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -345,7 +350,7 @@ switch ($action) {
     $env:PATH = FindAndMergeDllPath "."
     Write-Output "PATH=$env:PATH"
 
-    ctest -C Debug
+    ctest -C $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -370,10 +375,8 @@ switch ($action) {
     $CMAKE_OPTIONS = @(
       "-DCMAKE_CXX_STANDARD=$CXX_STANDARD",
       "-DCMAKE_CXX_STANDARD_REQUIRED=ON",
-      "-DCMAKE_CXX_EXTENSIONS=OFF",
-      "-DVCPKG_TARGET_TRIPLET=x64-windows",
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
-    )
+      "-DCMAKE_CXX_EXTENSIONS=OFF"
+    ) + $VCPKG_CMAKE_OPTIONS
 
     cmake $SRC_DIR `
       $CMAKE_OPTIONS `
@@ -388,7 +391,7 @@ switch ($action) {
       exit $exit
     }
 
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -398,13 +401,13 @@ switch ($action) {
 
     Write-Output "PATH=$env:PATH"
 
-    ctest -C Debug
+    ctest -C $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
 
-    cmake --build . --target install
+    cmake --build . --target install --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -453,7 +456,7 @@ switch ($action) {
       exit $exit
     }
 
-    ctest -C Debug --output-on-failure
+    ctest -C $BUILD_CONFIG --output-on-failure
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -467,10 +470,7 @@ switch ($action) {
     cd "$BUILD_DIR"
     mkdir "$BUILD_DIR\install_functions_test"
     cd "$BUILD_DIR\install_functions_test"
-    $INSTALL_FUNCTIONS_CMAKE_OPTIONS = @(
-      "-DVCPKG_TARGET_TRIPLET=x64-windows",
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
-    )
+    $INSTALL_FUNCTIONS_CMAKE_OPTIONS = $VCPKG_CMAKE_OPTIONS
     $CMAKE_OPTIONS_STRING = $INSTALL_FUNCTIONS_CMAKE_OPTIONS -join " "
     cmake "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
       "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
@@ -481,7 +481,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    ctest -C Debug --output-on-failure
+    ctest -C $BUILD_CONFIG --output-on-failure
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -495,10 +495,8 @@ switch ($action) {
 
     $CMAKE_OPTIONS = @(
       "-DCMAKE_CXX_STANDARD=17",
-      "-DVCPKG_TARGET_TRIPLET=x64-windows",
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake",
       "-DOTELCPP_BUILD_DLL=1"
-    )
+    ) + $VCPKG_CMAKE_OPTIONS
 
     cmake $SRC_DIR `
       $CMAKE_OPTIONS `
@@ -524,7 +522,7 @@ switch ($action) {
       exit $exit
     }
 
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -534,14 +532,14 @@ switch ($action) {
 
     Write-Output "PATH=$env:PATH"
 
-    ctest -C Debug
+    ctest -C $BUILD_CONFIG
 
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
 
-    cmake --build . --target install
+    cmake --build . --target install --config $BUILD_CONFIG
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -582,7 +580,7 @@ switch ($action) {
       exit $exit
     }
 
-    ctest -C Debug --output-on-failure
+    ctest -C $BUILD_CONFIG --output-on-failure
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
