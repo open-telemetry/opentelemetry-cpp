@@ -44,6 +44,49 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
+#if defined(__has_feature)
+#  if __has_feature(address_sanitizer) || __has_feature(thread_sanitizer)
+#    define OTEL_TEST_SANITIZED
+#  endif
+#endif
+#if defined(__SANITIZE_ADDRESS__) || defined(__SANITIZE_THREAD__)
+#  define OTEL_TEST_SANITIZED
+#endif
+
+// Sanitizers intercept pthread_create themselves.
+#if defined(__linux__) && OPENTELEMETRY_HAVE_EXCEPTIONS && !defined(OTEL_TEST_SANITIZED)
+#  define OTEL_TEST_FAIL_THREAD_START
+#  include <dlfcn.h>
+#  include <pthread.h>
+#  include <cerrno>
+
+namespace
+{
+std::atomic<bool> fail_thread_start{false};
+std::function<void()> on_failed_thread_start;
+}  // namespace
+
+// Fails thread creation on request, as it does when the process is out of threads.
+extern "C" int pthread_create(pthread_t *thread,
+                              const pthread_attr_t *attr,
+                              void *(*start_routine)(void *),
+                              void *arg)
+{
+  if (fail_thread_start.load(std::memory_order_acquire))
+  {
+    if (on_failed_thread_start)
+    {
+      on_failed_thread_start();
+    }
+    return EAGAIN;
+  }
+  using PthreadCreate = int (*)(pthread_t *, const pthread_attr_t *, void *(*)(void *), void *);
+  static const auto real_pthread_create =
+      reinterpret_cast<PthreadCreate>(dlsym(RTLD_NEXT, "pthread_create"));
+  return real_pthread_create(thread, attr, start_routine, arg);
+}
+#endif
+
 constexpr int HTTP_PORT{19000};
 
 namespace curl        = opentelemetry::ext::http::client::curl;
@@ -1561,6 +1604,113 @@ TEST_F(BasicCurlHttpTests, BackgroundThreadWaitMore)
     ASSERT_TRUE(http_client.MaybeSpawnBackgroundThread());
   }
 }
+
+#ifdef OTEL_TEST_FAIL_THREAD_START
+class ThreadStartFailure
+{
+public:
+  explicit ThreadStartFailure(std::function<void()> on_failure = nullptr)
+  {
+    on_failed_thread_start = std::move(on_failure);
+    fail_thread_start.store(true, std::memory_order_release);
+  }
+
+  ~ThreadStartFailure()
+  {
+    fail_thread_start.store(false, std::memory_order_release);
+    on_failed_thread_start = nullptr;
+  }
+
+  ThreadStartFailure(const ThreadStartFailure &)            = delete;
+  ThreadStartFailure &operator=(const ThreadStartFailure &) = delete;
+};
+
+class ThreadStartFailureHandler : public http_client::EventHandler
+{
+public:
+  void OnResponse(http_client::Response & /* response */) noexcept override
+  {
+    responses_.fetch_add(1, std::memory_order_release);
+  }
+
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
+  {
+    if (state == http_client::SessionState::CreateFailed)
+    {
+      create_failed_.fetch_add(1, std::memory_order_release);
+    }
+    if ((state == http_client::SessionState::ConnectFailed ||
+         state == http_client::SessionState::CreateFailed) &&
+        finish_on_failure_ != nullptr)
+    {
+      finish_on_failure_->FinishSession();
+    }
+  }
+
+  http_client::Session *finish_on_failure_ = nullptr;
+  std::atomic<int> create_failed_{0};
+  std::atomic<int> responses_{0};
+};
+
+TEST_F(BasicCurlHttpTests, BackgroundThreadStartFailureEndsTheRequest)
+{
+  curl::HttpClient client;
+  {
+    ThreadStartFailure failure;
+    for (int i = 0; i < 3; ++i)
+    {
+      auto session = client.CreateSession("http://127.0.0.1:19000");
+      auto request = session->CreateRequest();
+      request->SetUri("get/");
+      auto handler                = std::make_shared<ThreadStartFailureHandler>();
+      handler->finish_on_failure_ = session.get();
+      session->SendRequest(handler);
+      EXPECT_EQ(handler->create_failed_.load(std::memory_order_acquire), 1);
+      EXPECT_FALSE(session->IsSessionActive());
+      EXPECT_TRUE(session->FinishSession());
+    }
+  }
+
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  auto handler = std::make_shared<ThreadStartFailureHandler>();
+  session->SendRequest(handler);
+  session->FinishSession();
+  EXPECT_EQ(handler->responses_.load(std::memory_order_acquire), 1);
+}
+
+TEST_F(BasicCurlHttpTests, BackgroundThreadStartFailureReleasesCurlResources)
+{
+  curl::HttpClient client;
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  const http_client::HttpSslOptions ssl_options;
+  const http_client::Body body;
+  curl::HttpOperation operation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
+                                ssl_options, nullptr, {}, body, http_client::Compression::kNone);
+
+  ThreadStartFailure failure;
+  EXPECT_EQ(operation.SendAsync(static_cast<curl::Session *>(session.get()),
+                                [](curl::HttpOperation &) {}),
+            CURLE_FAILED_INIT);
+  operation.Finish();
+  EXPECT_FALSE(curl::HttpOperationTestPeer::HasCurlResources(operation));
+}
+
+TEST_F(BasicCurlHttpTests, CancelWhileBackgroundThreadStartFails)
+{
+  curl::HttpClient client;
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  auto handler = std::make_shared<ThreadStartFailureHandler>();
+
+  ThreadStartFailure failure([&session] { session->CancelSession(); });
+  session->SendRequest(handler);
+  EXPECT_EQ(handler->create_failed_.load(std::memory_order_acquire), 1);
+  EXPECT_TRUE(session->FinishSession());
+}
+#endif
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 struct GzipEventHandler : public CustomEventHandler

@@ -15,9 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
-* [EXPORTER] Log an error instead of calling `std::terminate` when the curl HTTP
-  client cannot create its background thread
-  [#4792](https://github.com/open-telemetry/opentelemetry-cpp/issues/4792)
+* [EXPORTER] Fail the request instead of calling `std::terminate` when the curl
+  HTTP client cannot create its background thread
+  [#4799](https://github.com/open-telemetry/opentelemetry-cpp/pull/4799)
 
 * [SDK] Keep +Inf, -Inf and NaN out of the base2 exponential histogram's
   count, sum, min and max, which they otherwise turn into `inf` or `nan`

@@ -255,45 +255,13 @@ void Session::SendRequest(
         is_session_active_.store(false, std::memory_order_release);
       });
 
-  if (success)
+  if (!success)
   {
-    // We will try to create a background to poll events. But when the background is running, we
-    // will reuse it instead of creating a new one.
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    try
-    {
-#endif
-      http_client_.MaybeSpawnBackgroundThread();
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    }
-    catch (const std::exception &e)
-    {
-      OTEL_INTERNAL_LOG_ERROR(
-          "[HTTP Client Curl] Failed to create the background thread: " << e.what());
-      success = false;
-    }
-    catch (...)
-    {
-      OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] Failed to create the background thread");
-      success = false;
-    }
-
-    // A thread started by another session may already have taken the request.
-    if (!success && http_client_.CancelPendingAdd(session_id_))
-    {
-      curl_operation_->DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
-                                     "Failed to create the background thread");
-      curl_operation_->Cleanup();
-    }
-#endif
-  }
-  else
-  {
+    is_session_active_.store(false, std::memory_order_release);
     if (callback)
     {
       callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed, "");
     }
-    is_session_active_.store(false, std::memory_order_release);
   }
 }
 
@@ -499,6 +467,11 @@ bool HttpClient::InternalCancelAllSessions() noexcept
 bool HttpClient::MaybeSpawnBackgroundThread()
 {
   std::lock_guard<std::mutex> lock_guard{background_thread_m_};
+  return spawnBackgroundThread();
+}
+
+bool HttpClient::spawnBackgroundThread()
+{
   if (background_thread_)
   {
     return false;
@@ -693,9 +666,31 @@ bool HttpClient::MaybeSpawnBackgroundThread()
   return true;
 }
 
-void HttpClient::ScheduleAddSession(uint64_t session_id)
+bool HttpClient::ScheduleAddSession(uint64_t session_id)
 {
   {
+    // The background thread exits under this lock, so it cannot exit without seeing the session.
+    std::lock_guard<std::mutex> background_thread_lock{background_thread_m_};
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+    {
+#endif
+      spawnBackgroundThread();
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    }
+    catch (const std::exception &e)
+    {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[HTTP Client Curl] Failed to create the background thread: " << e.what());
+      return false;
+    }
+    catch (...)
+    {
+      OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] Failed to create the background thread");
+      return false;
+    }
+#endif
+
     std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
     pending_to_add_session_ids_.insert(session_id);
     pending_to_remove_session_handles_.erase(session_id);
@@ -703,12 +698,7 @@ void HttpClient::ScheduleAddSession(uint64_t session_id)
   }
 
   wakeupBackgroundThread();
-}
-
-bool HttpClient::CancelPendingAdd(uint64_t session_id)
-{
-  std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
-  return pending_to_add_session_ids_.erase(session_id) > 0;
+  return true;
 }
 
 void HttpClient::ScheduleAbortSession(uint64_t session_id)
