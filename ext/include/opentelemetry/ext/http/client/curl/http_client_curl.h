@@ -367,6 +367,8 @@ public:
   bool MaybeSpawnBackgroundThread();
 
   void ScheduleAddSession(uint64_t session_id);
+  // Returns false once the background thread has taken the session.
+  bool CancelPendingAdd(uint64_t session_id);
   void ScheduleAbortSession(uint64_t session_id);
   void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
 

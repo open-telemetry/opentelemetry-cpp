@@ -270,10 +270,20 @@ void Session::SendRequest(
     {
       OTEL_INTERNAL_LOG_ERROR(
           "[HTTP Client Curl] Failed to create the background thread: " << e.what());
+      success = false;
     }
     catch (...)
     {
       OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] Failed to create the background thread");
+      success = false;
+    }
+
+    // A thread started by another session may already have taken the request.
+    if (!success && http_client_.CancelPendingAdd(session_id_))
+    {
+      curl_operation_->DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                                     "Failed to create the background thread");
+      curl_operation_->Cleanup();
     }
 #endif
   }
@@ -693,6 +703,12 @@ void HttpClient::ScheduleAddSession(uint64_t session_id)
   }
 
   wakeupBackgroundThread();
+}
+
+bool HttpClient::CancelPendingAdd(uint64_t session_id)
+{
+  std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
+  return pending_to_add_session_ids_.erase(session_id) > 0;
 }
 
 void HttpClient::ScheduleAbortSession(uint64_t session_id)
