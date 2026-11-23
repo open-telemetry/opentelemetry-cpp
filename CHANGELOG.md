@@ -63,8 +63,13 @@ Increment the:
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
-* [API] `Baggage::ToHeader` now percent-encodes spaces as `%20` instead of
-  `+`, as required by the W3C Baggage specification. Decoding is unchanged.
+* [API] Correct W3C Baggage encoding and decoding together: `Baggage::ToHeader`
+  percent-encodes spaces as `%20` instead of `+`, and `Baggage::FromHeader`
+  preserves literal `+` in keys and values instead of decoding it as a space.
+  Plus signs are emitted as `%2B`, preserving them when C++ forwards baggage.
+  Compatibility: spaces encoded as `+` by older C++ senders are now read as
+  literal plus signs, as they already are by conforming non-C++ receivers.
+  Older C++ readers already support `%20` and `%2B` from newer senders.
   [#4765](https://github.com/open-telemetry/opentelemetry-cpp/pull/4765)
 
 ## [1.30.0] 2026-10-22

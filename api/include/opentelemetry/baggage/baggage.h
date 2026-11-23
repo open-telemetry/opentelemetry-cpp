@@ -104,6 +104,7 @@ public:
   }
 
   // Returns shared_ptr of baggage after extracting key-value pairs from header
+  // Percent-decodes keys and values; a literal '+' remains a plus, not a space.
   static nostd::shared_ptr<Baggage> FromHeader(nostd::string_view header) noexcept
   {
     if (header.size() > kMaxSize)
@@ -165,6 +166,7 @@ public:
   }
 
   // Creates string from baggage object.
+  // Spaces are encoded as %20 and plus signs as %2B in keys and values.
   std::string ToHeader() const noexcept
   {
     std::string header_s;
@@ -331,7 +333,7 @@ private:
     return ret;
   }
 
-  // Uri decode key value pairs after extracting from header
+  // Percent-decode key-value pairs without applying form-style '+' decoding.
   static std::string UrlDecode(nostd::string_view str, bool &err)
   {
     std::string ret;
@@ -350,10 +352,6 @@ private:
         ret.push_back(static_cast<char>(common::detail::HexDigitValue(str[i + 1]) << 4 |
                                         common::detail::HexDigitValue(str[i + 2])));
         i += 2;
-      }
-      else if (str[i] == '+')
-      {
-        ret.push_back(' ');
       }
       // See https://www.w3.org/TR/baggage/#definition
       else if ((str[i] >= '!')      /* 21 */

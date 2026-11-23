@@ -138,6 +138,43 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
   }
 }
 
+TEST(BaggagePropagatorTest, PreserveSpaceAndPlusOnExtractAndInject)
+{
+  struct
+  {
+    const char *header;
+    const char *key;
+    const char *value;
+    const char *forwarded_header;
+  } testcases[] = {
+      {"expr=1+1", "expr", "1+1", "expr=1%2B1"},
+      {"key+name=hello+world", "key+name", "hello+world", "key%2Bname=hello%2Bworld"},
+      {"key%2Bname=hello%2bworld", "key+name", "hello+world", "key%2Bname=hello%2Bworld"},
+      {"key%20name=hello%20world", "key name", "hello world", "key%20name=hello%20world"},
+      {"key+%20%2B=1+%20%2B1;p=+%20%2B", "key+ +", "1+ +1;p=+%20%2B",
+       "key%2B%20%2B=1%2B%20%2B1;p=+%20%2B"}};
+
+  for (const auto &testcase : testcases)
+  {
+    SCOPED_TRACE(testcase.header);
+    BaggageCarrierTest inbound;
+    inbound.Set(baggage::kBaggageHeader, testcase.header);
+    context::Context base;
+    auto extracted = format.Extract(inbound, base);
+    std::string value;
+    ASSERT_TRUE(baggage::GetBaggage(extracted)->GetValue(testcase.key, value));
+    EXPECT_EQ(value, testcase.value);
+
+    BaggageCarrierTest outbound;
+    format.Inject(outbound, extracted);
+    EXPECT_EQ(outbound.Get(baggage::kBaggageHeader), testcase.forwarded_header);
+
+    auto round_tripped = format.Extract(outbound, base);
+    ASSERT_TRUE(baggage::GetBaggage(round_tripped)->GetValue(testcase.key, value));
+    EXPECT_EQ(value, testcase.value);
+  }
+}
+
 TEST(BaggagePropagatorTest, InjectEmptyHeader)
 {
   // Test Missing baggage from context
