@@ -40,6 +40,9 @@ public:
     return true;
   }
 
+  /** True when no storage was added, e.g. every matching view uses the Drop aggregation. */
+  bool Empty() const noexcept { return storages_.empty(); }
+
   void RecordLong(int64_t value, const opentelemetry::context::Context &context) noexcept override
   {
     for (auto &s : storages_)

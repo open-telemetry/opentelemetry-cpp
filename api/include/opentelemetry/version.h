@@ -12,9 +12,9 @@
 #endif
 
 // NOLINTBEGIN(cppcoreguidelines-macro-to-enum)
-#define OPENTELEMETRY_VERSION "1.30.0"
+#define OPENTELEMETRY_VERSION "1.31.0-dev"
 #define OPENTELEMETRY_VERSION_MAJOR 1
-#define OPENTELEMETRY_VERSION_MINOR 30
+#define OPENTELEMETRY_VERSION_MINOR 31
 #define OPENTELEMETRY_VERSION_PATCH 0
 // NOLINTEND(cppcoreguidelines-macro-to-enum)
 

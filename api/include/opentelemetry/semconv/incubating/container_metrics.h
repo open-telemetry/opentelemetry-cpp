@@ -144,14 +144,12 @@ CreateAsyncDoubleMetricContainerDiskIo(metrics::Meter *meter)
 /**
   Container filesystem available bytes.
   <p>
-  In K8s, this metric is derived from the
-  <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.AvailableBytes</a>
+  Available filesystem space for the container's @code rootfs @endcode.
+  In K8s, this metric is derived from the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.AvailableBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#ContainerStats">ContainerStats.Rootfs</a>
-  of the Kubelet's stats API.
-  <p>
-  updowncounter
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats">ContainerStats.Rootfs</a>
+  of the Kubelet's stats API. <p> updowncounter
  */
 static constexpr const char *kMetricContainerFilesystemAvailable = "container.filesystem.available";
 static constexpr const char *descrMetricContainerFilesystemAvailable =
@@ -193,14 +191,15 @@ CreateAsyncDoubleMetricContainerFilesystemAvailable(metrics::Meter *meter)
 /**
   Container filesystem capacity.
   <p>
-  In K8s, this metric is derived from the
-  <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.CapacityBytes</a>
+  Total filesystem capacity for the container's @code rootfs @endcode.
+  In general, this metric can be derived from <a
+  href="https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics">cadvisor</a>
+  and specifically the @code container_fs_limit_bytes @endcode metric for the container's @code
+  rootfs @endcode device. In K8s, this metric is derived from the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.CapacityBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#ContainerStats">ContainerStats.Rootfs</a>
-  of the Kubelet's stats API.
-  <p>
-  updowncounter
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats">ContainerStats.Rootfs</a>
+  of the Kubelet's stats API. <p> updowncounter
  */
 static constexpr const char *kMetricContainerFilesystemCapacity = "container.filesystem.capacity";
 static constexpr const char *descrMetricContainerFilesystemCapacity =
@@ -242,16 +241,17 @@ CreateAsyncDoubleMetricContainerFilesystemCapacity(metrics::Meter *meter)
 /**
   Container filesystem usage.
   <p>
-  This may not equal capacity - available.
-  <p>
-  In K8s, this metric is derived from the
-  <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.UsedBytes</a>
+  Filesystem space used by the container's @code rootfs @endcode.
+  In general, this metric can be derived from <a
+  href="https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics">cadvisor</a>
+  and specifically the @code container_fs_usage_bytes @endcode metric for the container's @code
+  rootfs @endcode device. In K8s, this metric is derived from the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.UsedBytes</a>
   field of the <a
-  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#ContainerStats">ContainerStats.Rootfs</a>
-  of the Kubelet's stats API.
-  <p>
-  updowncounter
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats">ContainerStats.Rootfs</a>
+  of the Kubelet's stats API. Capacity and available are reported for the backing filesystem, which
+  may be shared with other workloads; therefore, usage may not equal @code capacity - available
+  @endcode. <p> updowncounter
  */
 static constexpr const char *kMetricContainerFilesystemUsage     = "container.filesystem.usage";
 static constexpr const char *descrMetricContainerFilesystemUsage = "Container filesystem usage.";
@@ -496,8 +496,11 @@ CreateAsyncDoubleMetricContainerMemoryUsage(metrics::Meter *meter)
   <p>
   In general, this metric can be derived from <a
   href="https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics">cadvisor</a>
-  and specifically the @code container_memory_working_set_bytes @endcode metric. In K8s, this metric
-  is derived from the <a
+  and specifically the @code container_memory_working_set_bytes @endcode metric. When derived from
+  cAdvisor on Linux, the working set is calculated by excluding inactive file-backed memory from
+  memory usage (@code inactive_file @endcode on cgroup v2, @code total_inactive_file @endcode on
+  cgroup v1), so active file-backed memory remains included. In K8s, this metric is derived from the
+  <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats">MemoryStats.WorkingSetBytes</a>
   field of the <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats">ContainerStats.Memory</a>
@@ -582,16 +585,22 @@ CreateAsyncDoubleMetricContainerNetworkIo(metrics::Meter *meter)
   Container memory paging faults.
   <p>
   In general, this metric can be derived from <a
-  href="https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics">cadvisor</a>
-  and specifically the @code container_memory_failures_total{failure_type=pgfault, scope=container}
-  @endcode and @code container_memory_failures_total{failure_type=pgmajfault, scope=container}
-  @endcodemetric. In K8s, this metric is derived from the <a
+  href="https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics">cadvisor</a>.
+  The @code container_memory_failures_total{failure_type=pgfault, scope=container} @endcode counter
+  reports the total page faults (minor + major), while @code
+  container_memory_failures_total{failure_type=pgmajfault, scope=container} @endcode reports only
+  major faults. The minor page faults MUST be derived as the difference between the two. In K8s,
+  this metric is derived from the <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats">MemoryStats.PageFaults</a>
   and <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats">MemoryStats.MajorPageFaults</a>
-  field of the <a
+  fields of the <a
   href="https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats">ContainerStats.Memory</a>
-  of the Kubelet's stats API. <p> counter
+  of the Kubelet's stats API. @code MemoryStats.PageFaults @endcode reports the total number of page
+  faults (equivalent to @code pgfault @endcode in the cgroup @code memory.stat @endcode), with minor
+  and major combined. The minor page faults MUST therefore be derived as @code
+  MemoryStats.PageFaults - MemoryStats.MajorPageFaults @endcode, so that summing the metric over
+  @code system.paging.fault.type @endcode yields the total number of page faults. <p> counter
  */
 static constexpr const char *kMetricContainerPagingFaults     = "container.paging.faults";
 static constexpr const char *descrMetricContainerPagingFaults = "Container memory paging faults.";
@@ -632,7 +641,14 @@ CreateAsyncDoubleMetricContainerPagingFaults(metrics::Meter *meter)
   <p>
   Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
   as a floating point number with the highest precision available. The actual accuracy would depend
-  on the instrumentation and operating system. <p> gauge
+  on the instrumentation and operating system. In K8s environments, this metric can be derived from
+  Kubelet's stats API and specifically from the <a
+  href="https://github.com/kubernetes/kubelet/blob/v0.35.2/pkg/apis/stats/v1alpha1/types.go#L161">ContainerStats.StartTime</a>
+  field, where @code StartTime @endcode represents the container creation time as <a
+  href="https://github.com/kubernetes/kubernetes/blob/v1.36.3/pkg/kubelet/stats/cri_stats_provider.go#L776">noted
+  in the Kubelet source</a>. This value resets on every container restart and aligns with <a
+  href="https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#ContainerStateRunning">ContainerStateRunning.startedAt</a>
+  from the K8s API. <p> gauge
  */
 static constexpr const char *kMetricContainerUptime = "container.uptime";
 static constexpr const char *descrMetricContainerUptime =

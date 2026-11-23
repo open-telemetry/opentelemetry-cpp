@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <cmath>
 #include <cstdint>
 #include <limits>
 #include <memory>  // IWYU pragma: keep
@@ -48,6 +49,9 @@ LongCounter::LongCounter(const InstrumentDescriptor &instrument_descriptor,
                          std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR("[LongCounter::LongCounter] - Error constructing LongCounter."
@@ -141,6 +145,9 @@ DoubleCounter::DoubleCounter(const InstrumentDescriptor &instrument_descriptor,
                              std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR("[DoubleCounter::DoubleCounter] - Error constructing DoubleCounter."
@@ -242,6 +249,9 @@ LongUpDownCounter::LongUpDownCounter(const InstrumentDescriptor &instrument_desc
                                      std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR(
@@ -323,6 +333,9 @@ DoubleUpDownCounter::DoubleUpDownCounter(const InstrumentDescriptor &instrument_
                                          std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR(
@@ -405,6 +418,7 @@ LongGauge::LongGauge(const InstrumentDescriptor &instrument_descriptor,
                      std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+  SetEnabledFlag(meter_enabled_state_->Flag());
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR("[LongGauge::LongGauge] - Error constructing LongGauge."
@@ -482,6 +496,7 @@ DoubleGauge::DoubleGauge(const InstrumentDescriptor &instrument_descriptor,
                          std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+  SetEnabledFlag(meter_enabled_state_->Flag());
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR("[DoubleGauge::DoubleGauge] - Error constructing DoubleUpDownCounter."
@@ -559,6 +574,9 @@ LongHistogram::LongHistogram(const InstrumentDescriptor &instrument_descriptor,
                              std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR("[LongHistogram::LongHistogram] - Error constructing LongHistogram."
@@ -655,6 +673,9 @@ DoubleHistogram::DoubleHistogram(const InstrumentDescriptor &instrument_descript
                                  std::shared_ptr<MeterEnabledState> meter_enabled_state)
     : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  SetEnabledFlag(meter_enabled_state_->Flag());
+#endif
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR(
@@ -678,6 +699,13 @@ void DoubleHistogram::Record(double value,
         << instrument_descriptor_.name_);
     return;
   }
+  if (!std::isfinite(value))
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[DoubleHistogram::Record(V,A,C)] Value not recorded - non-finite value for: "
+        << instrument_descriptor_.name_);
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -698,6 +726,13 @@ void DoubleHistogram::Record(double value, const opentelemetry::context::Context
   {
     OTEL_INTERNAL_LOG_WARN(
         "[DoubleHistogram::Record(V,C)] Value not recorded - negative value for: "
+        << instrument_descriptor_.name_);
+    return;
+  }
+  if (!std::isfinite(value))
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[DoubleHistogram::Record(V,C)] Value not recorded - non-finite value for: "
         << instrument_descriptor_.name_);
     return;
   }
@@ -726,6 +761,13 @@ void DoubleHistogram::Record(double value,
         << instrument_descriptor_.name_);
     return;
   }
+  if (!std::isfinite(value))
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[DoubleHistogram::Record(V,A)] Value not recorded - non-finite value for: "
+        << instrument_descriptor_.name_);
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -747,6 +789,13 @@ void DoubleHistogram::Record(double value) noexcept
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleHistogram::Record(V)] Value not recorded - negative value for: "
                            << instrument_descriptor_.name_);
+    return;
+  }
+  if (!std::isfinite(value))
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[DoubleHistogram::Record(V)] Value not recorded - non-finite value for: "
+        << instrument_descriptor_.name_);
     return;
   }
   if (!storage_)
@@ -866,6 +915,12 @@ public:
     {
       OTEL_INTERNAL_LOG_WARN(
           "[BoundDoubleHistogram::Record(V)] Value not recorded - negative value");
+      return;
+    }
+    if (!std::isfinite(value))
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[BoundDoubleHistogram::Record(V)] Value not recorded - non-finite value");
       return;
     }
     if (storage_)

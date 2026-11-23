@@ -38,7 +38,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -61,7 +61,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -84,7 +84,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -108,7 +108,7 @@ jobs:
     runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -127,7 +127,7 @@ jobs:
       BUILD_TYPE: 'Release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -158,7 +158,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -197,7 +197,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -236,7 +236,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -275,7 +275,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -307,7 +307,7 @@ jobs:
       CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -339,7 +339,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -376,7 +376,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -408,7 +408,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -436,7 +436,7 @@ jobs:
     runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -455,7 +455,7 @@ jobs:
     runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -476,7 +476,7 @@ jobs:
     runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -497,7 +497,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -524,7 +524,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -538,12 +538,40 @@ jobs:
     - name: run cmake tests (enable opentracing-shim)
       run: ./ci/do_ci.sh cmake.opentracing_shim.test
 
-  cmake_test_cxx14_gcc:
-    name: CMake C++14 test(GCC)
-    runs-on: ubuntu-22.04
+  cmake_cxx_standard_test:
+    name: CMake C++${{ matrix.config.cxx_standard }} test(${{ matrix.config.compiler }}, ${{ matrix.config.os }}, STL ${{ matrix.stl }})
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { cxx_standard: '14', os: ubuntu-22.04, compiler: gcc 11, cc: /usr/bin/gcc-11, cxx: /usr/bin/g++-11, cxxflags: '', libcxx_packages: '' }
+          - { cxx_standard: '17', os: ubuntu-22.04, compiler: gcc 11, cc: /usr/bin/gcc-11, cxx: /usr/bin/g++-11, cxxflags: '', libcxx_packages: '' }
+          - { cxx_standard: '20', os: ubuntu-22.04, compiler: gcc 11, cc: /usr/bin/gcc-11, cxx: /usr/bin/g++-11, cxxflags: '', libcxx_packages: '' }
+          - { cxx_standard: '17', os: ubuntu-24.04, compiler: gcc 13, cc: /usr/bin/gcc-13, cxx: /usr/bin/g++-13, cxxflags: '', libcxx_packages: '' }
+          - { cxx_standard: '20', os: ubuntu-24.04, compiler: gcc 13, cc: /usr/bin/gcc-13, cxx: /usr/bin/g++-13, cxxflags: '', libcxx_packages: '' }
+          - { cxx_standard: '23', os: ubuntu-24.04, compiler: gcc 13, cc: /usr/bin/gcc-13, cxx: /usr/bin/g++-13, cxxflags: '', libcxx_packages: '' }
+          - { cxx_standard: '14', os: ubuntu-26.04, compiler: gcc 15, cc: /usr/bin/gcc-15, cxx: /usr/bin/g++-15, cxxflags: '', libcxx_packages: '' }
+          - { cxx_standard: '17', os: ubuntu-26.04, compiler: gcc 15, cc: /usr/bin/gcc-15, cxx: /usr/bin/g++-15, cxxflags: '', libcxx_packages: '' }
+          - { cxx_standard: '20', os: ubuntu-26.04, compiler: gcc 15, cc: /usr/bin/gcc-15, cxx: /usr/bin/g++-15, cxxflags: '', libcxx_packages: '' }
+          - { cxx_standard: '23', os: ubuntu-26.04, compiler: gcc 15, cc: /usr/bin/gcc-15, cxx: /usr/bin/g++-15, cxxflags: '', libcxx_packages: '' }
+          - { cxx_standard: '17', os: ubuntu-24.04, compiler: clang 18 libc++, cc: /usr/bin/clang-18, cxx: /usr/bin/clang++-18, cxxflags: '-stdlib=libc++', libcxx_packages: 'libc++-18-dev libc++abi-18-dev' }
+          - { cxx_standard: '20', os: ubuntu-24.04, compiler: clang 18 libc++, cc: /usr/bin/clang-18, cxx: /usr/bin/clang++-18, cxxflags: '-stdlib=libc++', libcxx_packages: 'libc++-18-dev libc++abi-18-dev' }
+          - { cxx_standard: '23', os: ubuntu-24.04, compiler: clang 18 libc++, cc: /usr/bin/clang-18, cxx: /usr/bin/clang++-18, cxxflags: '-stdlib=libc++', libcxx_packages: 'libc++-18-dev libc++abi-18-dev' }
+          - { cxx_standard: '14', os: ubuntu-26.04, compiler: clang 22 libc++, cc: /usr/bin/clang-22, cxx: /usr/bin/clang++-22, cxxflags: '-stdlib=libc++', libcxx_packages: 'libc++-22-dev libc++abi-22-dev' }
+          - { cxx_standard: '17', os: ubuntu-26.04, compiler: clang 22 libc++, cc: /usr/bin/clang-22, cxx: /usr/bin/clang++-22, cxxflags: '-stdlib=libc++', libcxx_packages: 'libc++-22-dev libc++abi-22-dev' }
+          - { cxx_standard: '20', os: ubuntu-26.04, compiler: clang 22 libc++, cc: /usr/bin/clang-22, cxx: /usr/bin/clang++-22, cxxflags: '-stdlib=libc++', libcxx_packages: 'libc++-22-dev libc++abi-22-dev' }
+          - { cxx_standard: '23', os: ubuntu-26.04, compiler: clang 22 libc++, cc: /usr/bin/clang-22, cxx: /usr/bin/clang++-22, cxxflags: '-stdlib=libc++', libcxx_packages: 'libc++-22-dev libc++abi-22-dev' }
+        stl: ['OFF', 'ON']
+    env:
+      CC: ${{ matrix.config.cc }}
+      CXX: ${{ matrix.config.cxx }}
+      CXXFLAGS: ${{ matrix.config.cxxflags }}
+      CXX_STANDARD: ${{ matrix.config.cxx_standard }}
+      OTELCPP_WITH_STL: ${{ matrix.stl }}
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -554,169 +582,23 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
+    - name: install libc++
+      if: ${{ matrix.config.libcxx_packages != '' }}
       run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file ./install/cmake/third_party_stable --packages "googletest;benchmark"
-    - name: run tests
-      env:
-        CXX_STANDARD: '14'
-      run: ./ci/do_ci.sh cmake.c++14.test
-    - name: run tests (enable stl)
-      env:
-        CXX_STANDARD: '14'
-      run: ./ci/do_ci.sh cmake.c++14.stl.test
-
-  cmake_test_cxx17_gcc:
-    name: CMake C++17 test(GCC)
-    runs-on: ubuntu-22.04
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
+        sudo apt-get install -y --no-install-recommends ${{ matrix.config.libcxx_packages }}
+    - name: install googletest and benchmark (C++14)
+      if: ${{ matrix.config.cxx_standard == '14' }}
       run: |
-        sudo -E ./ci/setup_ci_environment.sh
+        sudo env "CC=$CC" "CXX=$CXX" "CXXFLAGS=$CXXFLAGS -w" "CXX_STANDARD=$CXX_STANDARD" ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file ./install/cmake/third_party_minimum --packages "googletest;benchmark"
     - name: run tests
-      env:
-        CXX_STANDARD: '17'
-      run: ./ci/do_ci.sh cmake.c++17.test
-    - name: run tests (enable stl)
-      env:
-        CXX_STANDARD: '17'
-      run: ./ci/do_ci.sh cmake.c++17.stl.test
-
-  cmake_test_cxx20_gcc:
-    name: CMake C++20 test(GCC)
-    runs-on: ubuntu-22.04
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run tests
-      env:
-        CXX_STANDARD: '20'
-      run: ./ci/do_ci.sh cmake.c++20.test
-    - name: run tests (enable stl)
-      env:
-        CXX_STANDARD: '20'
-      run: ./ci/do_ci.sh cmake.c++20.stl.test
-
-  cmake_test_cxx20_clang:
-    name: CMake C++20 test(Clang with libc++)
-    runs-on: ubuntu-22.04
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      env:
-        CC: /usr/bin/clang
-        CXX: /usr/bin/clang++
-        CXXFLAGS: "-stdlib=libc++"
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run tests
-      env:
-        CC: /usr/bin/clang
-        CXX: /usr/bin/clang++
-        CXXFLAGS: "-stdlib=libc++"
-        CXX_STANDARD: '20'
-      run: ./ci/do_ci.sh cmake.c++20.test
-    - name: run tests (enable stl)
-      env:
-        CC: /usr/bin/clang
-        CXX: /usr/bin/clang++
-        CXXFLAGS: "-stdlib=libc++"
-        CXX_STANDARD: '20'
-      run: ./ci/do_ci.sh cmake.c++20.stl.test
-
-  cmake_test_cxx23_gcc:
-    name: CMake C++23 test(GCC)
-    runs-on: ubuntu-24.04
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run tests
-      env:
-        CXX_STANDARD: '23'
-      run: ./ci/do_ci.sh cmake.c++23.test
-    - name: run tests (enable stl)
-      env:
-        CXX_STANDARD: '23'
-      run: ./ci/do_ci.sh cmake.c++23.stl.test
-
-  cmake_test_cxx23_clang:
-    name: CMake C++23 test(Clang with libc++)
-    runs-on: ubuntu-22.04
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      env:
-        CC: /usr/bin/clang
-        CXX: /usr/bin/clang++
-        CXXFLAGS: "-stdlib=libc++"
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run tests
-      env:
-        CC: /usr/bin/clang
-        CXX: /usr/bin/clang++
-        CXXFLAGS: "-stdlib=libc++"
-        CXX_STANDARD: '23'
-      run: ./ci/do_ci.sh cmake.c++23.test
-    - name: run tests (enable stl)
-      env:
-        CC: /usr/bin/clang
-        CXX: /usr/bin/clang++
-        CXXFLAGS: "-stdlib=libc++"
-        CXX_STANDARD: '23'
-      run: ./ci/do_ci.sh cmake.c++23.stl.test
+      run: ./ci/do_ci.sh cmake.cxx_standard.test
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -747,7 +629,7 @@ jobs:
       CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -769,7 +651,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -792,7 +674,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -815,7 +697,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -842,7 +724,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -869,7 +751,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -896,7 +778,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -923,7 +805,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -950,7 +832,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -977,7 +859,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1004,7 +886,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1028,10 +910,10 @@ jobs:
 
   bazel_osx:
     name: Bazel on MacOS
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1059,7 +941,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1093,7 +975,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1110,7 +992,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1127,7 +1009,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1142,7 +1024,7 @@ jobs:
     runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1163,7 +1045,7 @@ jobs:
     runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1186,7 +1068,7 @@ jobs:
     runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1207,7 +1089,7 @@ jobs:
     runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1226,7 +1108,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1256,7 +1138,7 @@ jobs:
 
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1275,7 +1157,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1292,7 +1174,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1312,7 +1194,7 @@ jobs:
     runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
       with:
         egress-policy: audit
 
@@ -1330,7 +1212,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+        uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
         with:
           egress-policy: audit
 
@@ -1376,7 +1258,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+        uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
         with:
           egress-policy: audit
 
