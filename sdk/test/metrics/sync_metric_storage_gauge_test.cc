@@ -228,8 +228,8 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
   //      advance the per-collector start timestamp, so the next interval is
   //      correctly bounded (mirrors fast-path behaviour).
 
-  auto sdk_start_ts    = std::chrono::system_clock::now();
   auto before_creation = std::chrono::system_clock::now();
+  auto sdk_start_ts    = before_creation - std::chrono::seconds(1);
   InstrumentDescriptor instr_desc{"name", "desc", "1unit", InstrumentType::kGauge,
                                   InstrumentValueType::kLong};
   std::map<std::string, std::string> attributes_roomA = {{"Room.id", "Rack A"}};
@@ -397,10 +397,6 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
   EXPECT_TRUE(true);
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 }
-INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLongDeltaMultiReader,
-                         WritableMetricStorageDeltaMultiReaderTestFixture,
-                         ::testing::Values(AggregationTemporality::kDelta));
-
 TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
        DoubleGaugeLastValueAggregationDeltaTemporalityMultiReader)
 {
@@ -408,9 +404,8 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
   // Slow-path (collectors.size() > 1) delta temporality for gauge instruments (double).
   // Mirrors LongGaugeLastValueAggregationDeltaTemporalityMultiReader but uses
   // double values and RecordDouble.
-  auto sdk_start_ts = std::chrono::system_clock::now();
-
   auto before_creation = std::chrono::system_clock::now();
+  auto sdk_start_ts    = before_creation - std::chrono::seconds(1);
   InstrumentDescriptor instr_desc{"name", "desc", "1unit", InstrumentType::kGauge,
                                   InstrumentValueType::kDouble};
   std::map<std::string, std::string> attributes_roomA = {{"Room.id", "Rack A"}};
@@ -580,7 +575,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 }
 
-INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestDoubleDeltaMultiReader,
+INSTANTIATE_TEST_SUITE_P(WritableMetricStorageDeltaMultiReader,
                          WritableMetricStorageDeltaMultiReaderTestFixture,
                          ::testing::Values(AggregationTemporality::kDelta));
 
