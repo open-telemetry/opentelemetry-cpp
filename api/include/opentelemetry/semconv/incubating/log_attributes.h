@@ -20,27 +20,27 @@ namespace log
 {
 
 /**
-  The basename of the file.
+  The basename of the file to which the log record was emitted.
  */
 static constexpr const char *kLogFileName = "log.file.name";
 
 /**
-  The basename of the file, with symlinks resolved.
+  The basename of the file to which the log record was emitted, with symlinks resolved.
  */
 static constexpr const char *kLogFileNameResolved = "log.file.name_resolved";
 
 /**
-  The full path to the file.
+  The full path to the file to which the log record was emitted.
  */
 static constexpr const char *kLogFilePath = "log.file.path";
 
 /**
-  The full path to the file, with symlinks resolved.
+  The full path to the file to which the log record was emitted, with symlinks resolved.
  */
 static constexpr const char *kLogFilePathResolved = "log.file.path_resolved";
 
 /**
-  The stream associated with the log. See below for a list of well-known values.
+  The stream the log record was emitted to.
  */
 static constexpr const char *kLogIostream = "log.iostream";
 

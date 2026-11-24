@@ -63,6 +63,12 @@ static constexpr const char *kAzureCosmosdbResponseSubStatusCode =
     "azure.cosmosdb.response.sub_status_code";
 
 /**
+  The UTC epoch seconds at which the message has been accepted and stored in the entity.
+ */
+static constexpr const char *kAzureEventhubsMessageEnqueuedTime =
+    "azure.eventhubs.message.enqueued_time";
+
+/**
   The name of the Azure <a
   href="https://learn.microsoft.com/azure/azure-resource-manager/management/manage-resource-groups-portal">resource
   group</a> the resource belongs to.
@@ -81,6 +87,26 @@ static constexpr const char *kAzureResourceProviderNamespace = "azure.resource_p
   with the response.
  */
 static constexpr const char *kAzureServiceRequestId = "azure.service.request.id";
+
+/**
+  Describes the <a
+  href="https://learn.microsoft.com/azure/service-bus-messaging/message-transfers-locks-settlement#peeklock">settlement
+  type</a>.
+ */
+static constexpr const char *kAzureServicebusDispositionStatus =
+    "azure.servicebus.disposition_status";
+
+/**
+  Number of deliveries that have been attempted for this message.
+ */
+static constexpr const char *kAzureServicebusMessageDeliveryCount =
+    "azure.servicebus.message.delivery_count";
+
+/**
+  The UTC epoch seconds at which the message has been accepted and stored in the entity.
+ */
+static constexpr const char *kAzureServicebusMessageEnqueuedTime =
+    "azure.servicebus.message.enqueued_time";
 
 namespace AzureCosmosdbConnectionModeValues
 {
@@ -124,6 +150,30 @@ static constexpr const char *kEventual = "Eventual";
 static constexpr const char *kConsistentPrefix = "ConsistentPrefix";
 
 }  // namespace AzureCosmosdbConsistencyLevelValues
+
+namespace AzureServicebusDispositionStatusValues
+{
+/**
+  Message is completed
+ */
+static constexpr const char *kComplete = "complete";
+
+/**
+  Message is abandoned
+ */
+static constexpr const char *kAbandon = "abandon";
+
+/**
+  Message is sent to dead letter queue
+ */
+static constexpr const char *kDeadLetter = "dead_letter";
+
+/**
+  Message is deferred
+ */
+static constexpr const char *kDefer = "defer";
+
+}  // namespace AzureServicebusDispositionStatusValues
 
 }  // namespace azure
 }  // namespace semconv
