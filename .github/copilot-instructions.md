@@ -81,7 +81,7 @@ cd build && make -j$(nproc) && ctest --output-on-failure
 # Takes ~30 seconds. Must complete without errors.
 
 # 4. Validate with maintainer mode (CRITICAL for warnings)
-./ci/do_ci.sh cmake.maintainer.sync.test
+./ci/do_ci.sh cmake.maintainer.test
 # Takes ~4-6 minutes. NEVER CANCEL. Ensures all warnings are resolved.
 ```
 
@@ -100,7 +100,7 @@ go install github.com/bazelbuild/buildtools/buildifier@latest  # For Bazel files
 
 ```bash
 # Run maintainer mode validation
-./ci/do_ci.sh cmake.maintainer.sync.test
+./ci/do_ci.sh cmake.maintainer.test
 
 # What this does:
 # - Enables -Wall -Werror -Wextra compiler flags
@@ -123,7 +123,7 @@ Always run these before committing to ensure CI will pass:
 shellcheck --severity=error ci/*.sh
 
 # CRITICAL: Validate with maintainer mode to catch all warnings
-./ci/do_ci.sh cmake.maintainer.sync.test
+./ci/do_ci.sh cmake.maintainer.test
 # Takes ~4-6 minutes. Enables -Wall -Werror -Wextra for strict validation.
 
 # Validate build with additional exporters
@@ -198,9 +198,8 @@ third_party/          - External dependencies
 
 ```bash
 cmake.test                       # Standard CMake build with exporters (~5.2 min)
-cmake.maintainer.sync.test       # Maintainer mode: -Wall -Werror -Wextra (~4-6 min)
-cmake.maintainer.async.test      # Maintainer mode with async export enabled
-cmake.maintainer.abiv2.test      # Maintainer mode with ABI v2
+cmake.maintainer.test            # Maintainer mode: -Wall -Werror -Wextra (~4-6 min)
+                                 # OTELCPP_CMAKE_CACHE_FILE selects the ABI/preview cache file
 cmake.c++20.test                # C++20 standard testing
 bazel.test                      # Standard Bazel build and test
 format                          # Run formatting tools
@@ -232,7 +231,7 @@ premature cancellation.
 | CMake build (parallel) | 3 minutes | 15 minutes |
 | Test execution (ctest) | 24 seconds | 5 minutes |
 | CI cmake.test | 5.2 minutes | 20 minutes |
-| CI cmake.maintainer.sync.test | 4-6 minutes | 20 minutes |
+| CI cmake.maintainer.test | 4-6 minutes | 20 minutes |
 | Format script | 17 seconds | 2 minutes |
 | Bazel build | Varies | 15+ minutes |
 
@@ -289,7 +288,7 @@ For offline development, use CMake with pre-installed dependencies.
 2. Build and test: `cd build && make -j$(nproc) && ctest`
 3. Run example: `./examples/simple/example_simple`
 4. Format code: `./tools/format.sh`
-5. Validate warnings: `./ci/do_ci.sh cmake.maintainer.sync.test`
+5. Validate warnings: `./ci/do_ci.sh cmake.maintainer.test`
 6. Final validation: `./ci/do_ci.sh cmake.test`
 
 **Key Standards**:

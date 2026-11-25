@@ -11,49 +11,6 @@ permissions:
 
 jobs:
 
-# Commented 2024-11-06, lack of workers in github causes CI failures
-#  arm64_test:
-#    name: CMake test arm64 (with modern protobuf,grpc and abseil)
-#    runs-on: actuated-arm64-4cpu-16gb
-#    steps:
-#    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-#      with:
-#        submodules: 'recursive'
-#    - name: setup
-#      env:
-#        CXX_STANDARD: '17'
-#        CC: /usr/bin/gcc-10
-#        CXX: /usr/bin/g++-10
-#      run: |
-#        sudo -E ./ci/setup_gcc10.sh
-#        sudo -E ./ci/setup_ci_environment.sh
-#    - name: install dependencies
-#      run: |
-#        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-
-  cmake_test:
-    name: CMake test (prometheus, elasticsearch, zipkin)
-    runs-on: ubuntu-22.04
-    env:
-      CXX_STANDARD: '17'
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-        sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev nlohmann-json3-dev
-    - name: run cmake tests
-      run: |
-        ./ci/do_ci.sh cmake.test
-
   cmake_api_only_test:
     name: CMake API only test
     runs-on: ubuntu-24.04
@@ -149,13 +106,34 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.fetch_content.test
 
-  cmake_gcc_maintainer_sync_test:
-    name: CMake gcc 14 (maintainer mode, sync)
-    runs-on: ubuntu-24.04
+  cmake_maintainer_test:
+    name: CMake C++${{ matrix.config.cxx_standard }} maintainer test(${{ matrix.config.compiler }}, ${{ matrix.config.os }}, ${{ matrix.config.cmake_options }})
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { cxx_standard: '14', os: ubuntu-22.04, compiler: gcc 11, cc: /usr/bin/gcc-11, cxx: /usr/bin/g++-11, cmake_options: all-options-abiv1-preview, tags_file: install/cmake/third_party_minimum }
+          - { cxx_standard: '17', os: ubuntu-22.04, compiler: gcc 11, cc: /usr/bin/gcc-11, cxx: /usr/bin/g++-11, cmake_options: all-options-abiv1-preview, tags_file: install/cmake/third_party_minimum }
+          - { cxx_standard: '17', os: ubuntu-24.04, compiler: gcc 14, cc: /usr/bin/gcc-14, cxx: /usr/bin/g++-14, cmake_options: all-options-abiv1-preview, tags_file: third_party_release }
+          - { cxx_standard: '17', os: ubuntu-26.04, compiler: gcc 15, cc: /usr/bin/gcc-15, cxx: /usr/bin/g++-15, cmake_options: all-options-abiv1, tags_file: third_party_release }
+          - { cxx_standard: '17', os: ubuntu-26.04, compiler: gcc 15, cc: /usr/bin/gcc-15, cxx: /usr/bin/g++-15, cmake_options: all-options-abiv1-preview, tags_file: third_party_release }
+          - { cxx_standard: '17', os: ubuntu-26.04, compiler: gcc 15, cc: /usr/bin/gcc-15, cxx: /usr/bin/g++-15, cmake_options: all-options-abiv2, tags_file: third_party_release }
+          - { cxx_standard: '17', os: ubuntu-26.04, compiler: gcc 15, cc: /usr/bin/gcc-15, cxx: /usr/bin/g++-15, cmake_options: all-options-abiv2-preview, tags_file: third_party_release }
+          - { cxx_standard: '23', os: ubuntu-26.04, compiler: gcc 15, cc: /usr/bin/gcc-15, cxx: /usr/bin/g++-15, cmake_options: all-options-abiv2-preview, tags_file: third_party_release }
+          - { cxx_standard: '17', os: ubuntu-24.04, compiler: clang 18, cc: /usr/bin/clang-18, cxx: /usr/bin/clang++-18, cmake_options: all-options-abiv1-preview, tags_file: third_party_release }
+          - { cxx_standard: '17', os: ubuntu-26.04, compiler: clang 22, cc: /usr/bin/clang-22, cxx: /usr/bin/clang++-22, cmake_options: all-options-abiv1, tags_file: third_party_release }
+          - { cxx_standard: '17', os: ubuntu-26.04, compiler: clang 22, cc: /usr/bin/clang-22, cxx: /usr/bin/clang++-22, cmake_options: all-options-abiv1-preview, tags_file: third_party_release }
+          - { cxx_standard: '17', os: ubuntu-26.04, compiler: clang 22, cc: /usr/bin/clang-22, cxx: /usr/bin/clang++-22, cmake_options: all-options-abiv2, tags_file: third_party_release }
+          - { cxx_standard: '17', os: ubuntu-26.04, compiler: clang 22, cc: /usr/bin/clang-22, cxx: /usr/bin/clang++-22, cmake_options: all-options-abiv2-preview, tags_file: third_party_release }
+          - { cxx_standard: '23', os: ubuntu-26.04, compiler: clang 22, cc: /usr/bin/clang-22, cxx: /usr/bin/clang++-22, cmake_options: all-options-abiv2-preview, tags_file: third_party_release }
     env:
-      CC: /usr/bin/gcc-14
-      CXX: /usr/bin/g++-14
-      CXX_STANDARD: '17'
+      CC: ${{ matrix.config.cc }}
+      CXX: ${{ matrix.config.cxx }}
+      CXX_STANDARD: ${{ matrix.config.cxx_standard }}
+      OTELCPP_CMAKE_CACHE_FILE: ${{ matrix.config.cmake_options }}.cmake
+      # opentracing-cpp is omitted; the maintainer build disables the opentracing shim
+      THIRDPARTY_PACKAGES: 'abseil;zlib;curl;protobuf;grpc;benchmark;googletest;ms-gsl;nlohmann-json;opentelemetry-configuration;opentelemetry-proto;prometheus-cpp;ryml'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
@@ -170,193 +148,22 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: install dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run cmake gcc (maintainer mode, sync, Debug)
+        sudo env "CC=$CC" "CXX=$CXX" "CXX_STANDARD=$CXX_STANDARD" ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file ${{ matrix.config.tags_file }} --packages "$THIRDPARTY_PACKAGES"
+    - name: run cmake (maintainer mode, ${{ matrix.config.cmake_options }}, Debug, static libs)
       env:
         BUILD_TYPE: Debug
+        BUILD_SHARED_LIBS: 'OFF'
       run: |
-        ./ci/do_ci.sh cmake.maintainer.sync.test
-    - name: run cmake gcc (maintainer mode, sync, Release)
+        ./ci/do_ci.sh cmake.maintainer.test
+    - name: run cmake (maintainer mode, ${{ matrix.config.cmake_options }}, Release, shared libs)
       env:
         BUILD_TYPE: Release
+        BUILD_SHARED_LIBS: 'ON'
       run: |
-        ./ci/do_ci.sh cmake.maintainer.sync.test
-    - name: generate test cert
-      run: |
-        (cd ./functional/cert; ./generate_cert.sh)
-    - name: run func test
-      run: |
-        (cd ./functional/otlp; ./run_test.sh)
-
-  cmake_gcc_maintainer_async_test:
-    name: CMake gcc 14 (maintainer mode, async)
-    runs-on: ubuntu-24.04
-    env:
-      CC: /usr/bin/gcc-14
-      CXX: /usr/bin/g++-14
-      CXX_STANDARD: '17'
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run cmake gcc (maintainer mode, async, Debug)
-      env:
-        BUILD_TYPE: Debug
-      run: |
-        ./ci/do_ci.sh cmake.maintainer.async.test
-    - name: run cmake gcc (maintainer mode, async, Release)
-      env:
-        BUILD_TYPE: Release
-      run: |
-        ./ci/do_ci.sh cmake.maintainer.async.test
-    - name: generate test cert
-      run: |
-        (cd ./functional/cert; ./generate_cert.sh)
-    - name: run func test
-      run: |
-        (cd ./functional/otlp; ./run_test.sh)
-
-  cmake_gcc_maintainer_abiv2_test:
-    name: CMake gcc 14 (maintainer mode, abiv2)
-    runs-on: ubuntu-24.04
-    env:
-      CC: /usr/bin/gcc-14
-      CXX: /usr/bin/g++-14
-      CXX_STANDARD: '17'
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run cmake gcc (maintainer mode, abiv2, Debug)
-      env:
-        BUILD_TYPE: Debug
-      run: |
-        ./ci/do_ci.sh cmake.maintainer.abiv2.test
-    - name: run cmake gcc (maintainer mode, abiv2, Release)
-      env:
-        BUILD_TYPE: Release
-      run: |
-        ./ci/do_ci.sh cmake.maintainer.abiv2.test
-    - name: generate test cert
-      run: |
-        (cd ./functional/cert; ./generate_cert.sh)
-    - name: run func test
-      run: |
-        (cd ./functional/otlp; ./run_test.sh)
-
-  cmake_clang_maintainer_sync_test:
-    name: CMake clang 18 (maintainer mode, sync)
-    runs-on: ubuntu-24.04
-    env:
-      CC: /usr/bin/clang-18
-      CXX: /usr/bin/clang++-18
-      CXX_STANDARD: '17'
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run cmake clang (maintainer mode, sync)
-      run: |
-        ./ci/do_ci.sh cmake.maintainer.sync.test
-    - name: generate test cert
-      run: |
-        (cd ./functional/cert; ./generate_cert.sh)
-    - name: run func test
-      run: |
-        (cd ./functional/otlp; ./run_test.sh)
-
-  cmake_clang_maintainer_cxx14_async_test:
-    name: CMake clang 18 with C++14 (maintainer mode, async)
-    runs-on: ubuntu-24.04
-    env:
-      CC: /usr/bin/clang-18
-      CXX: /usr/bin/clang++-18
-      CXX_STANDARD: '14'
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      run: | # install c++14 compatible third-party versions
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file ./install/cmake/third_party_stable
-    - name: run cmake clang (maintainer mode, async)
-      run: |
-        ./ci/do_ci.sh cmake.maintainer.async.test
-    - name: generate test cert
-      run: |
-        (cd ./functional/cert; ./generate_cert.sh)
-    - name: run func test
-      run: |
-        (cd ./functional/otlp; ./run_test.sh)
-
-  cmake_clang_yaml_config:
-    name: CMake clang 18 (maintainer mode, yaml config)
-    runs-on: ubuntu-24.04
-    env:
-      CC: /usr/bin/clang-18
-      CXX: /usr/bin/clang++-18
-      CXX_STANDARD: '17'
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run cmake clang (maintainer mode, sync)
-      run: |
-        ./ci/do_ci.sh cmake.maintainer.yaml.test
+        ./ci/do_ci.sh cmake.maintainer.test
     - name: install shelltest
-      run: sudo apt update && sudo apt-get install -y shelltestrunner
+      if: endsWith(matrix.config.cmake_options, '-preview')
+      run: sudo apt-get update && sudo apt-get install -y shelltestrunner
     - name: generate test cert
       run: |
         (cd ./functional/cert; ./generate_cert.sh)
@@ -364,72 +171,10 @@ jobs:
       run: |
         (cd ./functional/otlp; ./run_test.sh)
     - name: run configuration func test
+      # OTELCPP_WITH_CONFIGURATION is only enabled by the preview cache files
+      if: endsWith(matrix.config.cmake_options, '-preview')
       run: |
         (cd ./functional/configuration; ./run_test.sh)
-
-  cmake_clang_maintainer_async_test:
-    name: CMake clang 18 (maintainer mode, async)
-    runs-on: ubuntu-24.04
-    env:
-      CC: /usr/bin/clang-18
-      CXX: /usr/bin/clang++-18
-      CXX_STANDARD: '17'
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run cmake clang (maintainer mode, async)
-      run: |
-        ./ci/do_ci.sh cmake.maintainer.async.test
-    - name: generate test cert
-      run: |
-        (cd ./functional/cert; ./generate_cert.sh)
-    - name: run func test
-      run: |
-        (cd ./functional/otlp; ./run_test.sh)
-
-  cmake_clang_maintainer_abiv2_test:
-    name: CMake clang 18 (maintainer mode, abiv2)
-    runs-on: ubuntu-24.04
-    env:
-      CC: /usr/bin/clang-18
-      CXX: /usr/bin/clang++-18
-      CXX_STANDARD: '17'
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run cmake clang (maintainer mode, abiv2)
-      run: |
-        ./ci/do_ci.sh cmake.maintainer.abiv2.test
-    - name: generate test cert
-      run: |
-        (cd ./functional/cert; ./generate_cert.sh)
-    - name: run func test
-      run: |
-        (cd ./functional/otlp; ./run_test.sh)
 
   cmake_msvc_maintainer_test:
     name: CMake msvc (maintainer mode)
@@ -491,33 +236,6 @@ jobs:
       env:
         CXX_STANDARD: '20'
       run: ./ci/do_ci.ps1 cmake.maintainer.abiv2.test
-
-  cmake_with_async_export_test:
-    name: CMake test (without otlp-exporter and with async export)
-    runs-on: ubuntu-24.04
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-        sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev
-    - name: run cmake tests (without otlp-exporter)
-      env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
-      run: |
-        ./ci/do_ci.sh cmake.with_async_export.test
 
   cmake_opentracing_shim_test:
     name: CMake test (with opentracing-shim)
@@ -592,105 +310,6 @@ jobs:
         sudo env "CC=$CC" "CXX=$CXX" "CXXFLAGS=$CXXFLAGS -w" "CXX_STANDARD=$CXX_STANDARD" ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file ./install/cmake/third_party_minimum --packages "googletest;benchmark"
     - name: run tests
       run: ./ci/do_ci.sh cmake.cxx_standard.test
-
-  cmake_otprotocol_test:
-    name: CMake test (with otlp-exporter)
-    runs-on: ubuntu-22.04
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run otlp exporter tests
-      run: |
-        ./ci/do_ci.sh cmake.exporter.otprotocol.test
-    - name: generate test cert
-      run: |
-        (cd ./functional/cert; ./generate_cert.sh)
-    - name: run func test
-      run: |
-        (cd ./functional/otlp; ./run_test.sh)
-
-  cmake_modern_protobuf_grpc_with_abseil_test:
-    name: CMake test (with modern protobuf,grpc and abseil)
-    runs-on: ubuntu-24.04
-    env:
-      CXX_STANDARD: '14'
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_stable
-    - name: run otlp exporter tests
-      run: |
-        ./ci/do_ci.sh cmake.exporter.otprotocol.test
-
-  cmake_do_not_install_test:
-    name: CMake do not install test (with otlp-exporter)
-    runs-on: ubuntu-22.04
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run otlp exporter tests
-      run: |
-        ./ci/do_ci.sh cmake.do_not_install.test
-
-  cmake_otprotocol_shared_libs_with_static_grpc_test:
-    name: CMake test (build shared libraries with otlp-exporter and static gRPC)
-    runs-on: ubuntu-22.04
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run otlp exporter tests
-      run: |
-        ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
 
   bazel_test:
     name: Bazel
