@@ -1623,6 +1623,8 @@ public:
 
   ThreadStartFailure(const ThreadStartFailure &)            = delete;
   ThreadStartFailure &operator=(const ThreadStartFailure &) = delete;
+  ThreadStartFailure(ThreadStartFailure &&)                 = delete;
+  ThreadStartFailure &operator=(ThreadStartFailure &&)      = delete;
 };
 
 class ThreadStartFailureHandler : public http_client::EventHandler
