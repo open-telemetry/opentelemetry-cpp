@@ -474,10 +474,10 @@ TEST(PrometheusExporterUtils, CrossSourceScopeCollisionsAndArrayAttributes)
 
 TEST(PrometheusExporterUtils, MultipleScopesMetricFamilyCollisions)
 {
-  Resource resource = Resource::Create(ResourceAttributes{});
-  auto scope1       = InstrumentationScope::Create("scope_1", "1.0.0");
-  auto scope2       = InstrumentationScope::Create("scope_2", "2.0.0");
-  auto scope3       = InstrumentationScope::Create("scope_3", "3.0.0");
+  Resource resource{ResourceAttributes{}};
+  auto scope1 = InstrumentationScope::Create("scope_1", "1.0.0");
+  auto scope2 = InstrumentationScope::Create("scope_2", "2.0.0");
+  auto scope3 = InstrumentationScope::Create("scope_3", "3.0.0");
 
   metric_sdk::SumPointData counter_point_1{};
   counter_point_1.value_        = 10.0;
@@ -532,19 +532,14 @@ TEST(PrometheusExporterUtils, MultipleScopesMetricFamilyCollisions)
       data, /*populate_target_info=*/false, /*without_otel_scope=*/false,
       /*without_units=*/true, /*without_type_suffix=*/true);
 
-  ASSERT_EQ(translated.size(), 1U);
-  EXPECT_EQ(translated[0].name, "http_requests");
-  EXPECT_EQ(translated[0].help, "first description");
-  EXPECT_EQ(translated[0].type, prometheus_client::MetricType::Counter);
-  ASSERT_EQ(translated[0].metric.size(), 2U);
-  EXPECT_DOUBLE_EQ(translated[0].metric[0].counter.value, 10.0);
-  EXPECT_DOUBLE_EQ(translated[0].metric[1].counter.value, 20.0);
+  EXPECT_EQ(SerializeMetrics(translated),
+            ReadTestDataFile("multiple_scopes_metric_family_collisions.txt"));
 }
 
 TEST(PrometheusExporterUtils, TargetInfoMetricFamilyCollision)
 {
-  Resource resource = Resource::Create(ResourceAttributes{{"service.name", "test_service"}});
-  auto scope        = InstrumentationScope::Create("scope_1", "1.0.0");
+  Resource resource{ResourceAttributes{{"service.name", "test_service"}}};
+  auto scope = InstrumentationScope::Create("scope_1", "1.0.0");
 
   metric_sdk::LastValuePointData gauge_point{};
   gauge_point.value_              = 42.0;
@@ -581,23 +576,15 @@ TEST(PrometheusExporterUtils, TargetInfoMetricFamilyCollision)
       data, /*populate_target_info=*/true, /*without_otel_scope=*/false,
       /*without_units=*/false, /*without_type_suffix=*/false);
 
-  ASSERT_EQ(translated.size(), 2U);
-  EXPECT_EQ(translated[0].name, "target");
-  EXPECT_EQ(translated[0].help, "Target metadata");
-  EXPECT_EQ(translated[0].type, prometheus_client::MetricType::Info);
-  ASSERT_EQ(translated[0].metric.size(), 1U);
-
-  EXPECT_EQ(translated[1].name, "http_requests_total");
-  EXPECT_EQ(translated[1].type, prometheus_client::MetricType::Counter);
-  ASSERT_EQ(translated[1].metric.size(), 1U);
-  EXPECT_DOUBLE_EQ(translated[1].metric[0].counter.value, 7.0);
+  EXPECT_EQ(SerializeMetrics(translated),
+            ReadTestDataFile("target_info_metric_family_collision.txt"));
 }
 
 TEST(PrometheusExporterUtils, UnsupportedAggregationDoesNotReserveMetricFamilyName)
 {
-  Resource resource = Resource::Create(ResourceAttributes{});
-  auto scope1       = InstrumentationScope::Create("scope_1", "1.0.0");
-  auto scope2       = InstrumentationScope::Create("scope_2", "2.0.0");
+  Resource resource{ResourceAttributes{}};
+  auto scope1 = InstrumentationScope::Create("scope_1", "1.0.0");
+  auto scope2 = InstrumentationScope::Create("scope_2", "2.0.0");
 
   metric_sdk::Base2ExponentialHistogramPointData exp_histogram_point{};
   exp_histogram_point.count_ = 5;
@@ -637,13 +624,8 @@ TEST(PrometheusExporterUtils, UnsupportedAggregationDoesNotReserveMetricFamilyNa
       data, /*populate_target_info=*/false, /*without_otel_scope=*/false,
       /*without_units=*/false, /*without_type_suffix=*/false);
 
-  ASSERT_EQ(translated.size(), 1U);
-  EXPECT_EQ(translated[0].name, "http_server_duration_seconds");
-  EXPECT_EQ(translated[0].help, "histogram description");
-  EXPECT_EQ(translated[0].type, prometheus_client::MetricType::Histogram);
-  ASSERT_EQ(translated[0].metric.size(), 1U);
-  EXPECT_EQ(translated[0].metric[0].histogram.sample_count, 4U);
-  EXPECT_DOUBLE_EQ(translated[0].metric[0].histogram.sample_sum, 45.0);
+  EXPECT_EQ(SerializeMetrics(translated),
+            ReadTestDataFile("unsupported_aggregation_does_not_reserve_name.txt"));
 }
 
 OPENTELEMETRY_END_NAMESPACE

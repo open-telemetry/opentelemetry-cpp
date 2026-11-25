@@ -1,0 +1,6 @@
+# HELP target Target metadata
+# TYPE target gauge
+target_info{otel_scope_name="scope_1",otel_scope_version="1.0.0",service_name="test_service"} 1
+# HELP http_requests_total requests description
+# TYPE http_requests_total counter
+http_requests_total{env="prod",otel_scope_name="scope_1",otel_scope_version="1.0.0"} 7
