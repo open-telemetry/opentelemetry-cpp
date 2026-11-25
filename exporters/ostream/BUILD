@@ -20,6 +20,8 @@ cc_library(
     strip_include_prefix = "include",
     tags = ["ostream"],
     deps = [
+        "//api",
+        "//sdk:headers",
         "//sdk/src/logs",
     ],
 )
@@ -36,6 +38,8 @@ cc_library(
     tags = ["ostream"],
     deps = [
         ":ostream_log_record_exporter",
+        "//api",
+        "//sdk:headers",
         "//sdk/src/configuration:configuration_core",
     ],
 )
@@ -70,6 +74,8 @@ cc_library(
         "ostream",
     ],
     deps = [
+        "//api",
+        "//sdk:headers",
         "//sdk/src/metrics",
     ],
 )
@@ -89,6 +95,8 @@ cc_library(
     ],
     deps = [
         ":ostream_metric_exporter",
+        "//api",
+        "//sdk:headers",
         "//sdk/src/configuration:configuration_core",
     ],
 )
@@ -120,6 +128,8 @@ cc_library(
     strip_include_prefix = "include",
     tags = ["ostream"],
     deps = [
+        "//api",
+        "//sdk:headers",
         "//sdk/src/trace",
     ],
 )
@@ -136,6 +146,8 @@ cc_library(
     tags = ["ostream"],
     deps = [
         ":ostream_span_exporter",
+        "//api",
+        "//sdk:headers",
         "//sdk/src/configuration:configuration_core",
     ],
 )
