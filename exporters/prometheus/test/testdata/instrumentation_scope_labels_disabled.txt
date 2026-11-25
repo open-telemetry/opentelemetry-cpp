@@ -1,0 +1,3 @@
+# HELP requests_total description
+# TYPE requests_total counter
+requests_total 10

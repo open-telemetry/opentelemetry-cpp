@@ -1,0 +1,6 @@
+# HELP target Target metadata
+# TYPE target gauge
+target_info{otel_scope_foo="resource_foo",service_name="test_service"} 1
+# HELP requests_total description
+# TYPE requests_total counter
+requests_total{otel_scope_name="library_name",otel_scope_version="1.2.0",otel_scope_schema_url="https://opentelemetry.io/schemas/1.21.0",otel_scope_foo="scope_foo"} 5

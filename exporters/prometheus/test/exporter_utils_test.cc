@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <prometheus/client_metric.h>
 #include <prometheus/metric_family.h>
 #include <prometheus/metric_type.h>
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
@@ -472,6 +474,35 @@ TEST(PrometheusExporterUtils, CrossSourceScopeCollisionsAndArrayAttributes)
   EXPECT_EQ(SerializeMetrics(translated), ReadTestDataFile("scope_collisions_and_arrays.txt"));
 }
 
+namespace
+{
+// InstrumentationScope::GetAttributes() returns an unordered_map, so the order of
+// emitted otel_scope_* attribute labels is unspecified across standard library
+// implementations. Sort labels before serializing when asserting on multiple
+// scope attributes.
+std::string SerializeMetricsWithSortedLabels(
+    const std::vector<prometheus_client::MetricFamily> &metrics)
+{
+  auto sorted = metrics;
+  for (auto &family : sorted)
+  {
+    for (auto &metric : family.metric)
+    {
+      std::sort(metric.label.begin(), metric.label.end(),
+                [](const prometheus_client::ClientMetric::Label &a,
+                   const prometheus_client::ClientMetric::Label &b) {
+                  if (a.name != b.name)
+                  {
+                    return a.name < b.name;
+                  }
+                  return a.value < b.value;
+                });
+    }
+  }
+  return SerializeMetrics(sorted);
+}
+}  // namespace
+
 TEST(PrometheusExporterUtils, InstrumentationScopeLabelsAndAttributes)
 {
   auto scope = InstrumentationScope::Create("library_name", "1.2.0",
@@ -488,41 +519,18 @@ TEST(PrometheusExporterUtils, InstrumentationScopeLabelsAndAttributes)
       opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{{{}, sum_point_data}}};
 
-  Resource resource = Resource::Create(ResourceAttributes{});
+  Resource resource{ResourceAttributes{}};
   metric_sdk::ResourceMetrics data{
       &resource, std::vector<metric_sdk::ScopeMetrics>{
                      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
-  ASSERT_EQ(translated.size(), 1U);
-  ASSERT_EQ(translated[0].metric.size(), 1U);
-
-  const auto &labels                                    = translated[0].metric[0].label;
-  std::vector<prometheus::ClientMetric::Label> expected = {
-      {"otel_scope_name", "library_name"},
-      {"otel_scope_version", "1.2.0"},
-      {"otel_scope_schema_url", "https://opentelemetry.io/schemas/1.21.0"},
-      {"otel_scope_scope_attr1", "val1"},
-      {"otel_scope_scope_attr2", "42"}};
-  ASSERT_EQ(labels.size(), expected.size());
-  for (const auto &expected_label : expected)
-  {
-    bool found = false;
-    for (const auto &label : labels)
-    {
-      if (label.name == expected_label.name)
-      {
-        EXPECT_EQ(label.value, expected_label.value);
-        found = true;
-      }
-    }
-    EXPECT_TRUE(found);
-  }
+  EXPECT_EQ(SerializeMetricsWithSortedLabels(translated),
+            ReadTestDataFile("instrumentation_scope_labels_and_attributes.txt"));
 
   auto translated_without_scope = PrometheusExporterUtils::TranslateToPrometheus(data, false, true);
-  ASSERT_EQ(translated_without_scope.size(), 1U);
-  ASSERT_EQ(translated_without_scope[0].metric.size(), 1U);
-  EXPECT_TRUE(translated_without_scope[0].metric[0].label.empty());
+  EXPECT_EQ(SerializeMetrics(translated_without_scope),
+            ReadTestDataFile("instrumentation_scope_labels_disabled.txt"));
 }
 
 TEST(PrometheusExporterUtils, InstrumentationScopeAttributeCollisionsAndReservedConflicts)
@@ -549,37 +557,14 @@ TEST(PrometheusExporterUtils, InstrumentationScopeAttributeCollisionsAndReserved
       opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{{{{"k", "v"}}, sum_point_data}}};
 
-  Resource resource = Resource::Create(ResourceAttributes{});
+  Resource resource{ResourceAttributes{}};
   metric_sdk::ResourceMetrics data{
       &resource, std::vector<metric_sdk::ScopeMetrics>{
                      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
-  ASSERT_EQ(translated.size(), 1U);
-  ASSERT_EQ(translated[0].metric.size(), 1U);
-
-  const auto &labels                                    = translated[0].metric[0].label;
-  std::vector<prometheus::ClientMetric::Label> expected = {
-      {"k", "v"},
-      {"otel_scope_name", "library_name"},
-      {"otel_scope_version", "1.2.0"},
-      {"otel_scope_schema_url", "https://opentelemetry.io/schemas/1.21.0"},
-      {"otel_scope_foo_a", "value1;value4;value2"},
-      {"otel_scope_foo_b", "value3"}};
-  ASSERT_EQ(labels.size(), expected.size());
-  for (const auto &expected_label : expected)
-  {
-    bool found = false;
-    for (const auto &label : labels)
-    {
-      if (label.name == expected_label.name)
-      {
-        EXPECT_EQ(label.value, expected_label.value);
-        found = true;
-      }
-    }
-    EXPECT_TRUE(found);
-  }
+  EXPECT_EQ(SerializeMetricsWithSortedLabels(translated),
+            ReadTestDataFile("instrumentation_scope_attribute_collisions.txt"));
 }
 
 TEST(PrometheusExporterUtils, InstrumentationScopePointAttributeCollisions)
@@ -602,29 +587,14 @@ TEST(PrometheusExporterUtils, InstrumentationScopePointAttributeCollisions)
             {"otel_scope_z", "point_z"}},
            sum_point_data}}};
 
-  Resource resource = Resource::Create(ResourceAttributes{});
+  Resource resource{ResourceAttributes{}};
   metric_sdk::ResourceMetrics data{
       &resource, std::vector<metric_sdk::ScopeMetrics>{
                      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
-  ASSERT_EQ(translated.size(), 1U);
-  ASSERT_EQ(translated[0].metric.size(), 1U);
-
-  const auto &labels                                    = translated[0].metric[0].label;
-  std::vector<prometheus::ClientMetric::Label> expected = {
-      {"otel_scope_foo", "scope_foo;point_foo"},
-      {"otel_scope_schema_url",
-       "https://example.com/point_schema;https://opentelemetry.io/schemas/1.21.0"},
-      {"otel_scope_z", "point_z;scope_z"},
-      {"otel_scope_name", "library_name"},
-      {"otel_scope_version", "1.2.0"}};
-  ASSERT_EQ(labels.size(), expected.size());
-  for (std::size_t i = 0; i < expected.size(); ++i)
-  {
-    EXPECT_EQ(labels[i].name, expected[i].name);
-    EXPECT_EQ(labels[i].value, expected[i].value);
-  }
+  EXPECT_EQ(SerializeMetrics(translated),
+            ReadTestDataFile("instrumentation_scope_point_attribute_collisions.txt"));
 }
 
 TEST(PrometheusExporterUtils, TargetInfoExcludesInstrumentationScopeLabels)
@@ -642,30 +612,15 @@ TEST(PrometheusExporterUtils, TargetInfoExcludesInstrumentationScopeLabels)
       opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{{{}, sum_point_data}}};
 
-  Resource resource = Resource::Create(
-      ResourceAttributes{{"service.name", "test_service"}, {"otel_scope_foo", "resource_foo"}});
+  Resource resource{
+      ResourceAttributes{{"service.name", "test_service"}, {"otel_scope_foo", "resource_foo"}}};
   metric_sdk::ResourceMetrics data{
       &resource, std::vector<metric_sdk::ScopeMetrics>{
                      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, true, false);
-  ASSERT_EQ(translated.size(), 2U);
-  ASSERT_EQ(translated[0].name, "target");
-  ASSERT_EQ(translated[0].metric.size(), 1U);
-
-  std::size_t otel_scope_foo_count = 0;
-  for (const auto &label : translated[0].metric[0].label)
-  {
-    EXPECT_NE(label.name, "otel_scope_name");
-    EXPECT_NE(label.name, "otel_scope_version");
-    EXPECT_NE(label.name, "otel_scope_schema_url");
-    if (label.name == "otel_scope_foo")
-    {
-      EXPECT_EQ(label.value, "resource_foo");
-      ++otel_scope_foo_count;
-    }
-  }
-  EXPECT_EQ(otel_scope_foo_count, 1U);
+  EXPECT_EQ(SerializeMetrics(translated),
+            ReadTestDataFile("target_info_excludes_scope_labels.txt"));
 }
 
 OPENTELEMETRY_END_NAMESPACE
