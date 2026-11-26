@@ -333,3 +333,57 @@ TEST(CircularBufferTest, ConcurrentProducersKeepOrder)
     }
   }
 }
+
+TEST(CircularBufferTest, RejectedAddLeavesSpace)
+{
+  // Producers race for the only slot while the consumer drains the buffer and
+  // then adds an element itself. If that Add fails, the slot must be held by a
+  // producer that is still adding its element, not by one that was rejected.
+  const int num_threads = 3;
+  const int num_rounds  = 1000;
+  CircularBuffer<int> buffer{1};
+  for (int round = 0; round < num_rounds; ++round)
+  {
+    std::atomic<bool> start{false};
+    std::atomic<int> num_done{0};
+    std::vector<std::thread> producers;
+    producers.reserve(num_threads);
+    for (int thread_index = 0; thread_index < num_threads; ++thread_index)
+    {
+      producers.emplace_back([&] {
+        while (!start)
+        {
+          std::this_thread::yield();
+        }
+        std::unique_ptr<int> x{new int{round}};
+        buffer.Add(x);
+        ++num_done;
+      });
+    }
+    start = true;
+    while (num_done < num_threads)
+    {
+      if (!buffer.empty())
+      {
+        buffer.Consume(buffer.size());
+        continue;
+      }
+      const uint64_t num_consumed = buffer.consumption_count();
+      std::unique_ptr<int> x{new int{-1}};
+      if (buffer.Add(x))
+      {
+        continue;
+      }
+      while (buffer.production_count() == num_consumed && num_done < num_threads)
+      {
+        std::this_thread::yield();
+      }
+      EXPECT_GT(buffer.production_count(), num_consumed) << "round " << round;
+    }
+    for (auto &producer : producers)
+    {
+      producer.join();
+    }
+    buffer.Clear();
+  }
+}

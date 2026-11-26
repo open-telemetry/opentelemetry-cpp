@@ -16,8 +16,8 @@ Increment the:
 ## [Unreleased]
 
 * [SDK] `CircularBuffer::Add`, the queue of the batch span and log record
-  processors, now claims a slot with fetch-and-add instead of retrying a
-  compare-and-swap
+  processors, now claims a slot before it stores the element, so producers no
+  longer wait for a producer that was descheduled in the middle of `Add`.
   [#4795](https://github.com/open-telemetry/opentelemetry-cpp/pull/4795)
 
 * [SDK] Keep +Inf, -Inf and NaN out of the base2 exponential histogram's

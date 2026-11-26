@@ -26,10 +26,10 @@ namespace common
  * A lock-free circular buffer that supports multiple concurrent producers
  * and a single consumer.
  *
- * Add() never retries: a producer reserves space with a fetch-and-add on
- * count_, then claims a slot with a fetch-and-add on head_, then stores its
- * element into the slot. The consumer gives space back only after it has
- * emptied the consumed slots, so a claimed slot is always empty.
+ * A producer claims a slot with a compare-and-swap on head_, which never
+ * gets more than max_size() ahead of tail_, then stores its element into the
+ * slot. The consumer advances tail_ only after it has emptied the consumed
+ * slots, so a claimed slot is always empty.
  */
 template <class T>
 class CircularBuffer
@@ -66,9 +66,8 @@ public:
     auto range = WaitForElements(PeekImpl().Take(n));
     static_assert(noexcept(callback(range)), "callback not allowed to throw");
     callback(range);
-    tail_ += n;
     // The callback has emptied the slots, so producers may now reuse them.
-    count_.fetch_sub(n, std::memory_order_release);
+    tail_ += n;
   }
 
   /**
@@ -100,24 +99,26 @@ public:
       return false;
     }
 
-    // Check for a full buffer with a plain load first, so that producers do
-    // not keep writing to count_ while the buffer stays full.
-    if (count_.load(std::memory_order_relaxed) >= capacity_ - 1)
+    // Claim a slot if the buffer is not full. A rejected Add changes nothing.
+    uint64_t head = head_.load();
+    for (;;)
     {
-      return false;
+      const uint64_t tail = tail_.load();
+      if (head < tail)
+      {
+        // The consumer has moved past our snapshot of head_.
+        head = head_.load();
+        continue;
+      }
+      if (head - tail >= capacity_ - 1)
+      {
+        return false;
+      }
+      if (head_.compare_exchange_strong(head, head + 1))
+      {
+        break;
+      }
     }
-
-    // Reserve space. If the buffer filled up in the meantime, undo the
-    // reservation. While an undone reservation is in flight, a concurrent Add
-    // on a nearly full buffer can fail as well.
-    if (count_.fetch_add(1, std::memory_order_acquire) >= capacity_ - 1)
-    {
-      count_.fetch_sub(1, std::memory_order_relaxed);
-      return false;
-    }
-
-    // Claim a slot. The reservation guarantees that the consumer has emptied it.
-    uint64_t head = head_.fetch_add(1, std::memory_order_acq_rel);
     data_[head % capacity_].Swap(ptr);
 
     // ptr now holds the previous value of the slot, which is null as long as
@@ -176,8 +177,6 @@ public:
 private:
   std::unique_ptr<AtomicUniquePtr<T>[]> data_;
   size_t capacity_;
-  // Space reserved by producers and not yet given back by the consumer.
-  std::atomic<uint64_t> count_{0};
   // Slots claimed by producers. A claimed slot may not be filled yet.
   std::atomic<uint64_t> head_{0};
   std::atomic<uint64_t> tail_{0};
@@ -185,7 +184,7 @@ private:
   /**
    * A producer stores its element only after it has claimed a slot, so wait
    * for the producers that have claimed a slot in the range but not stored
-   * into it yet. They only need to finish Add(), which never waits.
+   * into it yet. The rest of their Add() never waits or retries.
    */
   static CircularBufferRange<AtomicUniquePtr<T>> WaitForElements(
       const CircularBufferRange<AtomicUniquePtr<T>> &range) noexcept
