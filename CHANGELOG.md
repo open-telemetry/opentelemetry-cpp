@@ -20,6 +20,10 @@ Increment the:
   contributions, and bound per-reader monotonic counter baseline storage by
   the configured cardinality limit.
   [#4484](https://github.com/open-telemetry/opentelemetry-cpp/pull/4484)
+* [BAZEL] Add direct `//api` and `//sdk:headers` deps to the ostream exporter
+  libraries so they build with clang's `layering_check` feature
+  [#4809](https://github.com/open-telemetry/opentelemetry-cpp/pull/4809)
+
 * [SDK] Keep +Inf, -Inf and NaN out of the base2 exponential histogram's
   count, sum, min and max, which they otherwise turn into `inf` or `nan`
 
