@@ -15,6 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [BAZEL] Add direct `//api` and `//sdk:headers` deps to the ostream exporter
+  libraries so they build with clang's `layering_check` feature
+  [#4809](https://github.com/open-telemetry/opentelemetry-cpp/pull/4809)
+
+* [SDK] Keep +Inf, -Inf and NaN out of the base2 exponential histogram's
+  count, sum, min and max, which they otherwise turn into `inf` or `nan`
+
+* [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
+  measurements, so they no longer reach the histogram aggregations
+
 * [BUILD] Link `libatomic` on platforms that need it for 64-bit `std::atomic`
   (32-bit powerpc and mips with GCC), so the curl HTTP client, the OTLP gRPC
   client, and the trace, logs, and metrics libraries link successfully.
