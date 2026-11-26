@@ -479,14 +479,10 @@ TEST_F(BatchSpanProcessorTestPeer, TestMaxExportBatchSizeClampedToMaxQueueSize)
   const int num_spans = 8;
 
   const auto test_spans = GetTestSpans(batch_processor, num_spans);
-  for (int i = 0; i < num_spans - 1; ++i)
+  for (int i = 0; i < num_spans; ++i)
   {
     batch_processor->OnEnd(std::move(test_spans->at(i)));
   }
-
-  // Let the worker re-wait first, so the notify from the batch-filling span is not lost.
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  batch_processor->OnEnd(std::move(test_spans->at(num_spans - 1)));
 
   // Well before schedule_delay_millis, so only a full batch can trigger the export.
   const auto wait_start = std::chrono::steady_clock::now();
@@ -495,7 +491,11 @@ TEST_F(BatchSpanProcessorTestPeer, TestMaxExportBatchSizeClampedToMaxQueueSize)
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
+  const auto spans_exported_before_delay = spans_received_count->load();
 
+  EXPECT_TRUE(batch_processor->Shutdown());
+
+  EXPECT_EQ(static_cast<std::size_t>(num_spans), spans_exported_before_delay);
   EXPECT_EQ(std::vector<std::size_t>({options.max_queue_size}), *batch_sizes);
 }
 

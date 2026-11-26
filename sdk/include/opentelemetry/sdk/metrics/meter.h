@@ -36,6 +36,7 @@ namespace metrics
 
 class MetricStorage;
 class SyncWritableMetricStorage;
+class SyncMultiMetricStorage;
 class AsyncWritableMetricsStorge;
 class ObservableRegistry;
 
@@ -169,8 +170,13 @@ private:
   std::shared_ptr<ObservableRegistry> observable_registry_;
   // Shared with this meter's instruments so updates reach them; atomic so recording never blocks.
   std::shared_ptr<MeterEnabledState> meter_enabled_state_{new MeterEnabledState()};
-  std::unique_ptr<SyncWritableMetricStorage> RegisterSyncMetricStorage(
+  // Shared with instruments whose matching views all use the Drop aggregation. Never enabled.
+  std::shared_ptr<MeterEnabledState> always_disabled_state_{new MeterEnabledState(false)};
+  std::unique_ptr<SyncMultiMetricStorage> RegisterSyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
+  /** Returns the enabled state an instrument with this storage should share. */
+  std::shared_ptr<MeterEnabledState> GetInstrumentEnabledState(
+      const SyncMultiMetricStorage *storage) const noexcept;
   std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   std::mutex storage_lock_;

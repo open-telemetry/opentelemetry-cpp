@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -8,6 +9,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <ostream>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -17,6 +19,7 @@
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h"
@@ -36,6 +39,24 @@ namespace sdk
 {
 namespace logs
 {
+namespace
+{
+
+size_t ClampMaxExportBatchSize(size_t max_export_batch_size, size_t max_queue_size)
+{
+  // Clamping to a queue of 0 would give a batch of 0, which makes the worker spin.
+  if (max_queue_size > 0 && max_export_batch_size > max_queue_size)
+  {
+    OTEL_INTERNAL_LOG_WARN("[BatchLogRecordProcessor] max_export_batch_size ("
+                           << max_export_batch_size << ") is larger than max_queue_size ("
+                           << max_queue_size << "), using " << max_queue_size << ".");
+    return max_queue_size;
+  }
+  return max_export_batch_size;
+}
+
+}  // namespace
+
 BatchLogRecordProcessor::BatchLogRecordProcessor(
     std::unique_ptr<LogRecordExporter> &&exporter,
     const size_t max_queue_size,
@@ -44,7 +65,7 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(
     : exporter_(std::move(exporter)),
       max_queue_size_(max_queue_size),
       scheduled_delay_millis_(scheduled_delay_millis),
-      max_export_batch_size_(max_export_batch_size),
+      max_export_batch_size_(ClampMaxExportBatchSize(max_export_batch_size, max_queue_size)),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_instrumentation_(nullptr),
@@ -59,7 +80,8 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExport
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
-      max_export_batch_size_(options.max_export_batch_size),
+      max_export_batch_size_(
+          ClampMaxExportBatchSize(options.max_export_batch_size, options.max_queue_size)),
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_instrumentation_(nullptr),
@@ -76,7 +98,8 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
-      max_export_batch_size_(options.max_export_batch_size),
+      max_export_batch_size_(
+          ClampMaxExportBatchSize(options.max_export_batch_size, options.max_queue_size)),
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_instrumentation_(runtime_options.thread_instrumentation),
@@ -214,7 +237,7 @@ void BatchLogRecordProcessor::DoBackgroundWork()
           return true;
         }
 
-        return !buffer_.empty();
+        return buffer_.size() >= max_export_batch_size_;
       });
       synchronization_data_->is_force_wakeup_background_worker.store(false,
                                                                      std::memory_order_release);
@@ -259,28 +282,24 @@ void BatchLogRecordProcessor::Export()
   }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
-  do
+  std::uint64_t notify_force_flush =
+      synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire);
+  bool should_drain =
+      notify_force_flush >
+          synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire) ||
+      synchronization_data_->is_shutdown.load(std::memory_order_acquire);
+
+  // Snapshot the number of records to export once, before exporting anything.
+  // On a regular wakeup at most one full batch is exported; ForceFlush() and
+  // Shutdown() drain everything that is buffered at this point.
+  size_t remaining =
+      should_drain ? buffer_.size() : std::min(buffer_.size(), max_export_batch_size_);
+
+  while (remaining > 0)
   {
+    size_t num_records_to_export = std::min(remaining, max_export_batch_size_);
+
     std::vector<std::unique_ptr<Recordable>> records_arr;
-    size_t num_records_to_export{};
-    std::uint64_t notify_force_flush =
-        synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire);
-    if (notify_force_flush)
-    {
-      num_records_to_export = buffer_.size();
-    }
-    else
-    {
-      num_records_to_export =
-          buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
-    }
-
-    if (num_records_to_export == 0)
-    {
-      NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
-      break;
-    }
-
     // Reserve space for the number of records
     records_arr.reserve(num_records_to_export);
     buffer_.Consume(num_records_to_export,
@@ -295,8 +314,10 @@ void BatchLogRecordProcessor::Export()
 
     exporter_->Export(
         nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
-    NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
-  } while (true);
+    remaining -= num_records_to_export;
+  }
+
+  NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
