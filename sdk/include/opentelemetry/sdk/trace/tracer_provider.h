@@ -117,6 +117,9 @@ public:
    * Update the TracerConfigurator for this provider, recreate and propagate the resulting
    * TracerConfig to all existing Tracers while new Tracers will use the updated configuration.
    *
+   * If updating a Tracer's configuration fails, it keeps its previous configuration;
+   * the new configurator remains installed and updates continue for the other Tracers.
+   *
    * @param tracer_configurator The new configurator.
    *
    * @note Calling the TracerProvider::GetTracer from within

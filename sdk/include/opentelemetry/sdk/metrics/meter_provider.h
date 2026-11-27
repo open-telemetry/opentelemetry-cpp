@@ -134,6 +134,9 @@ public:
    * Update the MeterConfigurator for this provider, recreate and propagate the resulting
    * MeterConfig to all existing Meters while new Meters will use the updated configuration.
    *
+   * If updating a Meter's configuration fails, it keeps its previous configuration;
+   * the new configurator remains installed and updates continue for the other Meters.
+   *
    * @param meter_configurator The new configurator.
    *
    * @note Calling MeterProvider::GetMeter from within the
