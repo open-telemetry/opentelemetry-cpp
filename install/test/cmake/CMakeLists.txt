@@ -11,6 +11,13 @@ endif()
 
 separate_arguments(INSTALL_TEST_CMAKE_OPTIONS)
 
+# Multi-config generators (Visual Studio) otherwise build the Debug config
+get_property(_install_test_multi_config GLOBAL
+             PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(_install_test_multi_config)
+  set(INSTALL_TEST_BUILD_CONFIG_ARGS --config $<CONFIG>)
+endif()
+
 message(
   STATUS "INSTALL_TEST_CMAKE_OPTIONS is set to ${INSTALL_TEST_CMAKE_OPTIONS}")
 
@@ -81,9 +88,10 @@ add_test(
     "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}")
 
 # Build the full package test executable
-add_test(NAME full-package-build-test
-         COMMAND ${CMAKE_COMMAND} --build
-                 ${CMAKE_BINARY_DIR}/build-full-package-test --parallel)
+add_test(
+  NAME full-package-build-test
+  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/build-full-package-test
+          --parallel ${INSTALL_TEST_BUILD_CONFIG_ARGS})
 
 # Run the full package test executable
 add_test(NAME full-package-run-test
@@ -110,9 +118,10 @@ if(OTEL_ENABLE_PKGCONFIG_INSTALL_TEST)
     pkgconfig-test-config-test
     PROPERTIES ENVIRONMENT "PKG_CONFIG_PATH=${CMAKE_PREFIX_PATH}/lib/pkgconfig")
 
-  add_test(NAME pkgconfig-test-build-test
-           COMMAND ${CMAKE_COMMAND} --build
-                   ${CMAKE_BINARY_DIR}/build-pkgconfig-test --parallel)
+  add_test(
+    NAME pkgconfig-test-build-test
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/build-pkgconfig-test
+            --parallel ${INSTALL_TEST_BUILD_CONFIG_ARGS})
 
   add_test(NAME pkgconfig-test-run-test
            COMMAND ${CMAKE_BINARY_DIR}/build-pkgconfig-test/full_pkgconfig_test)
@@ -132,9 +141,11 @@ foreach(component ${INSTALL_TEST_COMPONENTS})
       "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}")
 
   # Build the component test executable
-  add_test(NAME component-${component}-build-test
-           COMMAND ${CMAKE_COMMAND} --build
-                   ${CMAKE_BINARY_DIR}/build-${component}-test --parallel)
+  add_test(
+    NAME component-${component}-build-test
+    COMMAND
+      ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/build-${component}-test
+      --parallel ${INSTALL_TEST_BUILD_CONFIG_ARGS})
 
   # Run the component test executable
   add_test(
@@ -157,7 +168,7 @@ add_test(
 # Build the examples with the installed package
 add_test(NAME examples-build-test
          COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/examples-test
-                 --parallel)
+                 --parallel ${INSTALL_TEST_BUILD_CONFIG_ARGS})
 
 # Run the examples
 add_test(NAME examples-run-test
