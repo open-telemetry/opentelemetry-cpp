@@ -1,0 +1,7 @@
+# HELP http_server_duration_seconds histogram description
+# TYPE http_server_duration_seconds histogram
+http_server_duration_seconds_count{env="prod",otel_scope_name="scope_2",otel_scope_version="2.0.0"} 4
+http_server_duration_seconds_sum{env="prod",otel_scope_name="scope_2",otel_scope_version="2.0.0"} 45
+http_server_duration_seconds_bucket{env="prod",otel_scope_name="scope_2",otel_scope_version="2.0.0",le="10"} 1
+http_server_duration_seconds_bucket{env="prod",otel_scope_name="scope_2",otel_scope_version="2.0.0",le="20"} 3
+http_server_duration_seconds_bucket{env="prod",otel_scope_name="scope_2",otel_scope_version="2.0.0",le="+Inf"} 4
