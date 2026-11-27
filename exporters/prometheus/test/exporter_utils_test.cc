@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <prometheus/client_metric.h>
 #include <prometheus/metric_family.h>
 #include <prometheus/metric_type.h>
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
@@ -470,6 +472,155 @@ TEST(PrometheusExporterUtils, CrossSourceScopeCollisionsAndArrayAttributes)
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
   EXPECT_EQ(SerializeMetrics(translated), ReadTestDataFile("scope_collisions_and_arrays.txt"));
+}
+
+namespace
+{
+// InstrumentationScope::GetAttributes() returns an unordered_map, so the order of
+// emitted otel_scope_* attribute labels is unspecified across standard library
+// implementations. Sort labels before serializing when asserting on multiple
+// scope attributes.
+std::string SerializeMetricsWithSortedLabels(
+    const std::vector<prometheus_client::MetricFamily> &metrics)
+{
+  auto sorted = metrics;
+  for (auto &family : sorted)
+  {
+    for (auto &metric : family.metric)
+    {
+      std::sort(metric.label.begin(), metric.label.end(),
+                [](const prometheus_client::ClientMetric::Label &a,
+                   const prometheus_client::ClientMetric::Label &b) {
+                  if (a.name != b.name)
+                  {
+                    return a.name < b.name;
+                  }
+                  return a.value < b.value;
+                });
+    }
+  }
+  return SerializeMetrics(sorted);
+}
+}  // namespace
+
+TEST(PrometheusExporterUtils, InstrumentationScopeLabelsAndAttributes)
+{
+  auto scope = InstrumentationScope::Create("library_name", "1.2.0",
+                                            "https://opentelemetry.io/schemas/1.21.0",
+                                            {{"scope.attr1", "val1"}, {"scope.attr2", 42}});
+
+  metric_sdk::SumPointData sum_point_data{};
+  sum_point_data.value_ = 10.0;
+  metric_sdk::MetricData metric_data{
+      metric_sdk::InstrumentDescriptor{"requests", "description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{}, sum_point_data}}};
+
+  Resource resource{ResourceAttributes{}};
+  metric_sdk::ResourceMetrics data{
+      &resource, std::vector<metric_sdk::ScopeMetrics>{
+                     {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
+  EXPECT_EQ(SerializeMetricsWithSortedLabels(translated),
+            ReadTestDataFile("instrumentation_scope_labels_and_attributes.txt"));
+
+  auto translated_without_scope = PrometheusExporterUtils::TranslateToPrometheus(data, false, true);
+  EXPECT_EQ(SerializeMetrics(translated_without_scope),
+            ReadTestDataFile("instrumentation_scope_labels_disabled.txt"));
+}
+
+TEST(PrometheusExporterUtils, InstrumentationScopeAttributeCollisionsAndReservedConflicts)
+{
+  auto scope = InstrumentationScope::Create("library_name", "1.2.0",
+                                            "https://opentelemetry.io/schemas/1.21.0",
+                                            {{"name", "ignored_name"},
+                                             {"_name", "ignored_leading_underscore_name"},
+                                             {"version", "ignored_version"},
+                                             {"schema_url", "ignored_schema_url"},
+                                             {"schema.url", "ignored_schema_dot_url"},
+                                             {"foo.a", "value1"},
+                                             {"foo_a", "value2"},
+                                             {"foo.b", "value3"},
+                                             {"foo__a", "value4"}});
+
+  metric_sdk::SumPointData sum_point_data{};
+  sum_point_data.value_ = 5.0;
+  metric_sdk::MetricData metric_data{
+      metric_sdk::InstrumentDescriptor{"requests", "description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{{"k", "v"}}, sum_point_data}}};
+
+  Resource resource{ResourceAttributes{}};
+  metric_sdk::ResourceMetrics data{
+      &resource, std::vector<metric_sdk::ScopeMetrics>{
+                     {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
+  EXPECT_EQ(SerializeMetricsWithSortedLabels(translated),
+            ReadTestDataFile("instrumentation_scope_attribute_collisions.txt"));
+}
+
+TEST(PrometheusExporterUtils, InstrumentationScopePointAttributeCollisions)
+{
+  auto scope = InstrumentationScope::Create("library_name", "1.2.0",
+                                            "https://opentelemetry.io/schemas/1.21.0",
+                                            {{"foo", "scope_foo"}, {"z", "scope_z"}});
+
+  metric_sdk::SumPointData sum_point_data{};
+  sum_point_data.value_ = 5.0;
+  metric_sdk::MetricData metric_data{
+      metric_sdk::InstrumentDescriptor{"requests", "description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{
+          {{{"otel_scope_foo", "point_foo"},
+            {"otel_scope_schema_url", "https://example.com/point_schema"},
+            {"otel_scope_z", "point_z"}},
+           sum_point_data}}};
+
+  Resource resource{ResourceAttributes{}};
+  metric_sdk::ResourceMetrics data{
+      &resource, std::vector<metric_sdk::ScopeMetrics>{
+                     {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
+  EXPECT_EQ(SerializeMetrics(translated),
+            ReadTestDataFile("instrumentation_scope_point_attribute_collisions.txt"));
+}
+
+TEST(PrometheusExporterUtils, TargetInfoExcludesInstrumentationScopeLabels)
+{
+  auto scope = InstrumentationScope::Create(
+      "library_name", "1.2.0", "https://opentelemetry.io/schemas/1.21.0", {{"foo", "scope_foo"}});
+
+  metric_sdk::SumPointData sum_point_data{};
+  sum_point_data.value_ = 5.0;
+  metric_sdk::MetricData metric_data{
+      metric_sdk::InstrumentDescriptor{"requests", "description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{}, sum_point_data}}};
+
+  Resource resource{
+      ResourceAttributes{{"service.name", "test_service"}, {"otel_scope_foo", "resource_foo"}}};
+  metric_sdk::ResourceMetrics data{
+      &resource, std::vector<metric_sdk::ScopeMetrics>{
+                     {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, true, false);
+  EXPECT_EQ(SerializeMetrics(translated),
+            ReadTestDataFile("target_info_excludes_scope_labels.txt"));
 }
 
 OPENTELEMETRY_END_NAMESPACE

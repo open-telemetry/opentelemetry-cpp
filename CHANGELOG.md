@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Prometheus exporter: export instrumentation scope schema URL and
+  attributes as labels
+  [#4735](https://github.com/open-telemetry/opentelemetry-cpp/pull/4735)
+
 * [BAZEL] Add direct `//api` and `//sdk:headers` deps to the ostream exporter
   libraries so they build with clang's `layering_check` feature
   [#4809](https://github.com/open-telemetry/opentelemetry-cpp/pull/4809)
