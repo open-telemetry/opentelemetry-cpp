@@ -22,6 +22,10 @@ cc_test(
     srcs = [
         "curl_http_test.cc",
     ],
+    linkopts = select({
+        "//bazel:windows": [],
+        "//conditions:default": ["-ldl"],
+    }),
     tags = ["test"],
     deps = [
         "//ext:headers",

@@ -632,7 +632,10 @@ void HttpOperation::Cleanup()
       async_data_->result_promise.set_value(last_curl_result_);
     }
 
-    return;
+    if (session != nullptr)
+    {
+      return;
+    }
   }
 
   // Sync mode
@@ -1553,7 +1556,18 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   }
   async_data_->callback = std::move(callback);
 
-  session->GetHttpClient().ScheduleAddSession(session->GetSessionId());
+  if (!session->GetHttpClient().ScheduleAddSession(session->GetSessionId()))
+  {
+    // No background thread holds the request, so release it before the handler hears of it.
+    async_data_->session.store(nullptr, std::memory_order_release);
+    async_data_->callback = nullptr;
+    last_curl_result_     = CURLE_FAILED_INIT;
+    session_state_        = opentelemetry::ext::http::client::SessionState::ConnectFailed;
+    Cleanup();
+    DispatchEvent(opentelemetry::ext::http::client::SessionState::ConnectFailed,
+                  GetCurlErrorMessage(last_curl_result_));
+    return last_curl_result_;
+  }
   return CURLE_OK;
 }
 

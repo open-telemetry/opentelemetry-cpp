@@ -366,7 +366,8 @@ public:
   // return true if create background thread, false is already exist background thread
   bool MaybeSpawnBackgroundThread();
 
-  void ScheduleAddSession(uint64_t session_id);
+  // Returns false, leaving the session unqueued, when no background thread could be started.
+  bool ScheduleAddSession(uint64_t session_id);
   void ScheduleAbortSession(uint64_t session_id);
   void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
 
@@ -377,6 +378,7 @@ public:
 private:
   friend class HttpClientTestPeer;
 
+  bool spawnBackgroundThread();
   void wakeupBackgroundThread();
   bool doAddSessions();
   bool doAbortSessions();

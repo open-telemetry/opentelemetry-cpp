@@ -7,7 +7,7 @@ if(OTELCPP_WITH_HTTP_CLIENT_CURL)
   target_link_libraries(
     ${FILENAME}
     PRIVATE ${GMOCK_LIB} ${GTEST_BOTH_LIBRARIES} opentelemetry_http_client_curl
-            opentelemetry_common CURL::libcurl)
+            opentelemetry_common CURL::libcurl ${CMAKE_DL_LIBS})
   if(WIN32)
     target_link_libraries(${FILENAME} PRIVATE ws2_32)
   endif()

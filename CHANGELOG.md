@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Fail the request instead of calling `std::terminate` when the curl
+  HTTP client cannot create its background thread
+  [#4799](https://github.com/open-telemetry/opentelemetry-cpp/pull/4799)
+
 * [BAZEL] Add direct `//api` and `//sdk:headers` deps to the ostream exporter
   libraries so they build with clang's `layering_check` feature
   [#4809](https://github.com/open-telemetry/opentelemetry-cpp/pull/4809)
