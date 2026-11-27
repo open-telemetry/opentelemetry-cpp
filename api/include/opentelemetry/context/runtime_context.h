@@ -14,6 +14,11 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include <exception>
+#  include <new>
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
@@ -106,8 +111,12 @@ public:
   // Return the current context.
   static Context GetCurrent() noexcept { return GetRuntimeContextStorage()->GetCurrent(); }
 
-  // Sets the current 'Context' object. Returns a token
-  // that can be used to reset to the previous Context.
+  /**
+   * Sets the current Context.
+   * @param context The Context to attach.
+   * @return A token to restore the previous Context. With the default storage,
+   * an active token must be detached or destroyed on the thread that called Attach.
+   */
   static nostd::unique_ptr<Token> Attach(const Context &context) noexcept
   {
     return GetRuntimeContextStorage()->Attach(context);
@@ -220,7 +229,11 @@ public:
   bool Detach(Token &token) noexcept override
   {
     // In most cases, the context to be detached is on the top of the stack.
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    if (&token == GetStack().TopToken())
+#else
     if (token == GetStack().Top())
+#endif
     {
       GetStack().Pop();
       return true;
@@ -231,7 +244,11 @@ public:
       return false;
     }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    while (&token != GetStack().TopToken())
+#else
     while (!(token == GetStack().Top()))
+#endif
     {
       GetStack().Pop();
     }
@@ -245,8 +262,14 @@ public:
   // that can be used to reset to the previous Context.
   nostd::unique_ptr<Token> Attach(const Context &context) noexcept override
   {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    auto token = CreateToken(context);
+    GetStack().Push(context, token.get());
+    return token;
+#else
     GetStack().Push(context);
     return CreateToken(context);
+#endif
   }
 
 private:
@@ -254,6 +277,24 @@ private:
   class Stack
   {
     friend class ThreadLocalContextStorage;
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    // Tokens cannot move and detach on destruction. Their addresses identify
+    // attachments without owning or dereferencing the tokens.
+    struct Frame
+    {
+      Context context;
+      const Token *token = nullptr;
+    };
+
+    // Beyond max_capacity_, contexts are not recorded, but tokens must still
+    // be tracked so repeated and out-of-order detaches remain safe.
+    struct OverflowToken
+    {
+      const Token *token;
+      OverflowToken *previous;
+    };
+#endif
 
     /**
      * Limit the max stack depth.
@@ -290,6 +331,11 @@ private:
       }
       if (size_ > max_capacity_)
       {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+        auto *top = overflow_;
+        overflow_ = top->previous;
+        delete top;
+#endif
         size_ -= 1;
         return;
       }
@@ -297,12 +343,32 @@ private:
       // the shared_ptr object (if stored in prev context object ) are released.
       // The stack is not resized, and the unused memory would be reutilised
       // for subsequent context storage.
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+      base_[size_ - 1] = Frame{};
+#else
       base_[size_ - 1] = Context();
+#endif
       size_ -= 1;
     }
 
     bool Contains(const Token &token) const noexcept
     {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+      for (auto *entry = overflow_; entry != nullptr; entry = entry->previous)
+      {
+        if (entry->token == &token)
+        {
+          return true;
+        }
+      }
+      for (size_t pos = size_ < max_capacity_ ? size_ : max_capacity_; pos > 0; --pos)
+      {
+        if (base_[pos - 1].token == &token)
+        {
+          return true;
+        }
+      }
+#else
       for (size_t pos = size_; pos > 0; --pos)
       {
         if (token == base_[pos - 1])
@@ -310,6 +376,7 @@ private:
           return true;
         }
       }
+#endif
 
       return false;
     }
@@ -325,23 +392,60 @@ private:
       {
         return Context();
       }
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+      return base_[size_ - 1].context;
+#else
       return base_[size_ - 1];
+#endif
     }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    const Token *TopToken() const noexcept
+    {
+      if (size_ == 0)
+      {
+        return nullptr;
+      }
+      if (size_ > max_capacity_)
+      {
+        return overflow_->token;
+      }
+      return base_[size_ - 1].token;
+    }
+#endif
 
     // Pushes the passed in context pointer to the top of the stack
     // and resizes if necessary.
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    void Push(const Context &context, const Token *token) noexcept
+#else
     void Push(const Context &context) noexcept
+#endif
     {
       size_++;
       if (size_ > max_capacity_)
       {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+        auto *entry = new (std::nothrow) OverflowToken{token, overflow_};
+        if (entry == nullptr)
+        {
+          // Preserve the allocation-failure behavior of this noexcept API.
+          std::terminate();
+        }
+        overflow_ = entry;
+#endif
         return;
       }
       if (size_ > capacity_)
       {
         Resize(size_ * 2);
       }
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+      base_[size_ - 1].context = context;
+      base_[size_ - 1].token   = token;
+#else
       base_[size_ - 1] = context;
+#endif
     }
 
     // Reallocates the storage array to the pass in new capacity size.
@@ -358,7 +462,16 @@ private:
         // Last increase
         new_capacity = max_capacity_;
       }
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+      Frame *temp = new (std::nothrow) Frame[new_capacity];
+      if (temp == nullptr)
+      {
+        // Preserve the allocation-failure behavior of this noexcept API.
+        std::terminate();
+      }
+#else
       Context *temp = new Context[new_capacity];
+#endif
       if (base_ != nullptr)
       {
         // vs2015 does not like this construct considering it unsafe:
@@ -375,11 +488,25 @@ private:
       capacity_ = new_capacity;
     }
 
-    ~Stack() noexcept { delete[] base_; }
+    ~Stack() noexcept
+    {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+      while (size_ > max_capacity_)
+      {
+        Pop();
+      }
+#endif
+      delete[] base_;
+    }
 
     size_t size_{};
     size_t capacity_{};
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    Frame *base_{nullptr};
+    OverflowToken *overflow_{nullptr};
+#else
     Context *base_{nullptr};
+#endif
   };
 
   OPENTELEMETRY_API_SINGLETON Stack &GetStack()
