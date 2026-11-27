@@ -75,6 +75,11 @@ auto exporter = std::make_unique<otlp::OtlpFileExporter>(options);
 |`metadata`                        |`OTEL_EXPORTER_OTLP_HEADERS`                  |                       | Custom metadata for GRPC             |
 |                                  |`OTEL_EXPORTER_OTLP_TRACES_HEADERS`           |                       |                                      |
 
+On Linux, the OTLP gRPC exporter supports VSOCK endpoints with gRPC 1.57.0 or
+later. Set `vsock://<cid>:<port>` as the endpoint; the exporter converts it
+to the `vsock:<cid>:<port>` target format expected by gRPC. A raw
+`vsock:<cid>:<port>` target is also accepted.
+
 ### Configuration options ( OTLP HTTP Exporter )
 
 | Option             | Env Variable                       | Default                         | Description                                                       |

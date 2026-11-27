@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [OTLP/gRPC] Support VSOCK endpoints on Linux
+  [#4706](https://github.com/open-telemetry/opentelemetry-cpp/issues/4706)
+
 * [BAZEL] Add direct `//api` and `//sdk:headers` deps to the ostream exporter
   libraries so they build with clang's `layering_check` feature
   [#4809](https://github.com/open-telemetry/opentelemetry-cpp/pull/4809)
