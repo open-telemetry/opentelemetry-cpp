@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] `CircularBuffer::Add`, the queue of the batch span and log record
+  processors, now claims a slot before it stores the element, so producers no
+  longer wait for a producer that was descheduled in the middle of `Add`.
+  [#4795](https://github.com/open-telemetry/opentelemetry-cpp/pull/4795)
+
 * [BAZEL] Add direct `//api` and `//sdk:headers` deps to the ostream exporter
   libraries so they build with clang's `layering_check` feature
   [#4809](https://github.com/open-telemetry/opentelemetry-cpp/pull/4809)

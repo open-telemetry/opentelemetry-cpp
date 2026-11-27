@@ -174,3 +174,216 @@ TEST(CircularBufferTest, Simulation)
     EXPECT_EQ(producer_numbers, consumer_numbers);
   }
 }
+
+TEST(CircularBufferTest, WrapAround)
+{
+  CircularBuffer<uint64_t> buffer{7};
+  uint64_t next_added    = 0;
+  uint64_t next_consumed = 0;
+  for (int lap = 0; lap < 100; ++lap)
+  {
+    // Add 1 to 7 elements; the ones that do not fit must be rejected.
+    const size_t space = buffer.max_size() - buffer.size();
+    for (size_t i = 0; i <= static_cast<size_t>(lap % 7); ++i)
+    {
+      std::unique_ptr<uint64_t> x{new uint64_t{next_added}};
+      const bool added = buffer.Add(x);
+      EXPECT_EQ(added, i < space);
+      if (added)
+      {
+        ++next_added;
+      }
+      else
+      {
+        EXPECT_NE(x, nullptr);
+      }
+    }
+    EXPECT_EQ(buffer.size(), next_added - next_consumed);
+    EXPECT_EQ(buffer.production_count(), next_added);
+
+    // Leave one element behind on odd laps so the tail moves around the buffer.
+    const size_t num_consumed = buffer.size() - static_cast<size_t>(lap % 2);
+    buffer.Consume(num_consumed,
+                   [&](CircularBufferRange<AtomicUniquePtr<uint64_t>> range) noexcept {
+                     EXPECT_EQ(range.size(), num_consumed);
+                     range.ForEach([&](AtomicUniquePtr<uint64_t> &ptr) noexcept {
+                       EXPECT_EQ(*ptr, next_consumed);
+                       ++next_consumed;
+                       ptr.Reset();
+                       return true;
+                     });
+                   });
+    EXPECT_EQ(buffer.consumption_count(), next_consumed);
+  }
+  buffer.Clear();
+  EXPECT_TRUE(buffer.empty());
+  EXPECT_EQ(buffer.consumption_count(), buffer.production_count());
+}
+
+TEST(CircularBufferTest, AddOnFullConcurrent)
+{
+  const int num_threads = 16;
+  const int n           = 1000;
+  CircularBuffer<int> buffer{100};
+  std::atomic<int> num_added{0};
+  std::atomic<int> num_rejected{0};
+  std::vector<std::thread> threads;
+  threads.reserve(num_threads);
+  for (int thread_index = 0; thread_index < num_threads; ++thread_index)
+  {
+    threads.emplace_back([&, thread_index] {
+      for (int i = 0; i < n; ++i)
+      {
+        const int value = thread_index * n + i;
+        std::unique_ptr<int> x{new int{value}};
+        if (buffer.Add(x))
+        {
+          ++num_added;
+        }
+        else
+        {
+          // A rejected element is left with the caller.
+          EXPECT_NE(x, nullptr);
+          EXPECT_EQ(*x, value);
+          ++num_rejected;
+        }
+      }
+    });
+  }
+  for (auto &thread : threads)
+  {
+    thread.join();
+  }
+  EXPECT_EQ(num_added, 100);
+  EXPECT_EQ(num_rejected, num_threads * n - 100);
+  EXPECT_EQ(buffer.size(), 100);
+  int num_consumed = 0;
+  buffer.Consume(buffer.size(), [&](CircularBufferRange<AtomicUniquePtr<int>> range) noexcept {
+    range.ForEach([&](AtomicUniquePtr<int> &ptr) noexcept {
+      EXPECT_FALSE(ptr.IsNull());
+      ++num_consumed;
+      ptr.Reset();
+      return true;
+    });
+  });
+  EXPECT_EQ(num_consumed, 100);
+  EXPECT_TRUE(buffer.empty());
+}
+
+TEST(CircularBufferTest, ConcurrentProducersKeepOrder)
+{
+  const uint64_t num_threads = 8;
+  const uint64_t n           = 20000;
+  for (size_t max_size : {1, 2, 3, 64})
+  {
+    CircularBuffer<uint64_t> buffer{max_size};
+    std::vector<std::thread> producers;
+    producers.reserve(num_threads);
+    for (uint64_t thread_index = 0; thread_index < num_threads; ++thread_index)
+    {
+      producers.emplace_back([&, thread_index] {
+        for (uint64_t i = 0; i < n; ++i)
+        {
+          std::unique_ptr<uint64_t> x{new uint64_t{(thread_index << 32) | i}};
+          while (!buffer.Add(x))
+          {
+            std::this_thread::yield();
+          }
+        }
+      });
+    }
+
+    // Each producer's elements must come out in the order it added them, and
+    // Consume(size()) must hand out exactly size() elements even while
+    // producers are in the middle of Add().
+    std::vector<uint64_t> next(num_threads, 0);
+    uint64_t num_consumed = 0;
+    while (num_consumed < num_threads * n)
+    {
+      const size_t num_to_consume = buffer.size();
+      if (num_to_consume == 0)
+      {
+        std::this_thread::yield();
+        continue;
+      }
+      buffer.Consume(num_to_consume,
+                     [&](CircularBufferRange<AtomicUniquePtr<uint64_t>> range) noexcept {
+                       EXPECT_EQ(range.size(), num_to_consume);
+                       range.ForEach([&](AtomicUniquePtr<uint64_t> &ptr) noexcept {
+                         EXPECT_FALSE(ptr.IsNull());
+                         const uint64_t thread_index = *ptr >> 32;
+                         EXPECT_LT(thread_index, num_threads);
+                         EXPECT_EQ(*ptr & 0xffffffff, next[thread_index]);
+                         ++next[thread_index];
+                         ++num_consumed;
+                         ptr.Reset();
+                         return true;
+                       });
+                     });
+    }
+    for (auto &producer : producers)
+    {
+      producer.join();
+    }
+    EXPECT_TRUE(buffer.empty());
+    EXPECT_EQ(num_consumed, num_threads * n);
+    for (uint64_t thread_index = 0; thread_index < num_threads; ++thread_index)
+    {
+      EXPECT_EQ(next[thread_index], n);
+    }
+  }
+}
+
+TEST(CircularBufferTest, RejectedAddLeavesSpace)
+{
+  // Producers race for the only slot while the consumer drains the buffer and
+  // then adds an element itself. If that Add fails, the slot must be held by a
+  // producer that is still adding its element, not by one that was rejected.
+  const int num_threads = 3;
+  const int num_rounds  = 1000;
+  CircularBuffer<int> buffer{1};
+  for (int round = 0; round < num_rounds; ++round)
+  {
+    std::atomic<bool> start{false};
+    std::atomic<int> num_done{0};
+    std::vector<std::thread> producers;
+    producers.reserve(num_threads);
+    for (int thread_index = 0; thread_index < num_threads; ++thread_index)
+    {
+      producers.emplace_back([&] {
+        while (!start)
+        {
+          std::this_thread::yield();
+        }
+        std::unique_ptr<int> x{new int{round}};
+        buffer.Add(x);
+        ++num_done;
+      });
+    }
+    start = true;
+    while (num_done < num_threads)
+    {
+      if (!buffer.empty())
+      {
+        buffer.Consume(buffer.size());
+        continue;
+      }
+      const uint64_t num_consumed = buffer.consumption_count();
+      std::unique_ptr<int> x{new int{-1}};
+      if (buffer.Add(x))
+      {
+        continue;
+      }
+      while (buffer.production_count() == num_consumed && num_done < num_threads)
+      {
+        std::this_thread::yield();
+      }
+      EXPECT_GT(buffer.production_count(), num_consumed) << "round " << round;
+    }
+    for (auto &producer : producers)
+    {
+      producer.join();
+    }
+    buffer.Clear();
+  }
+}
