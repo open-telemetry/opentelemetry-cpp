@@ -32,7 +32,11 @@ if(NOT prometheus-cpp_FOUND)
   endif()
 
   set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-  set(ENABLE_PUSH OFF CACHE BOOL "" FORCE)
+  if (DEFINED OTELCPP_WITH_PROMETHEUS_PUSH)
+    set(ENABLE_PUSH ${OTELCPP_WITH_PROMETHEUS_PUSH} CACHE BOOL "" FORCE)
+  else()
+    set(ENABLE_PUSH OFF CACHE BOOL "" FORCE)
+  endif()
   set(USE_THIRDPARTY_LIBRARIES ON CACHE BOOL "" FORCE)
 
   FetchContent_MakeAvailable(prometheus-cpp)
@@ -51,6 +55,16 @@ if(NOT prometheus-cpp_FOUND)
     set_target_properties(${_prometheus_target} PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
                                                      CXX_CLANG_TIDY "")
   endforeach()
+  if(ENABLE_PUSH)
+    set_target_properties(push PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
+                                          CXX_CLANG_TIDY "")
+  elseif(TARGET prometheus-cpp::push)
+    message(
+      FATAL_ERROR
+        "Target prometheus-cpp::push should not be built while OTELCPP_WITH_PROMETHEUS_PUSH is unset or OFF"
+    )
+  endif()
+  unset(ENABLE_PUSH CACHE)
 endif()
 
 if(NOT TARGET prometheus-cpp::core OR
