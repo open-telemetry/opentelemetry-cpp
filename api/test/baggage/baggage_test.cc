@@ -201,7 +201,8 @@ TEST(BaggageTest, ValidateExtractHeader)
        {"v1", "v2; metadata"}},  // key and value are trimmed
       {"1a-2f%40foo=bar%251,a%2A%2Ffoo-_%2Fbar=bar+4",
        {"1a-2f@foo", "a*/foo-_/bar"},
-       {"bar%1", "bar 4"}},                                       // decoding is done properly
+       {"bar%1", "bar+4"}},  // percent escapes decode and a literal plus remains a plus
+      {"k=hello%20world", {"k"}, {"hello world"}},                // %20 decodes as space
       {"field=foo:bar", {"field"}, {"foo:bar"}},                  // colon in value
       {"mixed=a/b:c?d=e", {"mixed"}, {"a/b:c?d=e"}},              // mixed special characters
       {"k1=v1,invalidmember,k2=v2", {"k1", "k2"}, {"v1", "v2"}},  // invalid member is skipped
@@ -256,10 +257,10 @@ TEST(BaggageTest, ValidateInjectHeader)
                    {{"k3", "k2", "k1"}, {"", "v2", "v1"}, "k1=v1,k2=v2,k3="},  // empty value
                    {{"1a-2f@foo", "a*/foo-_/bar"},
                     {"bar%1", "bar 4"},
-                    "a%2A%2Ffoo-_%2Fbar=bar+4,1a-2f%40foo=bar%251"},  // encoding is done properly
+                    "a%2A%2Ffoo-_%2Fbar=bar%204,1a-2f%40foo=bar%251"},  // encoding is done properly
                    {{"foo 1"},
                     {"bar 1;  metadata ; flag=encoded%20value"},
-                    "foo+1=bar+1;  metadata ; flag=encoded%20value"}};
+                    "foo%201=bar%201;  metadata ; flag=encoded%20value"}};
 
   for (auto &testcase : testcases)
   {
@@ -269,6 +270,74 @@ TEST(BaggageTest, ValidateInjectHeader)
       baggage = baggage->Set(testcase.keys[i], testcase.values[i]);
     }
     EXPECT_EQ(baggage->ToHeader(), testcase.header);
+  }
+}
+
+TEST(BaggageTest, SpaceIsPercentEncoded)
+{
+  auto baggage = Baggage().Set("k", "hello world");
+  auto header  = baggage->ToHeader();
+  EXPECT_EQ(header, "k=hello%20world");
+
+  std::string value;
+  EXPECT_TRUE(Baggage::FromHeader(header)->GetValue("k", value));
+  EXPECT_EQ(value, "hello world");
+}
+
+TEST(BaggageTest, PreserveLiteralPlusOnExtract)
+{
+  struct
+  {
+    const char *header;
+    const char *key;
+    const char *value;
+    const char *encoded_header;
+  } testcases[] = {
+      {"expr=1+1", "expr", "1+1", "expr=1%2B1"},
+      {"key+name=hello+world", "key+name", "hello+world", "key%2Bname=hello%2Bworld"},
+      {"key%2Bname=hello%2bworld", "key+name", "hello+world", "key%2Bname=hello%2Bworld"},
+      {"key+%20%2B=value+%20%2B;p=+%20%2B", "key+ +", "value+ +;p=+%20%2B",
+       "key%2B%20%2B=value%2B%20%2B;p=+%20%2B"}};
+
+  for (const auto &testcase : testcases)
+  {
+    SCOPED_TRACE(testcase.header);
+    auto baggage = Baggage::FromHeader(testcase.header);
+    std::string value;
+    ASSERT_TRUE(baggage->GetValue(testcase.key, value));
+    EXPECT_EQ(value, testcase.value);
+    EXPECT_EQ(baggage->ToHeader(), testcase.encoded_header);
+
+    auto round_tripped = Baggage::FromHeader(baggage->ToHeader());
+    ASSERT_TRUE(round_tripped->GetValue(testcase.key, value));
+    EXPECT_EQ(value, testcase.value);
+    EXPECT_EQ(round_tripped->ToHeader(), testcase.encoded_header);
+  }
+}
+
+TEST(BaggageTest, SpaceAndPlusRoundTripInKeysAndValues)
+{
+  struct
+  {
+    const char *key;
+    const char *value;
+    const char *header;
+  } testcases[] = {{"key name", "hello world", "key%20name=hello%20world"},
+                   {"key+name", "1+1", "key%2Bname=1%2B1"},
+                   {"key + name", "1 + 1", "key%20%2B%20name=1%20%2B%201"},
+                   {"key + name", "1 + 1;p=+%20%2B", "key%20%2B%20name=1%20%2B%201;p=+%20%2B"}};
+
+  for (const auto &testcase : testcases)
+  {
+    SCOPED_TRACE(testcase.header);
+    auto baggage = Baggage().Set(testcase.key, testcase.value);
+    EXPECT_EQ(baggage->ToHeader(), testcase.header);
+
+    auto round_tripped = Baggage::FromHeader(baggage->ToHeader());
+    std::string value;
+    ASSERT_TRUE(round_tripped->GetValue(testcase.key, value));
+    EXPECT_EQ(value, testcase.value);
+    EXPECT_EQ(round_tripped->ToHeader(), testcase.header);
   }
 }
 

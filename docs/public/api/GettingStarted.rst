@@ -102,3 +102,33 @@ Trace Id, and flags. Context Propagation is an important mechanism in distribute
 tracing to transfer this Context across service boundary often through HTTP headers.
 OpenTelemetry provides a text-based approach to propagate context to remote services
 using the W3C Trace Context HTTP headers.
+
+Baggage propagation
+~~~~~~~~~~~~~~~~~~~
+
+``opentelemetry::baggage::propagation::BaggagePropagator`` extracts and injects
+the W3C ``baggage`` header. ``Baggage::FromHeader`` percent-decodes keys and
+values without treating a literal ``+`` as a space. ``Baggage::ToHeader``
+encodes spaces as ``%20`` and plus signs as ``%2B``; baggage metadata remains
+in its wire form.
+
+For example, an incoming ``baggage: expr=1+1`` has the value ``1+1``, not
+``1 1``. Forwarding it produces ``baggage: expr=1%2B1``, which preserves the
+value at the next receiver. An incoming ``expr=1%201`` instead has the value
+``1 1`` and is forwarded as ``expr=1%201``. These rules apply to keys as well
+as values.
+
+Compatibility with older C++ senders
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Older C++ versions encoded spaces as ``+`` and decoded ``+`` as a space.
+Consequently, a space sent as ``+`` by an older C++ service is read as a
+literal plus sign by a newer C++ service, just as it already is by conforming
+non-C++ receivers. A receiver cannot distinguish that legacy space from an
+intentional literal plus. Services that need to send spaces to newer C++
+receivers should use a sender that emits ``%20``. Older C++ receivers already
+decode both ``%20`` and ``%2B``, so spaces and plus signs sent by newer C++
+services remain readable by older C++ versions.
+
+Changing encoding and decoding together avoids corrupting literal plus
+signs when C++ is an intermediary between other language implementations.
