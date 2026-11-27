@@ -70,6 +70,10 @@ Increment the:
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
+* [BUILD] Enable baseline compiler warnings for default builds: `/W3` for
+  MSVC and `-Wall` for GCC, Clang, and AppleClang.
+  [#4760](https://github.com/open-telemetry/opentelemetry-cpp/pull/4760)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
