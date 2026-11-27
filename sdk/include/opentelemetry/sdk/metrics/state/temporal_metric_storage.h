@@ -44,6 +44,13 @@ public:
                     nostd::function_ref<bool(MetricData)> callback) noexcept;
 
 private:
+  bool buildMetricsLocked(CollectorHandle *collector,
+                          nostd::span<std::shared_ptr<CollectorHandle>> collectors,
+                          opentelemetry::common::SystemTimestamp sdk_start_ts,
+                          opentelemetry::common::SystemTimestamp collection_ts,
+                          const std::shared_ptr<AttributesHashMap> &delta_metrics,
+                          nostd::function_ref<bool(MetricData)> callback);
+
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
 
@@ -52,7 +59,6 @@ private:
       unreported_metrics_;
   // last reported metrics stash for all the collectors.
   std::unordered_map<CollectorHandle *, LastReportedMetrics> last_reported_metrics_;
-
   // Lock while building metrics
   mutable std::mutex lock_;
   const AggregationConfig *aggregation_config_;
