@@ -368,6 +368,7 @@ if(OTELCPP_WITH_OTLP_HTTP)
     opentelemetry_exporter_otlp_http_client
     PUBLIC opentelemetry_http_client
     PRIVATE opentelemetry_common)
+  otel_link_libatomic(opentelemetry_exporter_otlp_http_client)
 
   target_include_directories(
     opentelemetry_exporter_otlp_http_client
@@ -529,7 +530,8 @@ if(OTELCPP_WITH_OTLP_HTTP)
     endif()
     opentelemetry_add_pkgconfig(
       exporter_otlp_http_client "OpenTelemetry OTLP - HTTP Client"
-      "HTTP client for OTLP protocol." "${_otlp_http_client_pc_requires}")
+      "HTTP client for OTLP protocol." "${_otlp_http_client_pc_requires}"
+      EXTRA_LIBS ${OPENTELEMETRY_ATOMIC_LIB})
 
     opentelemetry_add_pkgconfig(
       exporter_otlp_http
