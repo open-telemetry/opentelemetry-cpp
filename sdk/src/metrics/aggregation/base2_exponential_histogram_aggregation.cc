@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -341,6 +342,13 @@ void Base2ExponentialHistogramAggregation::Aggregate(
     double value,
     const PointAttributes & /* attributes */) noexcept
 {
+  // +Inf, -Inf and NaN do not map into a bucket, so they are kept out of the
+  // count, sum, min and max as the metrics SDK specification asks.
+  if (!std::isfinite(value))
+  {
+    return;
+  }
+
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.sum_ += value;
   point_data_.count_++;

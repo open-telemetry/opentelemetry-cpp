@@ -186,6 +186,7 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DOTELCPP_WITH_PROMETHEUS=ON \
+        -DOTELCPP_WITH_PROMETHEUS_PUSH=ON \
         -DOTELCPP_WITH_ZIPKIN=ON \
         -DOTELCPP_WITH_ELASTICSEARCH=ON \
         -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
@@ -335,6 +336,22 @@ elif [[ "$1" == "cmake.c++23.stl.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_WITH_STL=CXX23 \
+        "${SRC_DIR}"
+  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
+  ctest --output-on-failure
+  exit 0
+elif [[ "$1" == "cmake.cxx_standard.test" ]]; then
+  STL_OPTION="${OTELCPP_WITH_STL:-OFF}"
+  if [[ "${STL_OPTION}" == "ON" ]]; then
+    STL_OPTION="CXX${CXX_STANDARD:-17}"
+  fi
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DOTELCPP_MAINTAINER_MODE=ON \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DOTELCPP_WITH_STL="${STL_OPTION}" \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure

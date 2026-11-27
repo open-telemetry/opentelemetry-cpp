@@ -23,13 +23,69 @@ Increment the:
     `http/client/http_client_factory.h`,
     `http/client/curl/http_client_factory_curl.h` and
     `http/common/url_parser.h`.
-  * Code that included any of the other six moves to an internal target:
-    `//ext:curl_implementation_headers` or `//ext:http_client_detail` in
-    `implementation_deps`, and `//ext:server_headers` for tests and examples.
+  * Downstream Bazel consumers can use these four headers through
+    `//ext:headers`. The other six are available only to the listed in-tree
+    packages through `//ext:curl_implementation_headers`,
+    `//ext:http_client_detail`, and `//ext:server_headers`.
   * CMake narrowed to the same four in #4327, which first shipped in 1.29.0.
     A CMake consumer of the other six lost them there, so this change brings
     the Bazel surface in line rather than removing anything CMake still
     installs.
+
+* [BAZEL] Add direct `//api` and `//sdk:headers` deps to the ostream exporter
+  libraries so they build with clang's `layering_check` feature
+  [#4809](https://github.com/open-telemetry/opentelemetry-cpp/pull/4809)
+
+* [SDK] Keep +Inf, -Inf and NaN out of the base2 exponential histogram's
+  count, sum, min and max, which they otherwise turn into `inf` or `nan`
+
+* [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
+  measurements, so they no longer reach the histogram aggregations
+
+* [BUILD] Link `libatomic` on platforms that need it for 64-bit `std::atomic`
+  (32-bit powerpc and mips with GCC), so the curl HTTP client, the OTLP gRPC
+  client, and the trace, logs, and metrics libraries link successfully.
+  [#4773](https://github.com/open-telemetry/opentelemetry-cpp/issues/4773)
+
+* [SDK] Skip completely empty span links (invalid span context, no attributes
+  and no trace state), so they no longer count against `link_count_limit`
+  [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)
+
+* [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
+  returns `false` when the Meter is disabled or every matching view uses the
+  Drop aggregation
+  [#4721](https://github.com/open-telemetry/opentelemetry-cpp/pull/4721)
+
+* [SDK] `BatchLogRecordProcessor` now exports at most one batch on normal
+  wakeups instead of continuously draining the buffer, matching
+  `BatchSpanProcessor`
+  ([#4466](https://github.com/open-telemetry/opentelemetry-cpp/pull/4466)).
+  Scheduled exports and queue-pressure wakeups can still export partial batches.
+  `ForceFlush` and `Shutdown` drain buffered log records in batches respecting
+  `max_export_batch_size`.
+  [#4498](https://github.com/open-telemetry/opentelemetry-cpp/issues/4498)
+
+* [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
+  so a larger value no longer stops spans from being exported until the
+  schedule delay expires.
+  [#4727](https://github.com/open-telemetry/opentelemetry-cpp/pull/4727)
+
+* [BUG] Store `SocketAddr` in a `sockaddr_storage` and pass `addr()` and
+  `addr_len()` to the socket API, fixing a misaligned `sockaddr_in` access
+  [#4307](https://github.com/open-telemetry/opentelemetry-cpp/issues/4307)
+
+* [EXPORTER] Prometheus exporter: fix attribute serialization, label collision,
+  and empty point guards
+  [#4738](https://github.com/open-telemetry/opentelemetry-cpp/pull/4738)
+
+* [SDK] Fix lost wakeup in BatchSpanProcessor `OnEnd` notify when a span
+  fills the queue, which could stall the export and drop spans until the
+  schedule delay.
+  [#4741](https://github.com/open-telemetry/opentelemetry-cpp/pull/4741)
+
+* [SDK] Clamp `BatchLogRecordProcessor` max_export_batch_size to non-zero
+  max_queue_size, with a warning, matching `BatchSpanProcessor`.
+  [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
 ## [1.30.0] 2026-10-22
 

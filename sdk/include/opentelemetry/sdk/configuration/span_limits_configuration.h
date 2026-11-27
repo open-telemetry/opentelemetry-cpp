@@ -23,6 +23,7 @@ class SpanLimitsConfiguration
 public:
   static constexpr std::size_t kDefaultAttributeValueLengthLimit =
       (std::numeric_limits<std::size_t>::max)();
+  static constexpr std::size_t kDefaultAttributeValueDepthLimit   = 64;
   static constexpr std::uint32_t kDefaultAttributeCountLimit      = 128;
   static constexpr std::uint32_t kDefaultEventCountLimit          = 128;
   static constexpr std::uint32_t kDefaultLinkCountLimit           = 128;
@@ -30,6 +31,7 @@ public:
   static constexpr std::uint32_t kDefaultLinkAttributeCountLimit  = 128;
 
   OptionalValue<std::size_t> attribute_value_length_limit;
+  OptionalValue<std::size_t> attribute_value_depth_limit;
   OptionalValue<std::uint32_t> attribute_count_limit;
   OptionalValue<std::uint32_t> event_count_limit;
   OptionalValue<std::uint32_t> link_count_limit;

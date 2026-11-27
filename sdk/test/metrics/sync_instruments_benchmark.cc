@@ -440,6 +440,48 @@ void BM_Record_Counter_Sum_ByThreads(benchmark::State &state)
 }
 BENCHMARK(BM_Record_Counter_Sum_ByThreads)->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
 
+#if OPENTELEMETRY_ABI_VERSION_NO > 1
+// Same as BM_Record_Counter_Sum_ByThreads, checking Enabled() before each Add().
+void BM_Record_Counter_Sum_CheckEnabled_ByThreads(benchmark::State &state)
+{
+  static BenchmarkProvider provider;
+  static auto counter   = provider.meter->CreateDoubleCounter("benchmark_counter");
+  const auto attributes = MakeAttributes(kNominalAttributeCount);
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(counter);
+    if (counter->Enabled())
+    {
+      counter->Add(1.0, attributes_view, context);
+    }
+  }
+}
+BENCHMARK(BM_Record_Counter_Sum_CheckEnabled_ByThreads)
+    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+
+// Same as BM_Record_Counter_Disabled_ByThreads, checking Enabled() before each Add().
+void BM_Record_Counter_Disabled_CheckEnabled_ByThreads(benchmark::State &state)
+{
+  static BenchmarkProvider provider(false);
+  static auto counter   = provider.meter->CreateDoubleCounter("benchmark_counter");
+  const auto attributes = MakeAttributes(kNominalAttributeCount);
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(counter);
+    if (counter->Enabled())
+    {
+      counter->Add(1.0, attributes_view, context);
+    }
+  }
+}
+BENCHMARK(BM_Record_Counter_Disabled_CheckEnabled_ByThreads)
+    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+#endif  // OPENTELEMETRY_ABI_VERSION_NO > 1
+
 void BM_Record_Counter_Sum_ByAttributes(benchmark::State &state)
 {
   BenchmarkProvider provider;
