@@ -1,8 +1,0 @@
-# Copyright The OpenTelemetry Authors
-# SPDX-License-Identifier: Apache-2.0
-
-include(default)
-
-# CMake 4.5.0 fails the compiler ABI check when building Abseil (#4796).
-[replace_tool_requires]
-cmake/*: cmake/3.31.12

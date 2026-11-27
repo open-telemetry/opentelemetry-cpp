@@ -18,6 +18,13 @@ Increment the:
 * [OTLP/gRPC] Support VSOCK endpoints on Linux
   [#4706](https://github.com/open-telemetry/opentelemetry-cpp/issues/4706)
 
+* [BAZEL] Add direct `//api` and `//sdk:headers` deps to the ostream exporter
+  libraries so they build with clang's `layering_check` feature
+  [#4809](https://github.com/open-telemetry/opentelemetry-cpp/pull/4809)
+
+* [SDK] Keep +Inf, -Inf and NaN out of the base2 exponential histogram's
+  count, sum, min and max, which they otherwise turn into `inf` or `nan`
+
 * [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
   measurements, so they no longer reach the histogram aggregations
 
