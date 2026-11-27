@@ -39,6 +39,7 @@ cc_binary(
         "//api",
         "//exporters/ostream:ostream_span_exporter",
         "//ext:headers",
+        "//ext:server_headers",
         "//sdk/src/trace",
     ],
 )

@@ -15,6 +15,23 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Narrow the `//ext:headers` Bazel target to the four headers the
+  CMake package installs, and add internal targets for the rest
+  [#4634](https://github.com/open-telemetry/opentelemetry-cpp/pull/4634)
+  * `//ext:headers` now exposes only the four that `ext/CMakeLists.txt`
+    installs: `http/client/http_client.h`,
+    `http/client/http_client_factory.h`,
+    `http/client/curl/http_client_factory_curl.h` and
+    `http/common/url_parser.h`.
+  * Downstream Bazel consumers can use these four headers through
+    `//ext:headers`. The other six are available only to the listed in-tree
+    packages through `//ext:curl_implementation_headers`,
+    `//ext:http_client_detail`, and `//ext:server_headers`.
+  * CMake narrowed to the same four in #4327, which first shipped in 1.29.0.
+    A CMake consumer of the other six lost them there, so this change brings
+    the Bazel surface in line rather than removing anything CMake still
+    installs.
+
 * [BAZEL] Add direct `//api` and `//sdk:headers` deps to the ostream exporter
   libraries so they build with clang's `layering_check` feature
   [#4809](https://github.com/open-telemetry/opentelemetry-cpp/pull/4809)
