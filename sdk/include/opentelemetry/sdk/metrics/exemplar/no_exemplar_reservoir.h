@@ -9,6 +9,7 @@
 #  include <memory>
 #  include <vector>
 
+#  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
@@ -35,6 +36,20 @@ public:
 
   void OfferMeasurement(double /* value */,
                         const MetricAttributes & /* attributes */,
+                        const opentelemetry::context::Context & /* context */) noexcept override
+  {
+    // Stores nothing.
+  }
+
+  void OfferMeasurement(int64_t /* value */,
+                        const opentelemetry::common::KeyValueIterable & /* attributes */,
+                        const opentelemetry::context::Context & /* context */) noexcept override
+  {
+    // Stores nothing.
+  }
+
+  void OfferMeasurement(double /* value */,
+                        const opentelemetry::common::KeyValueIterable & /* attributes */,
                         const opentelemetry::context::Context & /* context */) noexcept override
   {
     // Stores nothing.
