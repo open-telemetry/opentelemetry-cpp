@@ -121,6 +121,7 @@ void AdaptingIntegerArray::Increment(size_t index, uint64_t count)
   OPENTELEMETRY_MAYBE_UNUSED const uint64_t result2 =
       nostd::visit(AdaptingIntegerArrayIncrement{index, count}, backing_);
   assert(result2 == 0);
+  (void)result2;
 }
 
 uint64_t AdaptingIntegerArray::Get(size_t index) const
@@ -156,6 +157,7 @@ void AdaptingIntegerArray::Fold(size_t from, size_t to)
   OPENTELEMETRY_MAYBE_UNUSED const uint64_t result2 =
       nostd::visit(AdaptingIntegerArrayFold{from, to}, backing_);
   assert(result2 == 0);
+  (void)result2;
 }
 
 void AdaptingIntegerArray::EnlargeToFit(uint64_t value)
