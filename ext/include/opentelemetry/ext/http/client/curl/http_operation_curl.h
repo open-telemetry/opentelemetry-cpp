@@ -294,13 +294,6 @@ public:
   void Abort();
 
   /**
-   * Process a completed curl message. This is called directly by synchronous requests or from the
-   * polling thread after receiving CURLMSG_DONE.
-   *
-   * @param code CURLcode
-   * @return true if the request was re-armed for a retry, false if the operation was cleaned up
-   */
-  /**
    * Read one completed curl message.
    * @return true when the operation has been rewound for another attempt, and the caller is to
    * take it on. False when the message was not this operation's to read, or it is finished.

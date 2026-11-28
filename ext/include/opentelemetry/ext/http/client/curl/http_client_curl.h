@@ -399,8 +399,7 @@ private:
   std::unordered_map<uint64_t, std::shared_ptr<Session>> pending_to_abort_sessions_;
   // One easy handle on its way back to libcurl, with the session its CURLOPT_PRIVATE names. The
   // session is taken when the record is made, so nothing has to find it again in a sessions_ the
-  // calling thread may change. One record per handle, not per session: a session that starts a
-  // second request queues a second handle, and one entry per session would orphan the first.
+  // calling thread may change.
   struct PendingCurlRemoval
   {
     uint64_t session_id;
