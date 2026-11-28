@@ -124,8 +124,9 @@ public:
   /**
    * Force flush the exporter.
    *
-   * Waits for the asynchronous sessions already started when the call was made, bounded by the
-   * caller's timeout rather than by the exporter's response timeout.
+   * Waits for the asynchronous sessions already started when the call was made, until the
+   * caller's timeout. A timeout of max (the default), zero or less waits up to the response
+   * timeout instead.
    *
    * @param timeout an option timeout, default to max.
    * @return true when each of those exports has reported a terminal outcome, false on timeout.
