@@ -232,6 +232,67 @@ public:
 
 /* ##################################   TESTS   ############################################ */
 
+
+TEST_F(BatchSpanProcessorTestPeer, TestShutdownTimeoutWithBlockedExport)
+{
+  auto batch_sizes = std::make_shared<std::vector<std::size_t>>();
+  auto received = std::make_shared<std::atomic<std::size_t>>(0);
+  auto is_shutdown = std::make_shared<std::atomic<bool>>(false);
+  auto flush_count = std::make_shared<std::atomic<std::size_t>>(0);
+  auto export_calls = std::make_shared<std::atomic<std::size_t>>(0);
+
+  auto *exporter = new BlockingMockSpanExporter(
+      batch_sizes, received, is_shutdown, flush_count, export_calls);
+  exporter->SetBlock(true);
+
+  sdk::trace::BatchSpanProcessorOptions options{};
+  options.max_queue_size = 8;
+  options.max_export_batch_size = 1;
+  options.schedule_delay_millis = std::chrono::milliseconds(10);
+
+  auto processor = std::make_shared<sdk::trace::BatchSpanProcessor>(
+      std::unique_ptr<sdk::trace::SpanExporter>(exporter), options);
+
+  processor->OnEnd(processor->MakeRecordable());
+
+  const auto wait_start = std::chrono::steady_clock::now();
+  while (export_calls->load() == 0 &&
+         std::chrono::steady_clock::now() - wait_start < std::chrono::seconds(3))
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+
+  if (export_calls->load() == 0)
+  {
+    exporter->SetBlock(false);
+    FAIL() << "Exporter did not enter Export()";
+    return;
+  }
+
+  std::thread release_worker([exporter] {
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    exporter->SetBlock(false);
+  });
+
+  const auto start = std::chrono::steady_clock::now();
+  const bool result = processor->Shutdown(std::chrono::milliseconds(10));
+  const auto elapsed = std::chrono::steady_clock::now() - start;
+
+  release_worker.join();
+
+  EXPECT_FALSE(result)
+      << "Shutdown must report failure when Export() exceeds the timeout";
+  EXPECT_LE(elapsed, std::chrono::milliseconds(150))
+      << "Shutdown exceeded its timeout while Export() was blocked";
+
+  // The exporter must not be shut down while Export() is blocked.
+  // After the worker is released, processor destruction must finish cleanup.
+  EXPECT_FALSE(is_shutdown->load());
+  processor.reset();
+  EXPECT_TRUE(is_shutdown->load())
+      << "Exporter Shutdown() was skipped after a timed-out processor Shutdown()";
+}
+
 TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
 {
   std::shared_ptr<std::atomic<std::size_t>> shut_down_counter(new std::atomic<std::size_t>(0));

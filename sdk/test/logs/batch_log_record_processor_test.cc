@@ -395,6 +395,60 @@ INSTANTIATE_TEST_SUITE_P(ConstructorOverloads,
                          testing::Values(0, 1, 2));
 #endif
 
+
+TEST_F(BatchLogRecordProcessorTest, TestShutdownTimeoutWithBlockedExport)
+{
+  auto batch_sizes = std::make_shared<std::vector<std::size_t>>();
+  auto received = std::make_shared<std::atomic<std::size_t>>(0);
+  auto is_shutdown = std::make_shared<std::atomic<bool>>(false);
+  auto export_calls = std::make_shared<std::atomic<std::size_t>>(0);
+
+  auto exporter = std::make_unique<BlockingMockLogExporter>(
+      batch_sizes, received, is_shutdown, std::chrono::milliseconds(0), export_calls);
+  auto *exporter_ptr = exporter.get();
+  exporter_ptr->SetBlock(true);
+
+  BatchLogRecordProcessorOptions options;
+  options.max_queue_size = 8;
+  options.max_export_batch_size = 1;
+  options.schedule_delay_millis = std::chrono::milliseconds(10);
+
+  auto processor = GetProcessor(std::move(exporter), options);
+  EmitLogs(processor, 1);
+
+  if (!WaitForExportCalls(export_calls, 1, std::chrono::milliseconds(3000)))
+  {
+    exporter_ptr->SetBlock(false);
+    FAIL() << "Exporter did not enter Export()";
+    return;
+  }
+
+  // Release the exporter after a controlled delay so the existing
+  // unbounded join cannot hang the regression test indefinitely.
+  std::thread release_worker([exporter_ptr] {
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    exporter_ptr->SetBlock(false);
+  });
+
+  const auto start = std::chrono::steady_clock::now();
+  const bool result = processor->Shutdown(std::chrono::milliseconds(10));
+  const auto elapsed = std::chrono::steady_clock::now() - start;
+
+  release_worker.join();
+
+  EXPECT_FALSE(result)
+      << "Shutdown must report failure when Export() exceeds the timeout";
+  EXPECT_LE(elapsed, std::chrono::milliseconds(150))
+      << "Shutdown exceeded its timeout while Export() was blocked";
+
+  // The exporter must not be shut down while Export() is blocked.
+  // After the worker is released, processor destruction must finish cleanup.
+  EXPECT_FALSE(is_shutdown->load());
+  processor.reset();
+  EXPECT_TRUE(is_shutdown->load())
+      << "Exporter Shutdown() was skipped after a timed-out processor Shutdown()";
+}
+
 TEST_F(BatchLogRecordProcessorTest, TestShutdown)
 {
   // initialize a batch log processor with the test exporter
