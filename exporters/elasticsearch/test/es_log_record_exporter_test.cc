@@ -398,8 +398,8 @@ inline bool WaitForWatermarks(logs_exporter::ElasticsearchLogRecordExporter &, s
 #endif  // ENABLE_ASYNC_EXPORT
 
 // ---------------------------------------------------------------------------
-// ForceFlush deadline. Only built with async export, which is the only
-// configuration where the wait exists.
+// ForceFlush deadline. The wait exists only with async export. These cases are
+// compiled in both configurations and skip in synchronous builds.
 // ---------------------------------------------------------------------------
 namespace
 {
