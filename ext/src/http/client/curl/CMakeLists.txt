@@ -19,6 +19,8 @@ target_link_libraries(
   PUBLIC opentelemetry_ext
   PRIVATE CURL::libcurl)
 
+otel_link_libatomic(opentelemetry_http_client_curl)
+
 if(OTELCPP_WITH_CURL_LOGGING)
   target_compile_definitions(opentelemetry_http_client_curl
                              PRIVATE ENABLE_CURL_LOGGING)
@@ -42,8 +44,15 @@ if(OTELCPP_INSTALL)
   if(OTELCPP_WITH_OTLP_HTTP_COMPRESSION)
     string(APPEND _http_client_curl_pc_requires " zlib")
   endif()
+  set(_http_client_curl_pc_extra_libs)
+  if(OPENTELEMETRY_ATOMIC_LIB)
+    list(APPEND _http_client_curl_pc_extra_libs ${OPENTELEMETRY_ATOMIC_LIB})
+  endif()
   opentelemetry_add_pkgconfig(
-    http_client_curl "OpenTelemetry Extension - HTTP Client CURL"
+    http_client_curl
+    "OpenTelemetry Extension - HTTP Client CURL"
     "CURL-based HTTP client used by OTLP HTTP, Zipkin, and Elasticsearch."
-    "${_http_client_curl_pc_requires}")
+    "${_http_client_curl_pc_requires}"
+    EXTRA_LIBS
+    ${_http_client_curl_pc_extra_libs})
 endif()

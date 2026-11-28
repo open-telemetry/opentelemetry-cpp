@@ -209,6 +209,28 @@ static constexpr const char *kGcpGceInstanceGroupManagerRegion =
 static constexpr const char *kGcpGceInstanceGroupManagerZone =
     "gcp.gce.instance_group_manager.zone";
 
+/**
+  The ack deadline in seconds set for the modify ack deadline request.
+ */
+static constexpr const char *kGcpPubsubMessageAckDeadline = "gcp.pubsub.message.ack_deadline";
+
+/**
+  The ack ID for a given message.
+ */
+static constexpr const char *kGcpPubsubMessageAckId = "gcp.pubsub.message.ack_id";
+
+/**
+  The delivery attempt for a given message.
+ */
+static constexpr const char *kGcpPubsubMessageDeliveryAttempt =
+    "gcp.pubsub.message.delivery_attempt";
+
+/**
+  The ordering key for a given message. If the attribute is not present, the message does not have
+  an ordering key.
+ */
+static constexpr const char *kGcpPubsubMessageOrderingKey = "gcp.pubsub.message.ordering_key";
+
 namespace GcpApphubServiceCriticalityTypeValues
 {
 /**

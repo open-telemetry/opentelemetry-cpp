@@ -15,24 +15,24 @@ Increment the:
 
 ## [Unreleased]
 
-* [BUG] Check what curl_multi_init returns instead of treating a failed
-  allocation as success, and report a curl operation that could not be
-  constructed once, with the reason, rather than from the constructor as well
-  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
+* [BAZEL] Add direct `//api` and `//sdk:headers` deps to the ostream exporter
+  libraries so they build with clang's `layering_check` feature
+  [#4809](https://github.com/open-telemetry/opentelemetry-cpp/pull/4809)
 
-* [BUG] Stop the curl IO thread spinning, flooding the log, and refusing to be
-  destroyed, when the multi handle cannot be created
-  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
+* [SDK] Keep +Inf, -Inf and NaN out of the base2 exponential histogram's
+  count, sum, min and max, which they otherwise turn into `inf` or `nan`
 
-* [BUG] Keep the curl IO thread from retiring while a request it accepted is
-  still waiting to be scheduled, and release the easy handles and header lists
-  left queued when the client is destroyed
-  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
+* [SDK] Restore the check in `DoubleHistogram::Record` that drops NaN and +Inf
+  measurements, so they no longer reach the histogram aggregations
 
-* [BUG] Take an operation that was cancelled or torn down out of the curl retry
-  queue, and check what curl_multi_remove_handle and curl_multi_add_handle
-  return when a retry is scheduled
-  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
+* [BUILD] Link `libatomic` on platforms that need it for 64-bit `std::atomic`
+  (32-bit powerpc and mips with GCC), so the curl HTTP client, the OTLP gRPC
+  client, and the trace, logs, and metrics libraries link successfully.
+  [#4773](https://github.com/open-telemetry/opentelemetry-cpp/issues/4773)
+
+* [SDK] Skip completely empty span links (invalid span context, no attributes
+  and no trace state), so they no longer count against `link_count_limit`
+  [#4772](https://github.com/open-telemetry/opentelemetry-cpp/pull/4772)
 
 * [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
   returns `false` when the Meter is disabled or every matching view uses the
@@ -65,6 +65,28 @@ Increment the:
   fills the queue, which could stall the export and drop spans until the
   schedule delay.
   [#4741](https://github.com/open-telemetry/opentelemetry-cpp/pull/4741)
+
+* [SDK] Clamp `BatchLogRecordProcessor` max_export_batch_size to non-zero
+  max_queue_size, with a warning, matching `BatchSpanProcessor`.
+  [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
+* [BUG] Check what curl_multi_init returns instead of treating a failed
+  allocation as success, and report a curl operation that could not be
+  constructed once, with the reason, rather than from the constructor as well
+  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
+
+* [BUG] Stop the curl IO thread spinning, flooding the log, and refusing to be
+  destroyed, when the multi handle cannot be created
+  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
+
+* [BUG] Keep the curl IO thread from retiring while a request it accepted is
+  still waiting to be scheduled, and release the easy handles and header lists
+  left queued when the client is destroyed
+  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
+
+* [BUG] Take an operation that was cancelled or torn down out of the curl retry
+  queue, and check what curl_multi_remove_handle and curl_multi_add_handle
+  return when a retry is scheduled
+  [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
 
 ## [1.30.0] 2026-10-22
 

@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <initializer_list>
 #include <memory>
 #include <mutex>
 #include <new>
@@ -22,11 +24,14 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
@@ -315,6 +320,80 @@ public:
         new BatchLogRecordProcessor(std::move(exporter), options));
   }
 };
+
+#if OTEL_INTERNAL_LOG_LEVEL >= OTEL_INTERNAL_LOG_LEVEL_WARN
+class BatchLogRecordProcessorClampTest : public testing::TestWithParam<int>
+{
+protected:
+  std::unique_ptr<BatchLogRecordProcessor> MakeProcessor(size_t max_queue_size,
+                                                         size_t max_export_batch_size)
+  {
+    auto exporter = std::make_unique<BlockingMockLogExporter>(
+        std::make_shared<std::vector<std::size_t>>(), std::make_shared<std::atomic<std::size_t>>(0),
+        std::make_shared<std::atomic<bool>>(false));
+
+    BatchLogRecordProcessorOptions options;
+    options.max_queue_size        = max_queue_size;
+    options.max_export_batch_size = max_export_batch_size;
+    options.schedule_delay_millis = std::chrono::milliseconds(10000);
+
+    switch (GetParam())
+    {
+      case 0:
+        return std::make_unique<BatchLogRecordProcessor>(std::move(exporter), max_queue_size,
+                                                         options.schedule_delay_millis,
+                                                         max_export_batch_size);
+      case 1:
+        return std::make_unique<BatchLogRecordProcessor>(std::move(exporter), options);
+      default:
+        return std::make_unique<BatchLogRecordProcessor>(std::move(exporter), options,
+                                                         BatchLogRecordProcessorRuntimeOptions());
+    }
+  }
+};
+
+TEST_P(BatchLogRecordProcessorClampTest, TestMaxExportBatchSizeClampLogsWarningOnce)
+{
+  opentelemetry::test_common::ScopedTestLogHandler log_handler(internal_log::LogLevel::Warning);
+  auto batch_processor = MakeProcessor(256, 512);
+  EXPECT_TRUE(batch_processor->Shutdown());
+
+  const auto entries = log_handler.Drain();
+  EXPECT_EQ(1u, entries.size());
+  EXPECT_EQ(1,
+            std::count_if(entries.begin(), entries.end(),
+                          [](const opentelemetry::test_common::ScopedTestLogHandler::Entry &entry) {
+                            return entry.level == internal_log::LogLevel::Warning &&
+                                   entry.msg ==
+                                       "[BatchLogRecordProcessor] max_export_batch_size (512) is "
+                                       "larger than max_queue_size (256), using 256.";
+                          }));
+}
+
+TEST_P(BatchLogRecordProcessorClampTest, TestValidMaxExportBatchSizeDoesNotLogWarning)
+{
+  for (size_t batch_size : {128u, 256u})
+  {
+    SCOPED_TRACE(batch_size);
+    opentelemetry::test_common::ScopedTestLogHandler log_handler(internal_log::LogLevel::Warning);
+    auto batch_processor = MakeProcessor(256, batch_size);
+    EXPECT_TRUE(batch_processor->Shutdown());
+    EXPECT_TRUE(log_handler.Drain().empty());
+  }
+}
+
+TEST_P(BatchLogRecordProcessorClampTest, TestZeroMaxQueueSizeDoesNotLogWarning)
+{
+  opentelemetry::test_common::ScopedTestLogHandler log_handler(internal_log::LogLevel::Warning);
+  auto batch_processor = MakeProcessor(0, 512);
+  EXPECT_TRUE(batch_processor->Shutdown());
+  EXPECT_TRUE(log_handler.Drain().empty());
+}
+
+INSTANTIATE_TEST_SUITE_P(ConstructorOverloads,
+                         BatchLogRecordProcessorClampTest,
+                         testing::Values(0, 1, 2));
+#endif
 
 TEST_F(BatchLogRecordProcessorTest, TestShutdown)
 {

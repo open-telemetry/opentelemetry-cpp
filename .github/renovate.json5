@@ -30,6 +30,42 @@
       matchCategories: ["bazel", "docker"],
       matchUpdateTypes: ["major"],
     },
+    {
+      description: "Keep the Windows 2022 install test on its intended runner",
+      matchDatasources: ["github-runners"],
+      matchPackageNames: ["windows"],
+      matchCurrentValue: "2022",
+      matchFileNames: [".github/workflows/cmake_install.yml"],
+      enabled: false,
+    },
+  ],
+  customManagers: [
+    {
+      customType: "regex",
+      description: "Update cmake fetch content",
+      managerFilePatterns: [
+        "**/CMakeLists.txt",
+        "**/*.cmake",
+      ],
+      matchStrings: [
+        "FetchContent_Declare\\(\\n\\s+(?<depName>.+?)\\n\\s+GIT_REPOSITORY (\")?(?<registryUrl>https:\/\/.+?)\\/(?<packageName>.+).git(\")?\\n\\s+GIT_TAG (?<currentDigest>[a-f0-9]{40,64}) \\# (?<currentValue>v[0-9.]+)",
+      ],
+      datasourceTemplate: "github-releases",
+      versioningTemplate: "semver",
+    },
+    {
+      customType: "regex",
+      description: "Update remote repo checkouts",
+      managerFilePatterns: [
+        "/\.github/(?:workflows|actions)/.+\.ya?ml$/",
+      ],
+      matchStrings: [
+        "actions\/checkout@(.|\\n)+with:\\n(.|\n)+repository: (\"|')?(?<packageName>.+\/(?<depName>[^\"']+))(\"|')?\\n.+ref: (?<currentDigest>[a-f0-9]{40,64}) \# (?<currentValue>v[0-9.]+)",
+        "actions\/checkout@(.|\\n)+with:\\n(.|\n)+repository: (\"|')?(?<packageName>.+\/(?<depName>[^\"']+))(\"|')?\\n.+ref: (\"|')?(?<currentValue>v[0-9.]+)(\"|')?",
+      ],
+      datasourceTemplate: "github-releases",
+      versioningTemplate: "semver",
+    },
   ],
   labels: ["dependencies"],
 }

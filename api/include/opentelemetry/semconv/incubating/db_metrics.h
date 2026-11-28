@@ -177,41 +177,95 @@ CreateAsyncDoubleMetricDbClientConnectionIdleMin(metrics::Meter *meter)
   <p>
   updowncounter
  */
-static constexpr const char *kMetricDbClientConnectionMax = "db.client.connection.max";
-static constexpr const char *descrMetricDbClientConnectionMax =
+static constexpr const char *kMetricDbClientConnectionLimit = "db.client.connection.limit";
+static constexpr const char *descrMetricDbClientConnectionLimit =
     "The maximum number of open connections allowed.";
-static constexpr const char *unitMetricDbClientConnectionMax = "{connection}";
+static constexpr const char *unitMetricDbClientConnectionLimit = "{connection}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
-CreateSyncInt64MetricDbClientConnectionMax(metrics::Meter *meter)
+CreateSyncInt64MetricDbClientConnectionLimit(metrics::Meter *meter)
 {
-  return meter->CreateInt64UpDownCounter(kMetricDbClientConnectionMax,
-                                         descrMetricDbClientConnectionMax,
-                                         unitMetricDbClientConnectionMax);
+  return meter->CreateInt64UpDownCounter(kMetricDbClientConnectionLimit,
+                                         descrMetricDbClientConnectionLimit,
+                                         unitMetricDbClientConnectionLimit);
 }
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricDbClientConnectionLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricDbClientConnectionLimit,
+                                          descrMetricDbClientConnectionLimit,
+                                          unitMetricDbClientConnectionLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricDbClientConnectionLimit(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricDbClientConnectionLimit,
+                                                   descrMetricDbClientConnectionLimit,
+                                                   unitMetricDbClientConnectionLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricDbClientConnectionLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricDbClientConnectionLimit,
+                                                    descrMetricDbClientConnectionLimit,
+                                                    unitMetricDbClientConnectionLimit);
+}
+
+/**
+  Deprecated, use @code db.client.connection.limit @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code db.client.connection.limit @endcode.", "reason": "renamed",
+  "renamed_to": "db.client.connection.limit"} <p> updowncounter
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientConnectionMax =
+    "db.client.connection.max";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricDbClientConnectionMax =
+    "Deprecated, use `db.client.connection.limit` instead.";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricDbClientConnectionMax =
+    "{connection}";
+
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricDbClientConnectionMax(metrics::Meter *meter)
+{
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
+  return meter->CreateInt64UpDownCounter(kMetricDbClientConnectionMax,
+                                         descrMetricDbClientConnectionMax,
+                                         unitMetricDbClientConnectionMax);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
+}
+
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricDbClientConnectionMax(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricDbClientConnectionMax,
                                           descrMetricDbClientConnectionMax,
                                           unitMetricDbClientConnectionMax);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricDbClientConnectionMax(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricDbClientConnectionMax,
                                                    descrMetricDbClientConnectionMax,
                                                    unitMetricDbClientConnectionMax);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricDbClientConnectionMax(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricDbClientConnectionMax,
                                                     descrMetricDbClientConnectionMax,
                                                     unitMetricDbClientConnectionMax);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -497,16 +551,16 @@ CreateAsyncDoubleMetricDbClientConnectionsIdleMin(metrics::Meter *meter)
 }
 
 /**
-  Deprecated, use @code db.client.connection.max @endcode instead.
+  Deprecated, use @code db.client.connection.limit @endcode instead.
 
   @deprecated
-  {"note": "Replaced by @code db.client.connection.max @endcode.", "reason": "renamed",
-  "renamed_to": "db.client.connection.max"} <p> updowncounter
+  {"note": "Replaced by @code db.client.connection.limit @endcode.", "reason": "renamed",
+  "renamed_to": "db.client.connection.limit"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientConnectionsMax =
     "db.client.connections.max";
 OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricDbClientConnectionsMax =
-    "Deprecated, use `db.client.connection.max` instead.";
+    "Deprecated, use `db.client.connection.limit` instead.";
 OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricDbClientConnectionsMax =
     "{connection}";
 
