@@ -1,5 +1,32 @@
 # HTTP transport requirements and options
 
+## Decision requested
+
+Where should the HTTP exporter enforce concurrency and resource limits, and what
+ownership and completion guarantees must every backend provide?
+
+The default Zipkin, Elasticsearch and OTLP/HTTP configurations wait for
+completion. A production logging workload described in #4448 also needs multiple
+concurrent requests. A viable design must accommodate both. Count limits alone
+do not bound memory when requests differ in size or a retry retains a body.
+
+| Approach | Question to resolve |
+| --- | --- |
+| Keep the session and callback interface | Can we define submission, completion, callback re-entry and shutdown precisely enough for existing clients? |
+| Put a backend-neutral request/result interface below a bounded scheduler | Can the scheduler preserve throughput, connection reuse, cancellation and deadlines at an acceptable thread and memory cost? |
+| Put a single-owner curl multi loop in the curl backend | Which work must that loop own, and how far should connections, capacity and shutdown state be shared across clients? |
+
+The first two approaches describe the interface visible to exporters. The third
+describes a possible curl implementation and is compatible with more than one
+interface. Compare the approaches on the same load and account for admitted
+requests, retained bytes, acknowledged and dropped batches, connection reuse and
+shutdown latency. Compatibility also includes installed headers and injected
+clients.
+
+The existing curl implementation overlapped requests in a fixed-payload loopback
+experiment on d642609d. That measures one implementation. Which requirement or
+measurement should decide where concurrency belongs?
+
 ## Why this document
 
 The HTTP client under `ext/http/client/curl` has accumulated a set of reports
@@ -149,10 +176,10 @@ rotation heuristic, indirectly for the third. It says nothing about the rest.
 Six things are modelled inconsistently, and most reports are a consequence of
 one of them.
 
-**Operation identity.** A `Session` holds one operation that can be replaced.
-The background thread recovers a `Session` from `CURLOPT_PRIVATE` and then asks
-it for its current operation, which is not necessarily the operation the
-completion belongs to.
+**Operation identity.** The curl backend stores a `Session` in `CURLOPT_PRIVATE`
+and resolves the operation through it. Since #4431, a session rejects a second
+`SendRequest`. The design question is whether completion should identify the
+attempt directly.
 
 **Ownership across an asynchronous boundary.** The operation borrows the request
 headers, body and SSL options, the event handler as a raw pointer, and the
@@ -203,18 +230,14 @@ handed an immutable request and a deadline and returns a handle for that
 submission. Exactly one of a response, an invalid request, a transport error, a
 deadline or a cancellation eventually settles it.
 
-The earlier draft of this section described the same contract as a blocking
-call. @owent's evidence rules that out as the shape to build on, though not as
-impossible: a blocking one attempt contract behind a bounded worker pool, under
-the same governor, also puts several requests in flight without a second request
-and result model beside it. What that costs is a thread for every request in
-flight and a harder cancellation story, so the case for submitting
-asynchronously is that price, not an inability to reach the workload. Two models
-beside each other is how the current code got here, and either shape can avoid
-it. Asynchronous submission is the general shape,
-and blocking is the special case of submitting one operation and waiting for
-that operation's own result until its own deadline. Not `ForceFlush`, which
-waits for everyone else's work as well, and which has its own open defects.
+The reported workload requires effective concurrent requests. Both asynchronous
+submission and a bounded pool of blocking attempts can provide them. Compare
+their thread cost, cancellation behavior and deadline handling under the same
+load. Two models beside each other is how the current code got here, and either
+shape can avoid it. Asynchronous submission is the general shape, and blocking
+is the special case of submitting one operation and waiting for that operation's
+own result until its own deadline. Not `ForceFlush`, which waits for everyone
+else's work as well, and which has its own open defects.
 
 What this buys is that the properties that keep breaking become structural
 rather than conventional. Exactly one outcome is what the handle settles to.
@@ -337,7 +360,7 @@ operations are making when it is called.
 | Throughput, connection reuse | keeps both | reuse yes, in-flight count owned above it | keeps both |
 | Cancellation | flag plus races | explicit, at a defined point | explicit, owner thread applies it |
 | Shutdown | the caller's deadline does not reach the transport, #4336 and #4339 | one deadline per operation | one owner to drain |
-| Admission and retry owner | inside the transport | above the transport | above the transport |
+| Admission and retry ownership | OTLP waits on a request-count watermark after submission. Curl schedules retries under the supplied policy. | An upper layer can own admission and retries. | The loop owns the curl handles. Admission and retry policy can live above the loop or inside the transport. |
 | Connection and stream scheduling | implicit, libcurl decides | backend policy | backend policy, one owner thread |
 | Installed interfaces | unchanged | new interface plus an adapter | unchanged, backend only |
 | Custom clients | must be re-entrant, undocumented | one method to implement | unaffected |
@@ -387,14 +410,9 @@ rather than answered.
 - [ ] Does submitting a request snapshot it or take ownership of it?
 - [ ] Is completion one terminal result, with progress separated out as optional
       diagnostics?
-- [ ] On what thread do callbacks run, and which calls may a callback make?
-      Not open in one direction: a handler that calls `SendRequest` on the
-      session that dispatched the callback destroys the operation whose member
-      function is running the dispatch. AddressSanitizer on `main` at
-      `58ed80d9`, single threaded and on the first attempt. Whatever the answer
-      is, it has to be enforceable where the call is made, because a `Session`
-      that owns its operation by `unique_ptr` and swaps it in place cannot
-      refuse.
+- [ ] Which thread delivers callbacks, and which calls may a callback make? The
+      current curl session rejects a second `SendRequest` (#4431). The
+      replacement must specify and enforce its reentrancy rules.
 - [ ] Which layer owns retry, in-flight concurrency and `Retry-After`?
 - [ ] What should the default number of requests in flight be, given that the
       option says 64 today and the one reported workload needed about four?
@@ -584,11 +602,23 @@ asked for: `CURLINFO_HTTP_VERSION` for the negotiated protocol and
 in flight cannot be told apart from four connections, four streams on one
 connection, or four requests serialized behind each other.
 
-The end to end half of that is not worth starting until the batching behaviour
-above is settled. Records per request is an input to every row of the table, and
-at 21 records per request rather than 2,048 the transport is being asked a
-different question than the reported workload asks. A transport level run with a
-fixed payload and arrival rate does not depend on batching and can go first.
+The processor batching changes are on main (#4466 for spans and #4743 for logs).
+Record the revision, batch settings, and observed records and bytes per request
+for each end-to-end run. Use a fixed payload for the transport-only runs and
+report the offered load or the in-flight window.
+
+A transport-only run on d642609d used the existing curl HttpClient with
+uncompressed 4 MiB POSTs over loopback HTTP/1.1. The server waited 100 ms after
+reading each body. Across three 12-request runs per setting, the median was 8.93
+acknowledged requests/s with one request in flight and 32.88 with four. All 72
+bodies arrived at full length and were acknowledged. The server observed one and
+four requests being processed concurrently, respectively. The delay was server
+processing time. In a second, randomized six-block run with the same binary, the
+100 ms medians were 9.06 and 32.99 requests/s. With no added delay they were
+103.45 and 202.74, and the four-request window was faster in each of the six
+paired blocks, by 1.67 to 2.24 times. Increasing the window also increased the
+observed number of TCP connections. Network RTT, exporter batching, HTTP/2 and
+cross-client isolation remain to be measured.
 
 The `100 ms` in the report is not qualified as one way or round trip, so the
 benchmark should define it as `netem` round trip and say so rather than inherit
