@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "builtin-baseline": "4334d8b4c8916018600212ab4dd4bbdc343065d1",
+  "dependencies": [
+    "benchmark",
+    "curl",
+    "grpc",
+    "gtest",
+    "ms-gsl",
+    "nlohmann-json",
+    "prometheus-cpp"
+  ]
+}
