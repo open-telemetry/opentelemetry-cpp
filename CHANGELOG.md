@@ -70,6 +70,10 @@ Increment the:
   max_queue_size, with a warning, matching `BatchSpanProcessor`.
   [#4768](https://github.com/open-telemetry/opentelemetry-cpp/pull/4768)
 
+* [SDK] Return a null recordable when MakeRecordable() fails to allocate,
+  instead of terminating the process from a noexcept function.
+  [#4700](https://github.com/open-telemetry/opentelemetry-cpp/pull/4700)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:

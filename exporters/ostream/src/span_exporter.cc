@@ -68,7 +68,18 @@ OStreamSpanExporter::OStreamSpanExporter(std::ostream &sout) noexcept : sout_(so
 
 std::unique_ptr<trace_sdk::Recordable> OStreamSpanExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<trace_sdk::Recordable>(new trace_sdk::SpanData);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    return std::unique_ptr<trace_sdk::Recordable>(new trace_sdk::SpanData);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (...)
+  {
+    return nullptr;
+  }
+#endif
 }
 
 sdk::common::ExportResult OStreamSpanExporter::Export(
